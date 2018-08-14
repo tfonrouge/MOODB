@@ -17,6 +17,7 @@ public abstract class Entity extends Base {
     public final MFieldString field_taxId = new MFieldString(this, "taxId") {
         @Override
         protected void initialize() {
+            mRequired = true;
             mDescription = "Tax payer id";
         }
     };
