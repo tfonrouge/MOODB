@@ -1,6 +1,6 @@
 # MOODB
 
-MOODB is a framework that allows to simplify Data Modeling when writting Java applications that use the capabilities of the NoSQL MongoDB engine by automatically generating code to describe container classes, field descriptors, indices, and constraints defined on a .XML file for each collection.
+MOODB is a ORM framework that allows to simplify Data Modeling when writting Java applications that use the capabilities of the NoSQL MongoDB engine by automatically generating code to describe container classes, field descriptors, indices, and constraints defined on a .XML file for each collection.
 
 For example, the following meta-descriptor XML:
 
