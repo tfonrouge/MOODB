@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<oons:Table extends="InvoiceItem"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:oons="http://fonrouge.tech/MOODB"
+            xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
+
+    <oons:Fields>
+
+    </oons:Fields>
+
+    <oons:MasterSource class="Invoice" field="invoice"/>
+
+    <oons:Index name="invoice_invItem" masterKeyField="invoice" keyField="invItem" unique="true"/>
+
+</oons:Table>

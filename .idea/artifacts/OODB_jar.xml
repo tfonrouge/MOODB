@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="OODB:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/OODB_jar</output-path>
+    <root id="archive" name="jOODB.jar">
+      <element id="module-output" name="OODB" />
+    </root>
+  </artifact>
+</component>

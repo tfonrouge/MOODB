@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<oons:Table extends="Person" tableName="users"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:oons="http://fonrouge.tech/MOODB"
+            xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
+
+    <oons:Fields>
+
+        <oons:FieldString name="userId" description="User Id" required="true"/>
+        <oons:FieldString name="userLevel" description="User level">
+            <oons:validValues>
+                <oons:keyValue key="0">General user</oons:keyValue>
+                <oons:keyValue key="1">Admin user</oons:keyValue>
+            </oons:validValues>
+        </oons:FieldString>
+        <oons:FieldString name="password" description="User password" required="true"/>
+        <oons:FieldDate name="lastLogin" description="Last date login"/>
+        <oons:FieldInteger name="logCounter" description="Login counter"/>
+
+    </oons:Fields>
+
+    <oons:Index name="userId" keyField="userId" unique="true"/>
+
+</oons:Table>

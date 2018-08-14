@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema
+        elementFormDefault="qualified"
+        targetNamespace="http://fonrouge.tech/MOODB"
+        xmlns="http://fonrouge.tech/MOODB"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="Table" type="TableType"/>
+    <xs:complexType name="TableType">
+        <xs:sequence>
+            <xs:element name="Fields" type="FieldsType"/>
+            <xs:element name="MasterSource" type="MasterSourceType" minOccurs="0"/>
+            <xs:element name="Index" type="IndexType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="extends" type="xs:string" use="required"/>
+        <xs:attribute name="abstract" type="xs:boolean"/>
+        <xs:attribute name="tableName" type="xs:string"/>
+        <xs:attribute name="database" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="FieldsType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="FieldBoolean" type="FieldBooleanType"/>
+            <xs:element name="FieldDate" type="FieldDateType"/>
+            <xs:element name="FieldDouble" type="FieldDoubleType"/>
+            <xs:element name="FieldInteger" type="FieldIntegerType"/>
+            <xs:element name="FieldLong" type="FieldBaseType"/>
+            <xs:element name="FieldTableField" type="FieldTableFieldType"/>
+            <xs:element name="FieldString" type="FieldStringType"/>
+            <xs:element name="FieldBinary" type="FieldBaseType"/>
+        </xs:choice>
+        <xs:attribute name="primaryKeyField" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="FieldBaseType">
+        <xs:all minOccurs="0">
+            <xs:element name="newValue" type="newValueType" minOccurs="0"/>
+            <xs:element name="validValues" type="validValuesType" minOccurs="0"/>
+        </xs:all>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="description" type="xs:string"/>
+        <xs:attribute name="calculated" type="xs:boolean"/>
+        <xs:attribute name="calcInline" type="xs:string"/>
+        <xs:attribute name="required" type="xs:boolean"/>
+    </xs:complexType>
+    <xs:complexType name="FieldBooleanType">
+        <xs:complexContent>
+            <xs:extension base="FieldBaseType">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="FieldDateType">
+        <xs:complexContent>
+            <xs:extension base="FieldBaseType">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="FieldDoubleType">
+        <xs:complexContent>
+            <xs:extension base="FieldBaseType">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="FieldIntegerType">
+        <xs:complexContent>
+            <xs:extension base="FieldBaseType">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="FieldTableFieldType">
+        <xs:complexContent>
+            <xs:extension base="FieldBaseType">
+                <xs:attribute name="class" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="FieldStringType">
+        <xs:complexContent>
+            <xs:extension base="FieldBaseType">
+                <xs:attribute name="size" type="xs:integer"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="newValueType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="type" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="IndexType">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="masterKeyField" type="xs:string"/>
+        <xs:attribute name="keyField" type="xs:string" use="required"/>
+        <xs:attribute name="unique" type="xs:boolean"/>
+        <xs:attribute name="descending" type="xs:boolean"/>
+    </xs:complexType>
+    <xs:complexType name="MasterSourceType">
+        <xs:attribute name="class" type="xs:string" use="required"/>
+        <xs:attribute name="field" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="validValuesType">
+        <xs:sequence>
+            <xs:element name="keyValue" type="validValueType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="validValueType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="key" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+</xs:schema>
