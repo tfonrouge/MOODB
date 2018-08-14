@@ -170,6 +170,7 @@ public class TestMain {
             customer.field_name.setValue("Boeing");
             customer.field_address.setValue("Chicago, Illinois, United States");
             customer.field_country.setValue("US");
+            customer.field_taxId.setValue("012938234876");
             if (!customer.post()) {
                 customer.cancel();
             }
@@ -179,6 +180,7 @@ public class TestMain {
             customer.field_name.setValue("Oracle");
             customer.field_address.setValue("Redwood City, California, United States");
             customer.field_country.setValue("US");
+            customer.field_taxId.setValue("982437651723");
             if (!customer.post()) {
                 customer.cancel();
             }
@@ -188,6 +190,7 @@ public class TestMain {
             customer.field_name.setValue("General Dynamics");
             customer.field_address.setValue("Falls Church, Virginia, United States");
             customer.field_country.setValue("US");
+            customer.field_taxId.setValue("645234982343");
             if (!customer.post()) {
                 customer.cancel();
             }
@@ -197,6 +200,7 @@ public class TestMain {
             customer.field_name.setValue("Nokia");
             customer.field_address.setValue("Espoo, Finland");
             customer.field_country.setValue("FN");
+            customer.field_taxId.setValue("98348765123675");
             if (!customer.post()) {
                 customer.cancel();
             }
@@ -206,6 +210,7 @@ public class TestMain {
             customer.field_name.setValue("General Electric");
             customer.field_address.setValue("Boston, Massachusetts, United States");
             customer.field_country.setValue("US");
+            customer.field_taxId.setValue("7623487765234");
             if (!customer.post()) {
                 customer.cancel();
             }
