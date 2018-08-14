@@ -8,7 +8,7 @@
     <oons:Fields>
 
         <oons:FieldString name="name" description="Name" required="true"/>
-        <oons:FieldString name="taxId" description="Tax payer id"/>
+        <oons:FieldString name="taxId" description="Tax payer id" required="true"/>
         <oons:FieldString name="country" description="Country id"/>
         <oons:FieldString name="address"/>
         <oons:FieldString name="phone1"/>
