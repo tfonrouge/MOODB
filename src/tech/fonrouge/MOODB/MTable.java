@@ -15,7 +15,6 @@ abstract public class MTable {
     public final MFieldObjectId field__id = new MFieldObjectId(this, "_id") {
         @Override
         protected void initialize() {
-            mFieldList.add(this);
             mDescription = "_id";
         }
     };
