@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MIndex {
-    boolean mDescending = true;
-    String mKeyField;
-    String mMasterKeyField;
-    String mName;
-    boolean mUnique = false;
+    private boolean mDescending;
+    private String mKeyField;
+    private String mMasterKeyField;
+    private String mName;
+    private boolean mUnique;
     private MTable mTable;
 
     public MIndex(MTable table, String name, String masterKeyField, String keyField, boolean descending, boolean unique) {
