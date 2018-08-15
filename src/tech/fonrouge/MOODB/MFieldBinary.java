@@ -1,6 +1,5 @@
 package tech.fonrouge.MOODB;
 
-import org.bson.Document;
 import org.bson.types.Binary;
 
 public class MFieldBinary extends MField<Binary> {
@@ -11,8 +10,6 @@ public class MFieldBinary extends MField<Binary> {
 
     @Override
     public Binary emptyValue() {
-        Document d = new Document();
-        Binary binary;
-        return null;
+        return new Binary(new byte[0]);
     }
 }
