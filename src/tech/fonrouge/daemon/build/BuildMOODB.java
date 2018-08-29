@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class BuildOODB {
+public class BuildMOODB {
 
     public void buildClasses(Path pathXml) {
         Document document = validXmlOODBFile(pathXml);

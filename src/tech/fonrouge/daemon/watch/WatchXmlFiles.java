@@ -1,8 +1,7 @@
 package tech.fonrouge.daemon.watch;
 
 import com.sun.nio.file.SensitivityWatchEventModifier;
-import javafx.scene.Parent;
-import tech.fonrouge.daemon.build.BuildOODB;
+import tech.fonrouge.daemon.build.BuildMOODB;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -20,7 +19,7 @@ public class WatchXmlFiles {
     private final Map<WatchKey, Path> watchKeyPathMap;
     private final PathMatcher matcher;
     private boolean trace;
-    private BuildOODB buildOODB;
+    private BuildMOODB buildMOODB;
 
     public WatchXmlFiles() throws IOException {
 
@@ -28,7 +27,7 @@ public class WatchXmlFiles {
         watchService = FileSystems.getDefault().newWatchService();
         matcher = FileSystems.getDefault().getPathMatcher("glob:" + "*.xml");
         watchKeyPathMap = new HashMap<>();
-        buildOODB = new BuildOODB();
+        buildMOODB = new BuildMOODB();
 
         System.out.format("Scanning %s ...\n", dir);
         registerAll(dir);
@@ -96,7 +95,7 @@ public class WatchXmlFiles {
 
                 if (matcher.matches(child.getFileName())) {
                     System.out.format("%d %s: %s\n", ++counter, event.kind().name(), child);
-                    buildOODB.buildClasses(child);
+                    buildMOODB.buildClasses(child);
                 }
 
                 if (kind == ENTRY_CREATE) {
