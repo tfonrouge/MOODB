@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/OODB.iml" filepath="$PROJECT_DIR$/OODB.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MOODB.iml" filepath="$PROJECT_DIR$/MOODB.iml" />
     </modules>
   </component>
 </project>
