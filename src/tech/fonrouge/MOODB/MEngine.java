@@ -7,7 +7,6 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,7 +14,7 @@ import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
-public class MEngine {
+public class MEngine<T> {
 
     static HashMap<String, MongoCollection<Document>> collections;
 
@@ -54,7 +53,7 @@ public class MEngine {
         Document document = null;
         if (mTable.mMasterSource != null) {
             document = new Document().
-                    append(mTable.mMasterSourceField.mName, mTable.mMasterSource.objectId());
+                    append(mTable.mMasterSourceField.mName, mTable.mMasterSource._id());
         }
         return document;
     }
@@ -116,7 +115,7 @@ public class MEngine {
      *
      * @param objectId of document to go
      */
-    public boolean goTo(ObjectId objectId) {
+    public boolean goTo(Object objectId) {
         pipeline = Arrays.asList(
                 new Document().
                         append("$match", new Document().
@@ -136,7 +135,8 @@ public class MEngine {
     public boolean insert(Document document) {
         try {
             mCollection.insertOne(document);
-            mTable.setObjectId(document.getObjectId("_id"));
+            Object a = document.get("_id");
+            mTable.set_id((T) a);
         } catch (Exception e) {
             mException = e;
             return false;
@@ -167,7 +167,7 @@ public class MEngine {
     public boolean update(Document document) {
         try {
             Bson bson = new Document("$set", document);
-            mCollection.updateOne(eq("_id", mTable.objectId()), bson);
+            mCollection.updateOne(eq("_id", mTable._id()), bson);
         } catch (Exception e) {
             mException = e;
             return false;

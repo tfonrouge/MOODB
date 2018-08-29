@@ -2,7 +2,7 @@ package tech.fonrouge.MOODB;
 
 import org.bson.types.ObjectId;
 
-public abstract class MFieldTableField<T> extends MField<ObjectId> {
+public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
 
     private T mDataObj;
 
@@ -18,10 +18,10 @@ public abstract class MFieldTableField<T> extends MField<ObjectId> {
             mDataObj = buildTable();
         }
 
-        ObjectId objectId = ((MTable) mDataObj).objectId();
+        Object objectId = mDataObj._id();
 
-        if (objectId == null || mValue == null || (objectId.compareTo(mValue)) != 0) {
-            ((MTable) mDataObj).goTo(mValue);
+        if (objectId == null || mValue == null || (objectId.equals(mValue))) {
+            mDataObj.goTo(mValue);
         }
 
         return mDataObj;
@@ -32,7 +32,7 @@ public abstract class MFieldTableField<T> extends MField<ObjectId> {
         return null;
     }
 
-    public boolean setTable(T value) {
-        return super.setValue(((MTable) value).objectId());
+    public boolean setValue(T table) {
+        return super.setValue(table._id());
     }
 }

@@ -3,33 +3,40 @@ package tech.fonrouge.MOODB;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 public abstract class MField<T> {
+
     protected boolean mRequired;
     protected String mDescription;
     protected HashMap<String, String> mKeyValueItems;
     protected boolean mCalculated;
+    protected Callable<T> calcValue = null;
+
     String mName;
     MTable mTable;
-
     T mValue;
     T mOrigValue;
 
-    private Method method = null;
-
-    protected Callable<T> calcValue = null;
-
     MField(MTable owner, String name) {
+
         mTable = owner;
+
+        if (mTable.mFieldList == null) {
+            mTable.mFieldList = new HashMap<>();
+        }
+
+        if (name.contentEquals("_id") && mTable.mFieldList.containsKey("_id")) {
+            throw new RuntimeException("attempt to re-assign_id field");
+        }
+
         mName = name;
         mCalculated = false;
         mRequired = false;
-        mTable.mFieldList.add(this);
+        mTable.mFieldList.put(name, this);
         initialize();
     }
 

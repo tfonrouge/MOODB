@@ -2,28 +2,30 @@ package tech.fonrouge.MOODB;
 
 import com.mongodb.client.MongoCursor;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 abstract public class MTable {
 
+    /**
+     * field__id : field for table's primary key
+     */
+    public final MFieldObject field__id = new MFieldObject(this, "_id");
 
-    protected MTable mMasterSource = null;
-    protected MField mMasterSourceField;
-    protected ArrayList<MField> mFieldList = new ArrayList<>();
-    public final MFieldObjectId field__id = new MFieldObjectId(this, "_id") {
-        @Override
-        protected void initialize() {
-            mDescription = "_id";
-        }
-    };
-    protected ArrayList<MIndex> mIndices = new ArrayList<>();
+    HashMap<String, MField> mFieldList;
+    MTable mMasterSource = null;
+    MFieldTableField mMasterSourceField;
+    ArrayList<MIndex> mIndices = new ArrayList<>();
     STATE mState = STATE.NORMAL;
     MEngine mEngine;
-    boolean mEof = true;
+    private boolean mEof = true;
     private Exception mException;
     private MDatabase mDatabase;
+
+    /* *************** */
+    /* private methods */
+    /* *************** */
 
     /* ******************* */
     /* constructor methods */
@@ -37,16 +39,16 @@ abstract public class MTable {
         initialize();
     }
 
-    /* *************** */
-    /* private methods */
-    /* *************** */
-
     /**
      * buildIndices
      */
     protected void buildIndices() {
         mIndices.forEach(MIndex::buildIndex);
     }
+
+    /* *********************** */
+    /* package private methods */
+    /* *********************** */
 
     private void initialize() {
         mIndices = new ArrayList<>();
@@ -59,27 +61,23 @@ abstract public class MTable {
         buildIndices();
     }
 
-    /* *********************** */
-    /* package private methods */
-    /* *********************** */
-
     /**
-     * objectId
+     * _id
      *
      * @return ObjectId for current document in table
      */
-    public ObjectId objectId() {
+    public Object _id() {
         return field__id.mValue;
-    }
-
-    void setObjectId(ObjectId objectId) {
-        field__id.mValue = objectId;
     }
 
 
     /* ***************** */
     /* protected methods */
     /* ***************** */
+
+    void set_id(Object value) {
+        field__id.mValue = value;
+    }
 
     /**
      * database
@@ -129,8 +127,14 @@ abstract public class MTable {
         return true;
     }
 
-    protected void setMasterSource(MTable masterSource, MField masterSourceField) {
-        mMasterSource = masterSource;
+    /**
+     * setMasterSource
+     *
+     * @param masterSourceTable : the master source table
+     * @param masterSourceField : the field on the master source table
+     */
+    protected void setMasterSource(MTable masterSourceTable, MFieldTableField masterSourceField) {
+        mMasterSource = masterSourceTable;
         mMasterSourceField = masterSourceField;
     }
 
@@ -143,7 +147,7 @@ abstract public class MTable {
 
         mEof = document == null;
 
-        mFieldList.forEach(mField -> {
+        mFieldList.forEach((fieldName, mField) -> {
             if (!mField.mCalculated) {
                 mField.mValue = document == null ? null : document.getOrDefault(mField.mName, null);
             }
@@ -197,7 +201,7 @@ abstract public class MTable {
         }
 
         /* fill field values */
-        mFieldList.forEach(mField -> {
+        mFieldList.forEach((fieldName, mField) -> {
             if (!mField.mCalculated) {
                 mField.mOrigValue = mField.mValue;
             }
@@ -222,7 +226,7 @@ abstract public class MTable {
      *
      * @return array of field list
      */
-    public ArrayList<MField> fieldList() {
+    public HashMap<String, MField> fieldList() {
         return mFieldList;
     }
 
@@ -231,7 +235,7 @@ abstract public class MTable {
     }
 
     /**
-     * getException
+     * exception
      *
      * @return exception object from last i/o operation
      */
@@ -249,9 +253,9 @@ abstract public class MTable {
     /**
      * goTo
      *
-     * @param objectId : objectId of document to go
+     * @param objectId : _id of document to go
      */
-    public boolean goTo(ObjectId objectId) {
+    public boolean goTo(Object objectId) {
         return mEngine.goTo(objectId);
     }
 
@@ -269,11 +273,11 @@ abstract public class MTable {
         }
 
         /* fill field values */
-        mFieldList.forEach(mField -> {
+        mFieldList.forEach((fieldName, mField) -> {
             if (!mField.mCalculated) {
                 mField.mValue = mField.getNewValue();
                 if (mMasterSource != null && mField.equals(mMasterSourceField)) {
-                    mField.mValue = mMasterSource.objectId();
+                    mField.mValue = mMasterSource._id();
                 }
             }
         });
@@ -297,12 +301,17 @@ abstract public class MTable {
             throw new RuntimeException("Table Not in EDIT/INSERT State.");
         }
 
+        mException = null;
+
         /* checks for empty values on required fields */
-        for (MField mField : mFieldList) {
+        mFieldList.forEach((fieldName, mField) -> {
             if (!mField.mCalculated && mField.mRequired && mField.isEmpty()) {
                 mException = new Exception("Empty Value on Required Field: '" + mField.mName + "'");
-                return false;
             }
+        });
+
+        if (mException != null) {
+            return false;
         }
 
         Document document = new Document();
@@ -313,18 +322,18 @@ abstract public class MTable {
             boolean result;
             switch (mState) {
                 case EDIT:
-                    mFieldList.forEach(mField -> {
-                        if (!mField.mCalculated && !mField.mName.contentEquals("_id") && mField.valueChanged()) {
-                            document.put(mField.mName, mField.value());
+                    mFieldList.forEach((fieldName, mField) -> {
+                        if (!mField.mCalculated && !fieldName.contentEquals("_id") && mField.valueChanged()) {
+                            document.put(fieldName, mField.value());
                         }
                     });
                     result = mEngine.update(document);
                     break;
                 case INSERT:
-                    mFieldList.forEach(mField -> {
+                    mFieldList.forEach((fieldName, mField) -> {
                         if (!mField.mCalculated) {
-                            if (!mField.mName.contentEquals("_id") && !(mField.mValue == null)) {
-                                document.put(mField.mName, mField.value());
+                            if (!(mField instanceof MFieldObjectId && fieldName.contentEquals("_id")) && !(mField.mValue == null)) {
+                                document.put(fieldName, mField.value());
                             }
                         }
                     });

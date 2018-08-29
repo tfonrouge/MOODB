@@ -2,7 +2,7 @@ package tech.fonrouge.MOODB;
 
 public class MFieldInteger extends MField<Integer> {
 
-    protected MFieldInteger(MTable owner, String name) {
+    public MFieldInteger(MTable owner, String name) {
         super(owner, name);
     }
 

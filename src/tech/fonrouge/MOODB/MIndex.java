@@ -1,7 +1,10 @@
 package tech.fonrouge.MOODB;
 
+import com.mongodb.Block;
+import com.mongodb.client.ListIndexesIterable;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
@@ -68,7 +71,18 @@ public class MIndex {
             if (mIndex.mUnique) {
                 indexOptions.unique(true);
             }
-            mTable.mEngine.mCollection.createIndex(bson, indexOptions);
+
+            ListIndexesIterable<Document> indices = mTable.mEngine.mCollection.listIndexes();
+            final boolean[] buildIndex = {true};
+            indices.forEach((Block<? super Document>) document -> {
+                if (document.containsKey("name") && document.getString("name").contentEquals(mIndex.mName)) {
+                    buildIndex[0] = false;
+                    System.out.println(document);
+                }
+            });
+            if (buildIndex[0]) {
+                mTable.mEngine.mCollection.createIndex(bson, indexOptions);
+            }
         }
     }
 
