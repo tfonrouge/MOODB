@@ -29,7 +29,7 @@ For example, the following meta-descriptor XML:
 Creates the following Java class:
 
 ```java
-package tech.fonrouge.test.data;
+package tech.fonrouge.test01.data;
 
 import tech.fonrouge.MOODB.*;
 
