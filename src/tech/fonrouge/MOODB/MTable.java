@@ -39,6 +39,20 @@ abstract public class MTable {
         initialize();
     }
 
+    public enum FIELD_TYPE {
+        BINARY,
+        BOOLEAN,
+        DATE,
+        DOUBLE,
+        INTEGER,
+        LONG,
+        OBJECT,
+        OBJECT_ID,
+        STRING,
+        TABLE_FIELD
+
+    }
+
     /**
      * buildIndices
      */
@@ -53,8 +67,6 @@ abstract public class MTable {
     private void initialize() {
         mIndices = new ArrayList<>();
 
-        initializeModel();
-
         mDatabase = newDatabase();
         mEngine = new MEngine(this);
 
@@ -64,7 +76,7 @@ abstract public class MTable {
     /**
      * _id
      *
-     * @return ObjectId for current document in table
+     * @return OBJECT_ID for current document in table
      */
     public Object _id() {
         return field__id.mValue;
@@ -87,11 +99,6 @@ abstract public class MTable {
     protected MDatabase database() {
         return mDatabase;
     }
-
-    /**
-     * initializeModel
-     */
-    abstract protected void initializeModel();
 
     /**
      * newDatabase
@@ -259,6 +266,10 @@ abstract public class MTable {
         return mEngine.goTo(objectId);
     }
 
+    public boolean hasNext() {
+        return mEngine.mMongoCursor != null && mEngine.mMongoCursor.hasNext();
+    }
+
     /**
      * insert
      */
@@ -275,9 +286,13 @@ abstract public class MTable {
         /* fill field values */
         mFieldList.forEach((fieldName, mField) -> {
             if (!mField.mCalculated) {
-                mField.mValue = mField.getNewValue();
                 if (mMasterSource != null && mField.equals(mMasterSourceField)) {
                     mField.mValue = mMasterSource._id();
+                } else {
+                    mField.mValue = mField.getNewValue();
+                    if (mField.mValue == null) {
+                        mField.mValue = mField.emptyValue();
+                    }
                 }
             }
         });

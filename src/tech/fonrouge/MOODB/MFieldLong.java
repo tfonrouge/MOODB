@@ -10,4 +10,9 @@ public class MFieldLong extends MField<Long> {
     public Long emptyValue() {
         return 0L;
     }
+
+    @Override
+    public MTable.FIELD_TYPE fieldType() {
+        return MTable.FIELD_TYPE.LONG;
+    }
 }

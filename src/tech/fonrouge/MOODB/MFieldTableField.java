@@ -32,6 +32,11 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
         return null;
     }
 
+    @Override
+    public MTable.FIELD_TYPE fieldType() {
+        return MTable.FIELD_TYPE.TABLE_FIELD;
+    }
+
     public boolean setValue(T table) {
         return super.setValue(table._id());
     }

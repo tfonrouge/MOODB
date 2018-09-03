@@ -20,7 +20,7 @@ public class MEngine<T> {
 
     MongoCollection<Document> mCollection;
     Exception mException;
-    private MongoCursor<Document> mMongoCursor;
+    MongoCursor<Document> mMongoCursor;
     private MTable mTable;
     private List<? extends Bson> pipeline;
 

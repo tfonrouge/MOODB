@@ -10,4 +10,9 @@ public class MFieldBoolean extends MField<Boolean> {
     public Boolean emptyValue() {
         return false;
     }
+
+    @Override
+    public MTable.FIELD_TYPE fieldType() {
+        return MTable.FIELD_TYPE.BOOLEAN;
+    }
 }

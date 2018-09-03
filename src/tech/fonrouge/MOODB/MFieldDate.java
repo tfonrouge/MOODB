@@ -12,4 +12,9 @@ public class MFieldDate extends MField<Date> {
     public Date emptyValue() {
         return null;
     }
+
+    @Override
+    public MTable.FIELD_TYPE fieldType() {
+        return MTable.FIELD_TYPE.DATE;
+    }
 }

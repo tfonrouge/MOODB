@@ -97,7 +97,7 @@ class FileMaker {
         } else {
             createFileTable();
         }
-        writeModel();
+        //writeModel();
     }
 
     private String getTableDescriptorBuffer() {
@@ -205,10 +205,12 @@ class FileMaker {
         }
 
         if (!isAbstract) {
+            /*
             buffer.
                     append("    private ").
                     append(className).
                     append("Model m;\n");
+            */
         }
 
         /* masterSource */
@@ -247,6 +249,7 @@ class FileMaker {
         }
 
         if (!isAbstract) {
+            /*
             buffer.
                     append("\n").
                     append("    @Override\n").
@@ -256,6 +259,7 @@ class FileMaker {
                     append("Model();\n").
                     append("        m.setTable(this);\n").
                     append("    }\n");
+                    */
         }
 
         return buffer.toString();
@@ -413,7 +417,6 @@ class FileMaker {
         if (writer != null) {
             boolean importDate = false;
             boolean importOTable = false;
-            boolean importBinary = false;
             for (FieldModel fieldModel : fieldModels) {
                 if (!importDate && fieldModel.type.equals("Date")) {
                     importDate = true;
@@ -422,7 +425,6 @@ class FileMaker {
                     importOTable = true;
                 }
                 if (!importDate && fieldModel.type.equals("Binary")) {
-                    importBinary = true;
                 }
             }
             writer.println("package " + getPackageName() + ";");
@@ -477,7 +479,7 @@ class FileMaker {
         String mName;
         boolean mUnique = false;
 
-        public IndexItem(String name, String keyField, String masterKeyField, boolean descending, boolean unique) {
+        IndexItem(String name, String keyField, String masterKeyField, boolean descending, boolean unique) {
             mName = name;
             mKeyField = keyField;
             mMasterKeyField = masterKeyField;
@@ -494,7 +496,7 @@ class FileMaker {
          *
          * @return boolean for descending index value
          */
-        public boolean descending() {
+        boolean descending() {
             return mDescending;
         }
 
@@ -512,7 +514,7 @@ class FileMaker {
          *
          * @return String of master key field
          */
-        public String masterKeyField() {
+        String masterKeyField() {
             return mMasterKeyField;
         }
 

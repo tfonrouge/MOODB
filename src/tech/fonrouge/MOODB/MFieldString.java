@@ -10,4 +10,9 @@ public class MFieldString extends MField<String> {
     public String emptyValue() {
         return "";
     }
+
+    @Override
+    public MTable.FIELD_TYPE fieldType() {
+        return MTable.FIELD_TYPE.STRING;
+    }
 }

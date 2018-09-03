@@ -10,4 +10,9 @@ public class MFieldObject extends MField<Object> {
     public Object emptyValue() {
         return null;
     }
+
+    @Override
+    public MTable.FIELD_TYPE fieldType() {
+        return MTable.FIELD_TYPE.OBJECT;
+    }
 }

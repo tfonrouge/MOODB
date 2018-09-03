@@ -15,12 +15,10 @@ public abstract class MField<T> {
     protected HashMap<String, String> mKeyValueItems;
     protected boolean mCalculated;
     protected Callable<T> calcValue = null;
-
     String mName;
     MTable mTable;
     T mValue;
     T mOrigValue;
-
     MField(MTable owner, String name) {
 
         mTable = owner;
@@ -39,6 +37,8 @@ public abstract class MField<T> {
         mTable.mFieldList.put(name, this);
         initialize();
     }
+
+    public abstract MTable.FIELD_TYPE fieldType();
 
     /**
      * description

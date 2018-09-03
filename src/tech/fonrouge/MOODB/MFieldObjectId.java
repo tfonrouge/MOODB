@@ -12,4 +12,9 @@ public abstract class MFieldObjectId extends MField<ObjectId> {
     public ObjectId emptyValue() {
         return new ObjectId();
     }
+
+    @Override
+    public MTable.FIELD_TYPE fieldType() {
+        return MTable.FIELD_TYPE.OBJECT_ID;
+    }
 }
