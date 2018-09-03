@@ -81,7 +81,6 @@
     <xs:complexType name="newValueType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute name="type" type="xs:string" use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
