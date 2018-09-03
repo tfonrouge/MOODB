@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<oons:Table extends="Base" tableName="inventory" database="Test2Database"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:oons="http://fonrouge.tech/MOODB"
+            xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
+
+    <oons:Fields>
+
+        <oons:FieldString name="nombre" description="Nombre" required="true"/>
+        <oons:FieldString name="udem" required="true">
+        </oons:FieldString>
+        <oons:FieldDouble name="existencia">
+            <oons:newValue>0.0;</oons:newValue>
+        </oons:FieldDouble>
+
+    </oons:Fields>
+
+    <oons:Index name="nombre" keyField="nombre" unique="true"/>
+
+</oons:Table>

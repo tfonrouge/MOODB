@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<oons:Table abstract="true" extends="Base"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:oons="http://fonrouge.tech/MOODB"
+            xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
+
+    <oons:Fields>
+
+        <oons:FieldString name="name" description="Name" required="true"/>
+        <oons:FieldString name="taxId" description="Tax payer id" required="true"/>
+        <oons:FieldString name="country" description="Country id"/>
+        <oons:FieldString name="address"/>
+        <oons:FieldString name="phone1"/>
+        <oons:FieldString name="phone2"/>
+        <oons:FieldString name="phone3"/>
+        <oons:FieldString name="webPage"/>
+        <oons:FieldString name="email1"/>
+        <oons:FieldString name="email2"/>
+        <oons:FieldString name="email3"/>
+
+    </oons:Fields>
+
+    <oons:Index name="taxId" keyField="taxId" unique="true"/>
+
+</oons:Table>

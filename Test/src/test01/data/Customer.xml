@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<oons:Table extends="Entity" tableName="customer"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:oons="http://fonrouge.tech/MOODB"
+            xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
+
+    <oons:Fields>
+
+        <oons:FieldString name="customerId" description="Customer Id"/>
+
+    </oons:Fields>
+
+    <oons:Index name="customerId" keyField="customerId" unique="true"/>
+
+</oons:Table>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<oons:Table abstract="true" extends="Base"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:oons="http://fonrouge.tech/MOODB"
+            xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
+
+    <oons:Fields>
+
+        <oons:FieldString name="name" description="Name" required="true"/>
+        <oons:FieldString name="firstName" description="First name" required="true"/>
+        <oons:FieldString name="lastName" description="Last name"/>
+        <oons:FieldDate name="bday" description="Birth day"/>
+        <oons:FieldString name="gender" required="true">
+            <oons:validValues>
+                <oons:keyValue key="M">Male</oons:keyValue>
+                <oons:keyValue key="F">Female</oons:keyValue>
+                <oons:keyValue key="?">Undetermined</oons:keyValue>
+            </oons:validValues>
+        </oons:FieldString>
+        <oons:FieldBoolean name="married"/>
+        <oons:FieldString name="personId" description="Person Id"/>
+
+    </oons:Fields>
+
+    <oons:Index name="personId" keyField="personId" unique="true"/>
+
+</oons:Table>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<oons:Table abstract="true" database="Test2Database"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:oons="http://fonrouge.tech/MOODB"
+            xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
+
+    <oons:Fields>
+
+        <oons:FieldDate name="fecha" required="true">
+            <oons:newValue>new Date();</oons:newValue>
+        </oons:FieldDate>
+
+    </oons:Fields>
+
+</oons:Table>
