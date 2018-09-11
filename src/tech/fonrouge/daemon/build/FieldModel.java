@@ -70,10 +70,10 @@ class FieldModel {
                         if (nodeListValidValues.getLength() > 0) {
                             for (int j = 0; j < nodeListValidValues.getLength(); j++) {
                                 Node nodeKeyValue = nodeListValidValues.item(j);
-                                if (nodeKeyValue.getNodeType() == Node.ELEMENT_NODE && nodeKeyValue.getLocalName().contentEquals("keyValue")) {
-                                    keyValueItems.
-                                            put(nodeKeyValue.getAttributes().getNamedItem("key").getNodeValue(), nodeKeyValue.getChildNodes().item(0).getNodeValue());
-
+                                if (nodeKeyValue.getNodeType() == Node.ELEMENT_NODE && nodeKeyValue.getLocalName().contentEquals("value")) {
+                                    String label = nodeKeyValue.getAttributes().getNamedItem("label").getNodeValue();
+                                    String value = nodeKeyValue.getChildNodes().item(0).getNodeValue();
+                                    keyValueItems.put(value, label);
                                 }
                             }
                         }

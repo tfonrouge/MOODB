@@ -15,7 +15,7 @@ public abstract class MField<T> {
     protected boolean notNull;
     protected String description;
     protected String label;
-    protected HashMap<String, String> keyValueItems;
+    protected HashMap<T, String> valueItems;
     protected boolean calculated;
     protected Callable<T> calcValue = null;
     protected Callable<Boolean> onValidate = null;
@@ -118,12 +118,12 @@ public abstract class MField<T> {
     }
 
     /**
-     * getKeyValueItems
+     * getValueItems
      *
-     * @return keyValueItems
+     * @return valueItems
      */
-    public HashMap<String, String> getKeyValueItems() {
-        return keyValueItems;
+    public HashMap<T, String> getValueItems() {
+        return valueItems;
     }
 
     /**
@@ -234,8 +234,8 @@ public abstract class MField<T> {
             return false; //throw new RuntimeException("Attempt to setValue() to Table in Normal State.");
         }
 
-        if (keyValueItems != null) {
-            if (!keyValueItems.containsKey(value.toString())) {
+        if (valueItems != null) {
+            if (!valueItems.containsKey(value)) {
                 return false; //throw new RuntimeException("Attempt to assign Invalid value to field.");
             }
         }

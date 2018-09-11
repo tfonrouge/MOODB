@@ -102,13 +102,13 @@
     </xs:complexType>
     <xs:complexType name="validValuesType">
         <xs:sequence>
-            <xs:element name="keyValue" type="validValueType" maxOccurs="unbounded"/>
+            <xs:element name="value" type="validValueType" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="validValueType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute name="key" type="xs:string" use="required"/>
+                <xs:attribute name="label" type="xs:string" use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
