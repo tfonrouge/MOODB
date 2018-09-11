@@ -1,5 +1,6 @@
 package tech.fonrouge.MOODB;
 
+import com.mongodb.client.MongoCursor;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -10,59 +11,49 @@ import java.util.concurrent.Callable;
 
 public abstract class MField<T> {
 
-    protected boolean mRequired;
-    protected String mDescription;
-    protected HashMap<String, String> mKeyValueItems;
-    protected boolean mCalculated;
+    protected boolean required;
+    protected boolean notNull;
+    protected String description;
+    protected String label;
+    protected HashMap<String, String> keyValueItems;
+    protected boolean calculated;
     protected Callable<T> calcValue = null;
-    String mName;
-    MTable mTable;
-    T mValue;
-    T mOrigValue;
+    protected Callable<Boolean> onValidate = null;
+    String name;
+    MTable table;
+    T value;
+    T origValue;
+    private String invalidCause = null;
+
     MField(MTable owner, String name) {
 
-        mTable = owner;
+        table = owner;
 
-        if (mTable.mFieldList == null) {
-            mTable.mFieldList = new HashMap<>();
+        if (table.fieldList == null) {
+            table.fieldList = new HashMap<>();
         }
 
-        if (name.contentEquals("_id") && mTable.mFieldList.containsKey("_id")) {
+        if (name.contentEquals("_id") && table.fieldList.containsKey("_id")) {
             throw new RuntimeException("attempt to re-assign_id field");
         }
 
-        mName = name;
-        mCalculated = false;
-        mRequired = false;
-        mTable.mFieldList.put(name, this);
+        this.name = name;
+        calculated = false;
+        required = false;
+        notNull = false;
+        table.fieldList.put(name, this);
         initialize();
     }
 
     public abstract MTable.FIELD_TYPE fieldType();
 
-    /**
-     * description
-     *
-     * @return
-     */
-    public String description() {
-        return mDescription;
-    }
-
-    /**
-     * emptyValue
-     *
-     * @return empty value for the field type
-     */
-    abstract public T emptyValue();
-
     public boolean find() {
         List<? extends Bson> pipeline = Arrays.asList(
                 new Document().
                         append("$sort", new Document().
-                                append(mName, 1))
+                                append(name, 1))
         );
-        return mTable.mEngine.executeAggregate(pipeline);
+        return table.setTableDocument(table.engine.executeAggregate(pipeline));
     }
 
     /**
@@ -75,11 +66,11 @@ public abstract class MField<T> {
         List<? extends Bson> pipeline = Arrays.asList(
                 new Document().
                         append("$match", new Document().
-                                append(mName, keyValue)),
+                                append(name, keyValue)),
                 new Document().
                         append("$limit", 1)
         );
-        return mTable.mEngine.executeAggregate(pipeline);
+        return table.setTableDocument(table.engine.executeAggregate(pipeline));
     }
 
     /**
@@ -89,12 +80,82 @@ public abstract class MField<T> {
      */
     private T getCalculatedValue() {
         T value = null;
-        if (mCalculated) {
+        if (calculated) {
             try {
                 value = calcValue.call();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+        return value;
+    }
+
+    /**
+     * getDescription
+     *
+     * @return String description for field
+     */
+    public String getDescription() {
+        if (description == null) {
+            return getLabel();
+        }
+        int nPos = description.indexOf("%%");
+        if (nPos > 0) {
+            return description.replaceFirst("%%", table.getGenre());
+        }
+        return description;
+    }
+
+    /**
+     * getEmptyValue
+     *
+     * @return empty value for the field type
+     */
+    abstract public T getEmptyValue();
+
+    public String getInvalidCause() {
+        return invalidCause;
+    }
+
+    /**
+     * getKeyValueItems
+     *
+     * @return keyValueItems
+     */
+    public HashMap<String, String> getKeyValueItems() {
+        return keyValueItems;
+    }
+
+    /**
+     * getLabel
+     *
+     * @return String label for field
+     */
+    public String getLabel() {
+        if (label == null) {
+            return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
+        }
+        return label;
+    }
+
+    public T getMaxValue() {
+        T value;
+        List<? extends Bson> pipeline = Arrays.asList(
+                new Document().
+                        append("$sort", new Document().
+                                append(name, -1)),
+                new Document().
+                        append("$limit", 1),
+                new Document().
+                        append("$project", new Document().
+                                append("folio", 1))
+        );
+        MongoCursor<Document> mongoCursor = table.engine.executeAggregate(pipeline);
+        if (mongoCursor.hasNext()) {
+            Document d = mongoCursor.next();
+            value = d.get(name, getEmptyValue());
+        } else {
+            value = getEmptyValue();
         }
         return value;
     }
@@ -106,6 +167,42 @@ public abstract class MField<T> {
      */
     protected T getNewValue() {
         return null;
+    }
+
+    /**
+     * getName
+     *
+     * @return
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * getValidStatus
+     *
+     * @return on invalid status, returns string with detail
+     */
+    public boolean getValidStatus() {
+        invalidCause = null;
+        if (!calculated && required && isEmpty()) {
+            invalidCause = "Empty value on required field";
+            return false;
+        }
+        if (onValidate == null) {
+            return true;
+        }
+        boolean status = false;
+        try {
+            status = onValidate.call();
+            if (!status) {
+                invalidCause = "invalid status";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            invalidCause = e.getLocalizedMessage();
+        }
+        return status;
     }
 
     /**
@@ -122,37 +219,29 @@ public abstract class MField<T> {
      */
     public boolean isEmpty() {
         T value = value();
-        return value == null || value.equals(emptyValue());
-    }
-
-    /**
-     * name
-     *
-     * @return
-     */
-    public String name() {
-        return mName;
+        return value == null || value.equals(getEmptyValue());
     }
 
     /**
      * setValue
      *
-     * @param value
-     * @return
+     * @param value T
+     * @return true on success
      */
     public boolean setValue(T value) {
 
-        if (mTable.mState == MTable.STATE.NORMAL) {
-            throw new RuntimeException("Attempt to setValue() to Table in Normal State.");
+        if (table.state == MTable.STATE.NORMAL) {
+            return false; //throw new RuntimeException("Attempt to setValue() to Table in Normal State.");
         }
 
-        if (mKeyValueItems != null) {
-            if (!mKeyValueItems.containsKey(value.toString())) {
-                throw new RuntimeException("Attempt to assign Invalid value to field.");
+        if (keyValueItems != null) {
+            if (!keyValueItems.containsKey(value.toString())) {
+                return false; //throw new RuntimeException("Attempt to assign Invalid value to field.");
             }
         }
 
-        mValue = value;
+        /* TODO: validate against notNull value */
+        this.value = value;
 
         return true;
     }
@@ -163,10 +252,10 @@ public abstract class MField<T> {
      * @return value of field
      */
     public final T value() {
-        if (mCalculated) {
+        if (calculated) {
             return getCalculatedValue();
         }
-        return mValue;
+        return value;
     }
 
     public final T value(T defaultValue) {
@@ -177,12 +266,14 @@ public abstract class MField<T> {
         return value;
     }
 
+    public abstract String valueAsString();
+
     /**
      * valueChanged
      *
      * @return boolean if value has changed
      */
     boolean valueChanged() {
-        return !(mValue == mOrigValue);
+        return !(value == origValue);
     }
 }

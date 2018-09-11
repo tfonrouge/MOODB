@@ -9,12 +9,17 @@ public class MFieldBinary extends MField<Binary> {
     }
 
     @Override
-    public Binary emptyValue() {
+    public Binary getEmptyValue() {
         return new Binary(new byte[0]);
     }
 
     @Override
     public MTable.FIELD_TYPE fieldType() {
         return MTable.FIELD_TYPE.BINARY;
+    }
+
+    @Override
+    public String valueAsString() {
+        return value.toString();
     }
 }

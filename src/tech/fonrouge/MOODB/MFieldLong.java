@@ -7,12 +7,17 @@ public class MFieldLong extends MField<Long> {
     }
 
     @Override
-    public Long emptyValue() {
+    public Long getEmptyValue() {
         return 0L;
     }
 
     @Override
     public MTable.FIELD_TYPE fieldType() {
         return MTable.FIELD_TYPE.LONG;
+    }
+
+    @Override
+    public String valueAsString() {
+        return value.toString();
     }
 }

@@ -9,7 +9,7 @@ public abstract class MFieldObjectId extends MField<ObjectId> {
     }
 
     @Override
-    public ObjectId emptyValue() {
+    public ObjectId getEmptyValue() {
         return new ObjectId();
     }
 

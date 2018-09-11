@@ -11,21 +11,21 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MIndex {
-    private boolean mDescending;
-    private String mKeyField;
-    private String mMasterKeyField;
-    private String mName;
-    private boolean mUnique;
-    private MTable mTable;
+    private boolean descending;
+    private String keyField;
+    private String masterKeyField;
+    private String name;
+    private boolean unique;
+    private MTable table;
 
     public MIndex(MTable table, String name, String masterKeyField, String keyField, boolean descending, boolean unique) {
-        mTable = table;
-        mName = name;
-        mMasterKeyField = masterKeyField;
-        mKeyField = keyField;
-        mDescending = descending;
-        mUnique = unique;
-        mTable.mIndices.add(this);
+        this.table = table;
+        this.name = name;
+        this.masterKeyField = masterKeyField;
+        this.keyField = keyField;
+        this.descending = descending;
+        this.unique = unique;
+        this.table.indices.add(this);
         buildIndex();
     }
 
@@ -51,37 +51,36 @@ public class MIndex {
         Bson bson;
         String s;
 
-        for (MIndex mIndex : mTable.mIndices) {
-            s = mIndex.mMasterKeyField;
-            if (!mIndex.mMasterKeyField.isEmpty()) {
-                if (!mIndex.mKeyField.isEmpty()) {
-                    s += "," + mIndex.mKeyField;
+        for (MIndex mIndex : table.indices) {
+            s = mIndex.masterKeyField;
+            if (!mIndex.masterKeyField.isEmpty()) {
+                if (!mIndex.keyField.isEmpty()) {
+                    s += "," + mIndex.keyField;
                 }
             } else {
-                s = mIndex.mKeyField;
+                s = mIndex.keyField;
             }
-            if (mIndex.mDescending) {
+            if (mIndex.descending) {
                 bson = Indexes.descending(getFields(s));
 
             } else {
                 bson = Indexes.ascending(getFields(s));
             }
             indexOptions = new IndexOptions();
-            indexOptions.name(mIndex.mName);
-            if (mIndex.mUnique) {
+            indexOptions.name(mIndex.name);
+            if (mIndex.unique) {
                 indexOptions.unique(true);
             }
 
-            ListIndexesIterable<Document> indices = mTable.mEngine.mCollection.listIndexes();
+            ListIndexesIterable<Document> indices = table.engine.collection.listIndexes();
             final boolean[] buildIndex = {true};
             indices.forEach((Block<? super Document>) document -> {
-                if (document.containsKey("name") && document.getString("name").contentEquals(mIndex.mName)) {
+                if (document.containsKey("name") && document.getString("name").contentEquals(mIndex.name)) {
                     buildIndex[0] = false;
-                    System.out.println(document);
                 }
             });
             if (buildIndex[0]) {
-                mTable.mEngine.mCollection.createIndex(bson, indexOptions);
+                table.engine.collection.createIndex(bson, indexOptions);
             }
         }
     }
@@ -96,7 +95,7 @@ public class MIndex {
      * @return boolean for descending index value
      */
     public boolean descending() {
-        return mDescending;
+        return descending;
     }
 
     /**
@@ -105,7 +104,7 @@ public class MIndex {
      * @return String of key field
      */
     public String keyField() {
-        return mKeyField;
+        return keyField;
     }
 
     /**
@@ -114,7 +113,7 @@ public class MIndex {
      * @return String of master key field
      */
     public String masterKeyField() {
-        return mMasterKeyField;
+        return masterKeyField;
     }
 
     /**
@@ -123,7 +122,7 @@ public class MIndex {
      * @return String name of index
      */
     public String name() {
-        return mName;
+        return name;
     }
 
     /**
@@ -132,6 +131,6 @@ public class MIndex {
      * @return boolean for unique index value
      */
     public boolean unique() {
-        return mUnique;
+        return unique;
     }
 }

@@ -7,12 +7,17 @@ public class MFieldString extends MField<String> {
     }
 
     @Override
-    public String emptyValue() {
+    public String getEmptyValue() {
         return "";
     }
 
     @Override
     public MTable.FIELD_TYPE fieldType() {
         return MTable.FIELD_TYPE.STRING;
+    }
+
+    @Override
+    public String valueAsString() {
+        return value;
     }
 }

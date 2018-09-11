@@ -5,6 +5,7 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -14,21 +15,21 @@ import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
-public class MEngine<T> {
+public class MEngine {
 
-    static HashMap<String, MongoCollection<Document>> collections;
+    private static HashMap<String, MongoCollection<Document>> collections;
 
-    MongoCollection<Document> mCollection;
-    Exception mException;
-    MongoCursor<Document> mMongoCursor;
-    private MTable mTable;
+    MongoCollection<Document> collection;
+    Exception exception;
+    MongoCursor<Document> mongoCursor;
+    private MTable table;
     private List<? extends Bson> pipeline;
 
     /* ******************* */
     /* constructor methods */
     /* ******************* */
     MEngine(MTable oTable) {
-        mTable = oTable;
+        table = oTable;
         initialize();
     }
 
@@ -42,7 +43,7 @@ public class MEngine<T> {
      * @return long of number of documents
      */
     long count() {
-        return mCollection.countDocuments();
+        return collection.countDocuments();
     }
 
     /* *************** */
@@ -51,16 +52,16 @@ public class MEngine<T> {
 
     private Document buildMasterSourceFilter() {
         Document document = null;
-        if (mTable.mMasterSource != null) {
+        if (table.masterSource != null) {
             document = new Document().
-                    append(mTable.mMasterSourceField.mName, mTable.mMasterSource._id());
+                    append(table.masterSourceField.name, table.masterSource._id());
         }
         return document;
     }
 
     private void initialize() {
-        String clientURI = mTable.database().getDatabaseURI();
-        String tableName = mTable.getTableName();
+        String clientURI = table.getDatabase().getDatabaseURI();
+        String tableName = table.getTableName();
         String key = clientURI + "/" + tableName;
 
         if (collections == null) {
@@ -68,13 +69,13 @@ public class MEngine<T> {
         }
 
         if (collections.containsKey(key)) {
-            mCollection = collections.get(key);
+            collection = collections.get(key);
         } else {
             MongoClientURI mongoClientURI = new MongoClientURI(clientURI);
             MongoClient mongoClient = new MongoClient(mongoClientURI);
-            MongoDatabase mongoDatabase = mongoClient.getDatabase(mTable.database().getDatabaseName());
-            mCollection = mongoDatabase.getCollection(tableName);
-            collections.put(key, mCollection);
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(table.getDatabase().getDatabaseName());
+            collection = mongoDatabase.getCollection(tableName);
+            collections.put(key, collection);
         }
     }
 
@@ -83,14 +84,24 @@ public class MEngine<T> {
     /* ************** */
 
     /**
+     * delete
+     *
+     * @return true if operation successful
+     */
+    public boolean delete() {
+        Document document = new Document().append("_id", table._id());
+        DeleteResult result = collection.deleteOne(document);
+        return result.getDeletedCount() == 1;
+    }
+
+    /**
      * executeAggregate
      *
      * @param bsonList bson list for executeAggregate function
      * @return iterable
      */
-    public boolean executeAggregate(List<? extends Bson> bsonList) {
-        mMongoCursor = mCollection.aggregate(bsonList).iterator();
-        return mTable.setTableDocument(mMongoCursor);
+    public MongoCursor<Document> executeAggregate(List<? extends Bson> bsonList) {
+        return collection.aggregate(bsonList).iterator();
     }
 
     /**
@@ -107,7 +118,7 @@ public class MEngine<T> {
         } else {
             pipeline = Arrays.asList();
         }
-        return executeAggregate(pipeline);
+        return table.setTableDocument(executeAggregate(pipeline));
     }
 
     /**
@@ -123,7 +134,7 @@ public class MEngine<T> {
                 new Document().
                         append("$limit", 1)
         );
-        return executeAggregate(pipeline);
+        return table.setTableDocument(executeAggregate(pipeline));
     }
 
     /**
@@ -134,11 +145,11 @@ public class MEngine<T> {
      */
     public boolean insert(Document document) {
         try {
-            mCollection.insertOne(document);
+            collection.insertOne(document);
             Object a = document.get("_id");
-            mTable.set_id((T) a);
+            table.set_id(a);
         } catch (Exception e) {
-            mException = e;
+            exception = e;
             return false;
         }
         return true;
@@ -150,12 +161,12 @@ public class MEngine<T> {
      * @return boolean if next is valid document
      */
     public boolean next() {
-        if (mMongoCursor != null) {
-            if (mMongoCursor.hasNext()) {
-                return mTable.setTableDocument(mMongoCursor);
+        if (mongoCursor != null) {
+            if (mongoCursor.hasNext()) {
+                return table.setTableDocument(mongoCursor);
             }
         }
-        return mTable.setTableDocument(null);
+        return table.setTableDocument(null);
     }
 
     /**
@@ -167,9 +178,9 @@ public class MEngine<T> {
     public boolean update(Document document) {
         try {
             Bson bson = new Document("$set", document);
-            mCollection.updateOne(eq("_id", mTable._id()), bson);
+            collection.updateOne(eq("_id", table._id()), bson);
         } catch (Exception e) {
-            mException = e;
+            exception = e;
             return false;
         }
         return true;

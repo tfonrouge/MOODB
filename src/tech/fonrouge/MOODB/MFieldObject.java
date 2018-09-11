@@ -7,12 +7,17 @@ public class MFieldObject extends MField<Object> {
     }
 
     @Override
-    public Object emptyValue() {
+    public Object getEmptyValue() {
         return null;
     }
 
     @Override
     public MTable.FIELD_TYPE fieldType() {
         return MTable.FIELD_TYPE.OBJECT;
+    }
+
+    @Override
+    public String valueAsString() {
+        return value.toString();
     }
 }
