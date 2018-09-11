@@ -135,7 +135,7 @@ abstract public class MTable {
     /**
      * setTableDocument
      */
-    protected boolean setTableDocument(MongoCursor<Document> mongoCursor) {
+    boolean setTableDocument(MongoCursor<Document> mongoCursor) {
 
         engine.mongoCursor = mongoCursor;
 
@@ -146,6 +146,9 @@ abstract public class MTable {
         fieldList.forEach((fieldName, mField) -> {
             if (!mField.calculated) {
                 mField.value = document == null ? null : document.getOrDefault(mField.name, null);
+                if (mField.value == null && mField.notNullable) {
+                    mField.value = mField.getEmptyValue();
+                }
             }
         });
 
@@ -346,7 +349,7 @@ abstract public class MTable {
                     } else {
                         mField.value = mField.getNewValue();
                     }
-                    if (mField.value == null && mField.notNull) {
+                    if (mField.value == null && mField.notNullable) {
                         mField.value = mField.getEmptyValue();
                     }
                 }

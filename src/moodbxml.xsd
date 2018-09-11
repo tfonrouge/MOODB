@@ -41,7 +41,7 @@
         <xs:attribute name="label" type="xs:string"/>
         <xs:attribute name="calculated" type="xs:boolean"/>
         <xs:attribute name="required" type="xs:boolean"/>
-        <xs:attribute name="notNull" type="xs:boolean"/>
+        <xs:attribute name="notNullable" type="xs:boolean"/>
         <xs:attribute name="validate" type="xs:boolean"/>
     </xs:complexType>
     <xs:complexType name="FieldBooleanType">

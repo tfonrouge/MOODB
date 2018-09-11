@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 public abstract class MField<T> {
 
     protected boolean required;
-    protected boolean notNull;
+    protected boolean notNullable;
     protected String description;
     protected String label;
     protected HashMap<T, String> valueItems;
@@ -40,7 +40,7 @@ public abstract class MField<T> {
         this.name = name;
         calculated = false;
         required = false;
-        notNull = false;
+        notNullable = false;
         table.fieldList.put(name, this);
         initialize();
     }
@@ -234,13 +234,17 @@ public abstract class MField<T> {
             return false; //throw new RuntimeException("Attempt to setValue() to Table in Normal State.");
         }
 
-        if (valueItems != null) {
+        if (value != null && valueItems != null) {
             if (!valueItems.containsKey(value)) {
-                return false; //throw new RuntimeException("Attempt to assign Invalid value to field.");
+                if (value.equals(getEmptyValue())) {
+                    value = null;
+                } else {
+                    return false; //throw new RuntimeException("Attempt to assign Invalid value to field.");
+                }
             }
         }
 
-        /* TODO: validate against notNull value */
+        /* TODO: validate against notNullable value */
         this.value = value;
 
         return true;
