@@ -15,6 +15,8 @@
         <xs:attribute name="abstract" type="xs:boolean"/>
         <xs:attribute name="tableName" type="xs:string"/>
         <xs:attribute name="database" type="xs:string"/>
+        <xs:attribute name="genre" type="xs:string"/>
+        <xs:attribute name="genres" type="xs:string"/>
     </xs:complexType>
     <xs:complexType name="FieldsType">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -36,9 +38,11 @@
         </xs:all>
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="description" type="xs:string"/>
+        <xs:attribute name="label" type="xs:string"/>
         <xs:attribute name="calculated" type="xs:boolean"/>
-        <xs:attribute name="calcInline" type="xs:string"/>
         <xs:attribute name="required" type="xs:boolean"/>
+        <xs:attribute name="notNull" type="xs:boolean"/>
+        <xs:attribute name="validate" type="xs:boolean"/>
     </xs:complexType>
     <xs:complexType name="FieldBooleanType">
         <xs:complexContent>
@@ -49,6 +53,7 @@
     <xs:complexType name="FieldDateType">
         <xs:complexContent>
             <xs:extension base="FieldBaseType">
+                <xs:attribute name="newDate" type="xs:boolean"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
