@@ -6,7 +6,7 @@ import org.w3c.dom.NodeList;
 import java.util.HashMap;
 
 class FieldModel {
-    boolean notNull;
+    boolean notNullable;
     boolean newDate;
     String fieldName;
     String type;
@@ -37,8 +37,8 @@ class FieldModel {
             node1 = node.getAttributes().getNamedItem("required");
             required = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
-            node1 = node.getAttributes().getNamedItem("notNull");
-            notNull = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
+            node1 = node.getAttributes().getNamedItem("notNullable");
+            notNullable = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
             node1 = node.getAttributes().getNamedItem("newDate");
             newDate = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");

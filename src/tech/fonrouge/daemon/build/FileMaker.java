@@ -148,8 +148,8 @@ class FileMaker {
                     initializeString += "            required = true;\n";
                 }
 
-                if (fieldModel.notNull) {
-                    initializeString += "            notNull = true;\n";
+                if (fieldModel.notNullable) {
+                    initializeString += "            notNullable = true;\n";
                 }
 
                 if (fieldModel.description != null) {
