@@ -6,10 +6,14 @@ import org.w3c.dom.NodeList;
 import java.util.HashMap;
 
 class FieldModel {
+    boolean notNull;
+    boolean newDate;
     String fieldName;
     String type;
     boolean calculated;
+    boolean validate;
     String description;
+    String label;
     boolean required;
     String className;
     HashMap<String, String> keyValueItems;
@@ -22,13 +26,22 @@ class FieldModel {
 
         try {
             fieldName = node.getAttributes().getNamedItem("name").getNodeValue();
-            type = node.getLocalName().substring(5);//node.getAttributes().getNamedItem("type").getNodeValue();
+            type = node.getLocalName().substring(5);
 
             node1 = node.getAttributes().getNamedItem("calculated");
             calculated = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
+            node1 = node.getAttributes().getNamedItem("validate");
+            validate = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
+
             node1 = node.getAttributes().getNamedItem("required");
             required = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
+
+            node1 = node.getAttributes().getNamedItem("notNull");
+            notNull = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
+
+            node1 = node.getAttributes().getNamedItem("newDate");
+            newDate = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
             node1 = node.getAttributes().getNamedItem("class");
             if (node1 != null) {
@@ -38,6 +51,11 @@ class FieldModel {
             node1 = node.getAttributes().getNamedItem("description");
             if (node1 != null) {
                 description = node1.getNodeValue();
+            }
+
+            node1 = node.getAttributes().getNamedItem("label");
+            if (node1 != null) {
+                label = node1.getNodeValue();
             }
 
             NodeList nodeList = node.getChildNodes();
