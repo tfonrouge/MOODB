@@ -22,14 +22,18 @@ class FileMaker {
     private final Boolean isAbstract;
     private final String extendClass;
     private final String tableName;
+    private final String genre;
+    private final String genres;
     private final String database;
     private String masterSourceClass = null;
     private String masterSourceField = null;
 
     private int numCalcFields = 0;
+    private int numValidateFields = 0;
     private List<FieldModel> fieldModels;
     private ArrayList<IndexItem> mIndices;
     private List<String> calcFieldList = new ArrayList<>();
+    private List<String> onValidateList = new ArrayList<>();
 
     FileMaker(Path pathExtLess, Document document, String className) {
 
@@ -37,6 +41,8 @@ class FileMaker {
         isAbstract = namedNodeMap.getNamedItem("abstract") != null && namedNodeMap.getNamedItem("abstract").getNodeValue().equals("true");
         extendClass = namedNodeMap.getNamedItem("extends") == null ? "MTable" : namedNodeMap.getNamedItem("extends").getNodeValue();
         tableName = namedNodeMap.getNamedItem("tableName") == null ? null : namedNodeMap.getNamedItem("tableName").getNodeValue();
+        genre = namedNodeMap.getNamedItem("genre") == null ? null : namedNodeMap.getNamedItem("genre").getNodeValue();
+        genres = namedNodeMap.getNamedItem("genres") == null ? null : namedNodeMap.getNamedItem("genres").getNodeValue();
         database = namedNodeMap.getNamedItem("database") == null ? null : namedNodeMap.getNamedItem("database").getNodeValue();
 
         this.pathTable = Paths.get(pathExtLess.toString() + ".java");
@@ -55,6 +61,9 @@ class FileMaker {
                     fieldModels.add(fieldModel);
                     if (fieldModel.calculated) {
                         ++numCalcFields;
+                    }
+                    if (fieldModel.validate) {
+                        ++numValidateFields;
                     }
                 }
             }
@@ -114,11 +123,11 @@ class FileMaker {
                 }
                 buffer.
                         append("    public final MField").
-                        append(fieldModel.type + cast).
+                        append(fieldModel.type).append(cast).
                         append(" field_").
                         append(fieldModel.fieldName).
-                        append(" = new MField").
-                        append(fieldModel.type + cast).
+                        append(" = new MField").append(fieldModel.type).
+                        append(cast).
                         append("(this, \"").
                         append(fieldModel.fieldName).
                         append("\"").
@@ -127,22 +136,38 @@ class FileMaker {
                 String initializeString = "";
 
                 if (fieldModel.calculated) {
-                    initializeString += "            mCalculated = true;\n";
+                    initializeString += "            calculated = true;\n";
                     initializeString += "            calcValue = () -> calcField_" + fieldModel.fieldName + "();\n";
                 }
 
+                if (fieldModel.validate) {
+                    initializeString += "            onValidate = () -> onValidate_" + fieldModel.fieldName + "();\n";
+                }
+
                 if (fieldModel.required) {
-                    initializeString += "            mRequired = true;\n";
+                    initializeString += "            required = true;\n";
+                }
+
+                if (fieldModel.notNull) {
+                    initializeString += "            notNull = true;\n";
                 }
 
                 if (fieldModel.description != null) {
-                    initializeString += "            mDescription = \"" + fieldModel.description + "\";\n";
+                    initializeString += "            description = \"" + fieldModel.description + "\";\n";
+                }
+
+                if (fieldModel.label != null) {
+                    initializeString += "            label = \"" + fieldModel.label + "\";\n";
+                }
+
+                if (fieldModel.newDate) {
+                    initializeString += "            mNewDate = true;\n";
                 }
 
                 if (fieldModel.keyValueItems.size() > 0) {
-                    initializeString += "\n            mKeyValueItems = new HashMap<>();\n";
+                    initializeString += "\n            keyValueItems = new HashMap<>();\n";
                     final String[] line = {""};
-                    fieldModel.keyValueItems.forEach((key, value) -> line[0] += "            mKeyValueItems.put(\"" + key + "\", \"" + value + "\");\n");
+                    fieldModel.keyValueItems.forEach((key, value) -> line[0] += "            keyValueItems.put(\"" + key + "\", \"" + value + "\");\n");
                     initializeString += line[0];
                 }
 
@@ -159,7 +184,7 @@ class FileMaker {
                     buffer.
                             append("\n").
                             append("        @Override\n").
-                            append("        protected " + fieldModel.className + " buildTable() {\n").
+                            append("        protected " + fieldModel.className + " buildTableField() {\n").
                             append("            return new ").
                             append(fieldModel.className).
                             append("();\n").
@@ -171,7 +196,14 @@ class FileMaker {
                     buffer.
                             append("\n").
                             append("        @Override\n").
-                            append("        protected " + fieldModel.type + " getNewValue() {\n").
+                            append("        protected ");
+                    if (fieldModel.type.contentEquals("TableField")) {
+                        buffer.append("Object");
+                    } else {
+                        buffer.append(fieldModel.type);
+                    }
+                    buffer.
+                            append(" getNewValue() {\n").
                             append("            return ").
                             append(fieldModel.newValue).
                             append("\n").
@@ -236,6 +268,30 @@ class FileMaker {
                     append("    }\n");
         }
 
+        /* getGenre */
+        if (genre != null) {
+            buffer.
+                    append("\n").
+                    append("    @Override\n").
+                    append("    public final String getGenre() {\n").
+                    append("        return \"").
+                    append(genre).
+                    append("\";\n").
+                    append("    }\n");
+        }
+
+        /* getGenres */
+        if (genre != null) {
+            buffer.
+                    append("\n").
+                    append("    @Override\n").
+                    append("    public final String getGenres() {\n").
+                    append("        return \"").
+                    append(genres).
+                    append("\";\n").
+                    append("    }\n");
+        }
+
         /* newDatabase */
         if (database != null) {
             buffer.
@@ -288,6 +344,13 @@ class FileMaker {
                     }
                 }
             }
+            if (fieldModels.size() > 0 && numValidateFields > 0) {
+                for (FieldModel fieldModel : fieldModels) {
+                    if (fieldModel.validate) {
+                        writer.println(getValidateFieldBuffer(fieldModel));
+                    }
+                }
+            }
             writer.println("}");
             writer.close();
         } catch (FileNotFoundException e) {
@@ -307,6 +370,18 @@ class FileMaker {
         return buffer;
     }
 
+    private String getValidateFieldBuffer(FieldModel fieldModel) {
+        String buffer = "";
+
+        buffer += "\n";
+        buffer += "    /* @@ begin onValidate_" + fieldModel.fieldName + " @@ */\n";
+        buffer += "    private boolean onValidate_" + fieldModel.fieldName + "() {\n";
+        buffer += "        return true;\n";
+        buffer += "    }\n";
+        buffer += "    /* @@ end onValidate_" + fieldModel.fieldName + " @@ */";
+        return buffer;
+    }
+
     private String getPackageName() {
         StringBuilder result = new StringBuilder();
         String name;
@@ -323,6 +398,7 @@ class FileMaker {
     private void updateFileTable() {
         Scanner scanner = null;
         StringBuilder calculatedFieldsBuffer = new StringBuilder();
+        StringBuilder validateFieldsBuffer = new StringBuilder();
         try {
             scanner = new Scanner(pathTable).useDelimiter("\n");
         } catch (IOException e) {
@@ -332,15 +408,21 @@ class FileMaker {
             List<String> stringList = new ArrayList<>();
 
             String line;
-            String token = "@@ begin calcField_";
+            final String tokenCalcField = "@@ begin calcField_";
+            final String tokenOnValidate = "@@ begin onValidate_";
             String fieldName;
 
             while (scanner.hasNext()) {
                 line = scanner.next();
-                if (line.contains(token)) {
-                    fieldName = line.substring(line.indexOf(token) + token.length(), line.lastIndexOf(" @@"));
+                if (line.contains(tokenCalcField)) {
+                    fieldName = line.substring(line.indexOf(tokenCalcField) + tokenCalcField.length(), line.lastIndexOf(" @@"));
                     if (calcFieldList.indexOf(fieldName) < 0) {
                         calcFieldList.add(fieldName);
+                    }
+                } else if (line.contains(tokenOnValidate)) {
+                    fieldName = line.substring(line.indexOf(tokenOnValidate) + tokenOnValidate.length(), line.lastIndexOf(" @@"));
+                    if (onValidateList.indexOf(fieldName) < 0) {
+                        onValidateList.add(fieldName);
                     }
                 } else {
                     /* check abstract */
@@ -369,6 +451,14 @@ class FileMaker {
                         calcFieldList.add(fieldModel.fieldName);
                         calculatedFieldsBuffer.append(getCalculatedFieldBuffer(fieldModel));
                     }
+                i = onValidateList.indexOf(fieldModel.fieldName);
+                if (fieldModel.validate)
+                    if (i >= 0) {
+                        onValidateList.remove(i);
+                    } else {
+                        onValidateList.add(fieldModel.fieldName);
+                        validateFieldsBuffer.append(getValidateFieldBuffer(fieldModel));
+                    }
             }
 
             PrintWriter writer = null;
@@ -396,6 +486,9 @@ class FileMaker {
                         writer.println(s);
                         if (calculatedFieldsBuffer.length() > 0) {
                             writer.println(calculatedFieldsBuffer);
+                        }
+                        if (validateFieldsBuffer.length() > 0) {
+                            writer.println(validateFieldsBuffer);
                         }
                     }
                 }
