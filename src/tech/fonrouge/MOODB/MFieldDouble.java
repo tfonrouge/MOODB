@@ -17,7 +17,15 @@ public class MFieldDouble extends MField<Double> {
     }
 
     @Override
+    public Double getAsValue(Object anyValue) {
+        return null;
+    }
+
+    @Override
     public String valueAsString() {
+        if (value == null) {
+            return "";
+        }
         return value.toString();
     }
 }

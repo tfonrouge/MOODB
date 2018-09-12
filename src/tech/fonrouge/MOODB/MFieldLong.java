@@ -17,7 +17,15 @@ public class MFieldLong extends MField<Long> {
     }
 
     @Override
+    public Long getAsValue(Object anyValue) {
+        return null;
+    }
+
+    @Override
     public String valueAsString() {
+        if (value == null) {
+            return "";
+        }
         return value.toString();
     }
 }

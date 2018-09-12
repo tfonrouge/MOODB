@@ -17,7 +17,21 @@ public class MFieldInteger extends MField<Integer> {
     }
 
     @Override
+    public Integer getAsValue(Object anyValue) {
+        switch (anyValue.getClass().getName()) {
+            case "java.lang.Integer":
+                return (Integer) anyValue;
+            case "java.lang.String":
+                return Integer.valueOf((String) anyValue);
+        }
+        return null;
+    }
+
+    @Override
     public String valueAsString() {
+        if (value == null) {
+            return "";
+        }
         return value.toString();
     }
 }

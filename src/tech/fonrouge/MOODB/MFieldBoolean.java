@@ -17,7 +17,15 @@ public class MFieldBoolean extends MField<Boolean> {
     }
 
     @Override
+    public Boolean getAsValue(Object anyValue) {
+        return null;
+    }
+
+    @Override
     public String valueAsString() {
+        if (value == null) {
+            return "";
+        }
         return value.toString();
     }
 }

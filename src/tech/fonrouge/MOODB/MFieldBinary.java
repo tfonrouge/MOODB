@@ -19,7 +19,15 @@ public class MFieldBinary extends MField<Binary> {
     }
 
     @Override
+    public Binary getAsValue(Object anyValue) {
+        return null;
+    }
+
+    @Override
     public String valueAsString() {
+        if (value == null) {
+            return "";
+        }
         return value.toString();
     }
 }

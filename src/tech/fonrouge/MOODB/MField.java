@@ -62,7 +62,7 @@ public abstract class MField<T> {
      * @param keyValue
      * @return
      */
-    public boolean find(T keyValue) {
+    public <V extends T> boolean find(V keyValue) {
         List<? extends Bson> pipeline = Arrays.asList(
                 new Document().
                         append("$match", new Document().
@@ -72,6 +72,8 @@ public abstract class MField<T> {
         );
         return table.setTableDocument(table.engine.executeAggregate(pipeline));
     }
+
+    public abstract T getAsValue(Object anyValue);
 
     /**
      * getCalculatedValue

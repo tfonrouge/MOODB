@@ -23,7 +23,7 @@ abstract public class MTable {
     private boolean eof = true;
     private Exception exception;
     private MDatabase database;
-    private MFieldTableField linkedField;
+    private MFieldTableField<? extends MTable> linkedField;
 
     /* *************** */
     /* private methods */
@@ -152,6 +152,10 @@ abstract public class MTable {
             }
         });
 
+        if (linkedField != null && linkedField.table.state != STATE.NORMAL) {
+            linkedField.setValue(_id());
+        }
+
         return !eof;
     }
 
@@ -245,7 +249,7 @@ abstract public class MTable {
      *
      * @return array of field list
      */
-    public HashMap<String, MField> getFieldList() {
+    public HashMap<String, ? extends MField> getFieldList() {
         return fieldList;
     }
 
@@ -290,7 +294,7 @@ abstract public class MTable {
         return linkedField;
     }
 
-    void setLinkedField(MFieldTableField linkedField) {
+    <T extends MTable> void setLinkedField(MFieldTableField<T> linkedField) {
         this.linkedField = linkedField;
     }
 
