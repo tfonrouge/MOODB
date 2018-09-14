@@ -11,13 +11,13 @@ public class MFieldDate extends MField<Date> {
     }
 
     @Override
-    public Date getEmptyValue() {
-        return null;
+    protected MTable.FIELD_TYPE getFieldType() {
+        return MTable.FIELD_TYPE.DATE;
     }
 
     @Override
-    public MTable.FIELD_TYPE fieldType() {
-        return MTable.FIELD_TYPE.DATE;
+    public Date getEmptyValue() {
+        return null;
     }
 
     @Override
@@ -27,9 +27,9 @@ public class MFieldDate extends MField<Date> {
 
     @Override
     public String valueAsString() {
-        if (value == null) {
+        if (getFieldState().value == null) {
             return "";
         }
-        return value.toString();
+        return getFieldState().value.toString();
     }
 }

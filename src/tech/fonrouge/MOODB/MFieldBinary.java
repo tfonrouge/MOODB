@@ -9,13 +9,13 @@ public class MFieldBinary extends MField<Binary> {
     }
 
     @Override
-    public Binary getEmptyValue() {
-        return new Binary(new byte[0]);
+    protected MTable.FIELD_TYPE getFieldType() {
+        return MTable.FIELD_TYPE.BINARY;
     }
 
     @Override
-    public MTable.FIELD_TYPE fieldType() {
-        return MTable.FIELD_TYPE.BINARY;
+    public Binary getEmptyValue() {
+        return new Binary(new byte[0]);
     }
 
     @Override
@@ -25,9 +25,9 @@ public class MFieldBinary extends MField<Binary> {
 
     @Override
     public String valueAsString() {
-        if (value == null) {
+        if (getFieldState().value == null) {
             return "";
         }
-        return value.toString();
+        return getFieldState().value.toString();
     }
 }

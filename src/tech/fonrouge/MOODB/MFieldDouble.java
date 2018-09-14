@@ -7,13 +7,13 @@ public class MFieldDouble extends MField<Double> {
     }
 
     @Override
-    public Double getEmptyValue() {
-        return 0.0;
+    protected MTable.FIELD_TYPE getFieldType() {
+        return MTable.FIELD_TYPE.DOUBLE;
     }
 
     @Override
-    public MTable.FIELD_TYPE fieldType() {
-        return MTable.FIELD_TYPE.DOUBLE;
+    public Double getEmptyValue() {
+        return 0.0;
     }
 
     @Override
@@ -23,9 +23,9 @@ public class MFieldDouble extends MField<Double> {
 
     @Override
     public String valueAsString() {
-        if (value == null) {
+        if (getFieldState().value == null) {
             return "";
         }
-        return value.toString();
+        return getFieldState().value.toString();
     }
 }

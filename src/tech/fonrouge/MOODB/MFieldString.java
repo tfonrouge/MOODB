@@ -7,13 +7,13 @@ public class MFieldString extends MField<String> {
     }
 
     @Override
-    public String getEmptyValue() {
-        return "";
+    protected MTable.FIELD_TYPE getFieldType() {
+        return MTable.FIELD_TYPE.STRING;
     }
 
     @Override
-    public MTable.FIELD_TYPE fieldType() {
-        return MTable.FIELD_TYPE.STRING;
+    public String getEmptyValue() {
+        return "";
     }
 
     @Override
@@ -23,9 +23,9 @@ public class MFieldString extends MField<String> {
 
     @Override
     public String valueAsString() {
-        if (value==null) {
+        if (getFieldState().value==null) {
             return "";
         }
-        return value;
+        return getFieldState().value;
     }
 }

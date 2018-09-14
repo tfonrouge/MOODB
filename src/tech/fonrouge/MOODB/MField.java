@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCursor;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -11,19 +12,21 @@ import java.util.concurrent.Callable;
 
 public abstract class MField<T> {
 
-    protected boolean required;
+    final MTable.FIELD_TYPE fieldType = getFieldType();
+    final MTable table;
     protected boolean notNullable;
+    protected boolean required;
+    protected boolean calculated;
     protected String description;
     protected String label;
     protected HashMap<T, String> valueItems;
-    protected boolean calculated;
     protected Callable<T> calcValue = null;
     protected Callable<Boolean> onValidate = null;
     String name;
-    MTable table;
-    T value;
-    T origValue;
     private String invalidCause = null;
+
+    private int fieldStateIndex = -1;
+    private ArrayList<FieldState> fieldStateList = new ArrayList<>();
 
     MField(MTable owner, String name) {
 
@@ -45,7 +48,26 @@ public abstract class MField<T> {
         initialize();
     }
 
-    public abstract MTable.FIELD_TYPE fieldType();
+    void fieldStatePull() {
+        if (fieldStateIndex == 0) {
+            throw new RuntimeException("fieldStateIndex out of bounds.");
+        }
+        --fieldStateIndex;
+    }
+
+    void fieldStatePush() {
+        fieldStateList.add(new FieldState());
+        ++fieldStateIndex;
+    }
+
+    FieldState getFieldState() {
+        if (fieldStateIndex == -1) {
+            fieldStatePush();
+        }
+        return fieldStateList.get(fieldStateIndex);
+    }
+
+    protected abstract MTable.FIELD_TYPE getFieldType();
 
     public boolean find() {
         List<? extends Bson> pipeline = Arrays.asList(
@@ -232,7 +254,7 @@ public abstract class MField<T> {
      */
     public boolean setValue(T value) {
 
-        if (table.state == MTable.STATE.NORMAL) {
+        if (table.getTableState().state == MTable.STATE.NORMAL) {
             return false; //throw new RuntimeException("Attempt to setValue() to Table in Normal State.");
         }
 
@@ -247,7 +269,7 @@ public abstract class MField<T> {
         }
 
         /* TODO: validate against notNullable value */
-        this.value = value;
+        this.getFieldState().value = value;
 
         return true;
     }
@@ -261,7 +283,7 @@ public abstract class MField<T> {
         if (calculated) {
             return getCalculatedValue();
         }
-        return value;
+        return getFieldState().value;
     }
 
     public final T value(T defaultValue) {
@@ -280,6 +302,12 @@ public abstract class MField<T> {
      * @return boolean if value has changed
      */
     boolean valueChanged() {
-        return !(value == origValue);
+        return !(getFieldState().value == getFieldState().
+                origValue);
+    }
+
+    class FieldState {
+        T value;
+        T origValue;
     }
 }

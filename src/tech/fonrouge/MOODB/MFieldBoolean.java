@@ -7,13 +7,13 @@ public class MFieldBoolean extends MField<Boolean> {
     }
 
     @Override
-    public Boolean getEmptyValue() {
-        return false;
+    protected MTable.FIELD_TYPE getFieldType() {
+        return MTable.FIELD_TYPE.BOOLEAN;
     }
 
     @Override
-    public MTable.FIELD_TYPE fieldType() {
-        return MTable.FIELD_TYPE.BOOLEAN;
+    public Boolean getEmptyValue() {
+        return false;
     }
 
     @Override
@@ -23,9 +23,9 @@ public class MFieldBoolean extends MField<Boolean> {
 
     @Override
     public String valueAsString() {
-        if (value == null) {
+        if (getFieldState().value == null) {
             return "";
         }
-        return value.toString();
+        return getFieldState().value.toString();
     }
 }

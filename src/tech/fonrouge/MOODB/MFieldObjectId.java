@@ -14,7 +14,7 @@ public abstract class MFieldObjectId extends MField<ObjectId> {
     }
 
     @Override
-    public MTable.FIELD_TYPE fieldType() {
+    protected MTable.FIELD_TYPE getFieldType() {
         return MTable.FIELD_TYPE.OBJECT_ID;
     }
 }

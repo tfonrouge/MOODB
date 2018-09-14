@@ -21,7 +21,6 @@ public class MEngine {
 
     MongoCollection<Document> collection;
     Exception exception;
-    MongoCursor<Document> mongoCursor;
     private MTable table;
     private List<? extends Bson> pipeline;
 
@@ -52,9 +51,9 @@ public class MEngine {
 
     private Document buildMasterSourceFilter() {
         Document document = null;
-        if (table.masterSource != null) {
+        if (table.getTableState().masterSource != null) {
             document = new Document().
-                    append(table.masterSourceField.name, table.masterSource._id());
+                    append(table.getTableState().masterSourceField.name, table.getTableState().masterSource._id());
         }
         return document;
     }
@@ -161,9 +160,9 @@ public class MEngine {
      * @return boolean if next is valid document
      */
     public boolean next() {
-        if (mongoCursor != null) {
-            if (mongoCursor.hasNext()) {
-                return table.setTableDocument(mongoCursor);
+        if (table.getTableState().mongoCursor != null) {
+            if (table.getTableState().mongoCursor.hasNext()) {
+                return table.setTableDocument(table.getTableState().mongoCursor);
             }
         }
         return table.setTableDocument(null);

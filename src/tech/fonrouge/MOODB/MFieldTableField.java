@@ -5,13 +5,18 @@ import org.bson.types.ObjectId;
 public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
 
     private final T linkedTable = initializeTableField();
-    private MFieldTableField<T> linkedField;
+    boolean notSynced = false;
 
     protected MFieldTableField(MTable owner, String name) {
         super(owner, name);
     }
 
-    public T getLinkedTable() {
+    @Override
+    protected MTable.FIELD_TYPE getFieldType() {
+        return MTable.FIELD_TYPE.TABLE_FIELD;
+    }
+
+    public final T getLinkedTable() {
         return linkedTable;
     }
 
@@ -22,11 +27,6 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
     }
 
     protected abstract T buildTableField();
-
-    @Override
-    public MTable.FIELD_TYPE fieldType() {
-        return MTable.FIELD_TYPE.TABLE_FIELD;
-    }
 
     @Override
     public ObjectId getEmptyValue() {
@@ -42,8 +42,8 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
 
         Object objectId = linkedTable._id();
 
-        if (objectId == null || !objectId.equals(value)) {
-            linkedTable.goTo(value);
+        if (objectId == null || !objectId.equals(getFieldState().value)) {
+            linkedTable.goTo(getFieldState().value);
         }
 
         return linkedTable;

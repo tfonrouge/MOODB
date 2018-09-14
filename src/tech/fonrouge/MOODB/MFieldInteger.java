@@ -7,13 +7,13 @@ public class MFieldInteger extends MField<Integer> {
     }
 
     @Override
-    public Integer getEmptyValue() {
-        return 0;
+    protected MTable.FIELD_TYPE getFieldType() {
+        return MTable.FIELD_TYPE.INTEGER;
     }
 
     @Override
-    public MTable.FIELD_TYPE fieldType() {
-        return MTable.FIELD_TYPE.INTEGER;
+    public Integer getEmptyValue() {
+        return 0;
     }
 
     @Override
@@ -29,9 +29,9 @@ public class MFieldInteger extends MField<Integer> {
 
     @Override
     public String valueAsString() {
-        if (value == null) {
+        if (getFieldState().value == null) {
             return "";
         }
-        return value.toString();
+        return getFieldState().value.toString();
     }
 }
