@@ -23,9 +23,9 @@ public class MFieldString extends MField<String> {
 
     @Override
     public String valueAsString() {
-        if (getFieldState().value==null) {
+        if (fieldState.value==null) {
             return "";
         }
-        return getFieldState().value;
+        return fieldState.value;
     }
 }

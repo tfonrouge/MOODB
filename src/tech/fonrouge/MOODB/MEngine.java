@@ -51,9 +51,9 @@ public class MEngine {
 
     private Document buildMasterSourceFilter() {
         Document document = null;
-        if (table.getTableState().masterSource != null) {
+        if (table.tableState.masterSource != null) {
             document = new Document().
-                    append(table.getTableState().masterSourceField.name, table.getTableState().masterSource._id());
+                    append(table.tableState.masterSourceField.name, table.tableState.masterSource._id());
         }
         return document;
     }
@@ -160,9 +160,9 @@ public class MEngine {
      * @return boolean if next is valid document
      */
     public boolean next() {
-        if (table.getTableState().mongoCursor != null) {
-            if (table.getTableState().mongoCursor.hasNext()) {
-                return table.setTableDocument(table.getTableState().mongoCursor);
+        if (table.tableState.mongoCursor != null) {
+            if (table.tableState.mongoCursor.hasNext()) {
+                return table.setTableDocument(table.tableState.mongoCursor);
             }
         }
         return table.setTableDocument(null);

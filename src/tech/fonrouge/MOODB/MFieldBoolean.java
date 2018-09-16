@@ -23,9 +23,9 @@ public class MFieldBoolean extends MField<Boolean> {
 
     @Override
     public String valueAsString() {
-        if (getFieldState().value == null) {
+        if (fieldState.value == null) {
             return "";
         }
-        return getFieldState().value.toString();
+        return fieldState.value.toString();
     }
 }
