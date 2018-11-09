@@ -1,0 +1,1478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="MOODB:jar" />
+    </artifacts-to-build>
+  </component>
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/src/tech/fonrouge/daemon/build/FileMaker.java" line="121" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6229ad43-ec20-451c-ac06-85038c799e30" name="Default" comment="* updated">
+      <change afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MBaseData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Test/src/test01/TestMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/Test/src/test01/TestMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Test/src/test01/data/Inventory.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Test/src/test01/data/Inventory.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Test/src/test01/data/Invoice.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Test/src/test01/data/Invoice.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Test/src/test02/BaseData.java" beforeDir="false" afterPath="$PROJECT_DIR$/Test/src/test02/BaseData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Test/src/test02/InventarioData.java" beforeDir="false" afterPath="$PROJECT_DIR$/Test/src/test02/InventarioData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Test/src/test02/MainCtrl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Test/src/test02/MainCtrl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Test/src/test02/datos/Base.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Test/src/test02/datos/Base.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Test/src/test02/datos/Inventario.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Test/src/test02/datos/Inventario.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/moodbxml.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/src/moodbxml.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MField.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MField.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldBinary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldBinary.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldBoolean.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldBoolean.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldDate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldDate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldDouble.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldDouble.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldInteger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldInteger.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldLong.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldLong.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldObjectId.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldObjectId.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldString.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldString.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MIndex.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MIndex.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/daemon/build/FieldModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/daemon/build/FieldModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tech/fonrouge/daemon/build/FileMaker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tech/fonrouge/daemon/build/FileMaker.java" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/out/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/OODB$Main.ic" NAME="Main Coverage Results" MODIFIED="1532889606060" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/OODB$Test.ic" NAME="Test Coverage Results" MODIFIED="1534202394680" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/jOODB$Main.ic" NAME="Main Coverage Results" MODIFIED="1522189356130" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+  </component>
+  <component name="CoverageViewManager">
+    <option name="myElementSize" value="201" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="1917860599">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.closed" value="14" />
+          <entry key="project.open.time.1" value="3" />
+          <entry key="project.open.time.14" value="1" />
+          <entry key="project.open.time.18" value="1" />
+          <entry key="project.open.time.2" value="1" />
+          <entry key="project.open.time.22" value="1" />
+          <entry key="project.open.time.23" value="1" />
+          <entry key="project.open.time.24" value="1" />
+          <entry key="project.open.time.5" value="1" />
+          <entry key="project.open.time.6" value="1" />
+          <entry key="project.open.time.7" value="2" />
+          <entry key="project.open.time.8" value="1" />
+          <entry key="project.opened" value="14" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="MF" value="2" />
+          <entry key="class" value="20" />
+          <entry key="iml" value="3" />
+          <entry key="java" value="445" />
+          <entry key="xml" value="130" />
+          <entry key="xsd" value="19" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="CLASS" value="20" />
+          <entry key="IDEA_MODULE" value="3" />
+          <entry key="JAVA" value="445" />
+          <entry key="Manifest" value="2" />
+          <entry key="XML" value="149" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="java" value="25953" />
+          <entry key="txt" value="26" />
+          <entry key="xml" value="1906" />
+          <entry key="xsd" value="394" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="JAVA" value="25953" />
+          <entry key="PLAIN_TEXT" value="26" />
+          <entry key="XML" value="2300" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.spring.boot.mvc.usages" />
+      <usages-collector id="statistics.js.language.service.starts" />
+      <usages-collector id="statistics.spring.boot.run.usages" />
+    </session>
+    <session id="1208847091">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.closed" value="45" />
+          <entry key="project.open.time.0" value="4" />
+          <entry key="project.open.time.1" value="15" />
+          <entry key="project.open.time.12" value="1" />
+          <entry key="project.open.time.13" value="2" />
+          <entry key="project.open.time.14" value="1" />
+          <entry key="project.open.time.15" value="5" />
+          <entry key="project.open.time.16" value="1" />
+          <entry key="project.open.time.17" value="1" />
+          <entry key="project.open.time.18" value="1" />
+          <entry key="project.open.time.23" value="1" />
+          <entry key="project.open.time.3" value="1" />
+          <entry key="project.open.time.5" value="2" />
+          <entry key="project.open.time.6" value="4" />
+          <entry key="project.open.time.7" value="3" />
+          <entry key="project.open.time.8" value="1" />
+          <entry key="project.open.time.9" value="2" />
+          <entry key="project.opened" value="45" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="class" value="26" />
+          <entry key="fxml" value="4" />
+          <entry key="iml" value="5" />
+          <entry key="java" value="598" />
+          <entry key="log" value="1" />
+          <entry key="md" value="4" />
+          <entry key="xml" value="85" />
+          <entry key="xsd" value="15" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="CLASS" value="26" />
+          <entry key="IDEA_MODULE" value="5" />
+          <entry key="JAVA" value="598" />
+          <entry key="Markdown" value="4" />
+          <entry key="PLAIN_TEXT" value="1" />
+          <entry key="XML" value="104" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="dummy" value="10" />
+          <entry key="fxml" value="49" />
+          <entry key="java" value="19840" />
+          <entry key="txt" value="987" />
+          <entry key="xml" value="791" />
+          <entry key="xsd" value="703" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="JAVA" value="19840" />
+          <entry key="PLAIN_TEXT" value="997" />
+          <entry key="XML" value="1543" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.js.language.service.starts" />
+      <usages-collector id="statistics.spring.boot.run.usages" />
+      <usages-collector id="statistics.spring.boot.mvc.usages" />
+      <usages-collector id="statistics.vcs.git.usages" />
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MBaseData.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="258">
+              <caret line="28" column="10" selection-start-line="28" selection-start-column="10" selection-end-line="28" selection-end-column="10" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MField.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="23" column="17" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="FxmlFile" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>getNewvalue</find>
+      <find>notNull</find>
+      <find>getTable</find>
+      <find>setValueWithExpression</find>
+      <find>expression</find>
+      <find>valueAs</find>
+      <find>fieldList</find>
+      <find>linkedField</find>
+      <find>notSynced</find>
+      <find>mongoCursor</find>
+      <find>getFieldState\(\)</find>
+      <find>getTableState\(\)</find>
+      <find>valid</find>
+      <find>keyValueItems</find>
+      <find>MFieldObjectId</find>
+      <find>getNewValue</find>
+      <find>validValuesType</find>
+      <find>partialFilterType</find>
+      <find>index</find>
+      <find>FieldModel</find>
+      <find>MIndex</find>
+      <find>mIndices</find>
+      <find>descending</find>
+      <find>FieldBaseType</find>
+      <find>FieldModelº</find>
+      <find>fieldModel</find>
+      <find>pipeline</find>
+      <find>calculated</find>
+      <find>Sup</find>
+      <find>newValue</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>name</replace>
+      <replace>fieldState</replace>
+      <replace>tableState</replace>
+    </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Teo Fonrouge" />
+      </list>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/Test/src/test02/mainCtlr.java" />
+        <option value="$PROJECT_DIR$/Test/src/test02/mainList.fxml" />
+        <option value="$PROJECT_DIR$/Test/src/test02/mainCtrl.java" />
+        <option value="$PROJECT_DIR$/Test/src/test02/Main.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/InvoiceItem.xml" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Customer.xml" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Entity.xml" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Base.xml" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/User.xml" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Person.xml" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Invoice.xml" />
+        <option value="$PROJECT_DIR$/Test/src/test02/InventarioData.java" />
+        <option value="$PROJECT_DIR$/Test/src/test02/BaseData.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/InvoiceItem_XInvoice.xml" />
+        <option value="$PROJECT_DIR$/Test/src/test01/TestMain.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/T.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Base.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldTableField.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MEngine.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Inventory.xml" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/BaseData.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldBoolean.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldString.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldDate.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldBinary.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldObjectId.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldInteger.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldDouble.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldLong.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldObject.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Entity.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Inventory.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Person.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Invoice.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/Customer.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/InvoiceItem.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/User.java" />
+        <option value="$PROJECT_DIR$/Test/src/test01/data/InvoiceItem_XInvoice.java" />
+        <option value="$PROJECT_DIR$/Test/src/test02/datos/Base.xml" />
+        <option value="$PROJECT_DIR$/Test/src/test02/datos/Base.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/daemon/build/IndexModel.java" />
+        <option value="$PROJECT_DIR$/src/moodbxml.xsd" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/daemon/build/FieldModel.java" />
+        <option value="$PROJECT_DIR$/Test/src/test02/datos/Inventario.xml" />
+        <option value="$PROJECT_DIR$/Test/src/test02/MainCtrl.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MIndex.java" />
+        <option value="$PROJECT_DIR$/Test/src/test02/datos/Inventario.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/daemon/build/FileMaker.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MTable.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MField.java" />
+        <option value="$PROJECT_DIR$/src/tech/fonrouge/MOODB/MBaseData.java" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState>
+      <expand />
+      <select />
+    </treeState>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="y" value="23" />
+    <option name="width" value="1680" />
+    <option name="height" value="1027" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="MOODB" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MOODB" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MOODB" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MOODB" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MOODB" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MOODB" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="fonrouge" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MOODB" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MOODB" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="fonrouge" type="462c0819:PsiDirectoryNode" />
+              <item name="MOODB" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="Downloaded.Files.Path.Enabled" value="false" />
+    <property name="GenerateAntBuildDialog.backupFiles" value="true" />
+    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="GenerateAntBuildDialog.outputFileNameProperty" value="oodb" />
+    <property name="Repository.Attach.JavaDocs" value="true" />
+    <property name="Repository.Attach.Sources" value="false" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1538622539469" />
+    <property name="create.test.in.the.same.root" value="true" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/Test/src" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="preferences.mongoOptions" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="tech.fonrouge.MOODB" />
+      <recent name="test02" />
+      <recent name="tech.fonrouge.jOODB.JField" />
+      <recent name="tech.fonrouge" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/Test/src" />
+      <recent name="$PROJECT_DIR$/Test" />
+      <recent name="$PROJECT_DIR$/src/tech/fonrouge/test2/datos" />
+      <recent name="$PROJECT_DIR$/src/tech/fonrouge/test/data" />
+      <recent name="$PROJECT_DIR$/src/tech/fonrouge/ArelBase" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="tech.fonrouge.MOODB" />
+      <recent name="tech.fonrouge.test2.datos" />
+      <recent name="tech.fonrouge.test.data" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src" />
+      <recent name="$PROJECT_DIR$/src/tech/fonrouge/tables" />
+      <recent name="$PROJECT_DIR$/src/tech/fonrouge" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Application.Daemon">
+    <configuration name="Daemon" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="tech.fonrouge.daemon.Main" />
+      <module name="MOODB" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test01" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="test01.TestMain" />
+      <module name="Test" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test02" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="test02.Main" />
+      <module name="Test" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../Cobra/src" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.Test02" />
+      <item itemvalue="Application.Test01" />
+      <item itemvalue="Application.Daemon" />
+    </list>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6229ad43-ec20-451c-ac06-85038c799e30" name="Default" comment="" />
+      <created>1522164769251</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1522164769251</updated>
+      <workItem from="1533050963998" duration="3167000" />
+      <workItem from="1533172118647" duration="1572000" />
+      <workItem from="1533179989892" duration="767000" />
+      <workItem from="1533229055399" duration="9193000" />
+      <workItem from="1533310002622" duration="9552000" />
+      <workItem from="1533566781806" duration="1130000" />
+      <workItem from="1533656967304" duration="601000" />
+      <workItem from="1533661568355" duration="11000" />
+      <workItem from="1533768445281" duration="17784000" />
+      <workItem from="1533827614289" duration="25636000" />
+      <workItem from="1533871493297" duration="47000" />
+      <workItem from="1533871620353" duration="140171000" />
+      <workItem from="1534204317649" duration="5242000" />
+      <workItem from="1534260665048" duration="3217000" />
+      <workItem from="1534264039373" duration="2262000" />
+      <workItem from="1534269009004" duration="925000" />
+      <workItem from="1534269956430" duration="27000" />
+      <workItem from="1534282290128" duration="10375000" />
+      <workItem from="1534425611360" duration="589000" />
+      <workItem from="1534689112665" duration="3090000" />
+      <workItem from="1534778512813" duration="399000" />
+      <workItem from="1534779508414" duration="7000" />
+      <workItem from="1534785713426" duration="61000" />
+      <workItem from="1535150349097" duration="29298000" />
+      <workItem from="1535414511942" duration="7000" />
+      <workItem from="1535551972688" duration="6846000" />
+      <workItem from="1535561230946" duration="25381000" />
+      <workItem from="1535655651992" duration="529000" />
+      <workItem from="1535904341470" duration="2163000" />
+      <workItem from="1535983023329" duration="1250000" />
+      <workItem from="1535997406226" duration="7728000" />
+      <workItem from="1536091467766" duration="5958000" />
+      <workItem from="1536173781561" duration="452000" />
+      <workItem from="1536174262230" duration="598000" />
+      <workItem from="1536177931533" duration="3958000" />
+      <workItem from="1536277368045" duration="10719000" />
+      <workItem from="1536330569508" duration="16415000" />
+      <workItem from="1536372301985" duration="12583000" />
+      <workItem from="1536509986732" duration="12240000" />
+      <workItem from="1536615984208" duration="19064000" />
+      <workItem from="1536685809345" duration="14232000" />
+      <workItem from="1536706370073" duration="92000" />
+      <workItem from="1536710948183" duration="11477000" />
+      <workItem from="1536869341568" duration="35722000" />
+      <workItem from="1537375475668" duration="584000" />
+      <workItem from="1537382011435" duration="5870000" />
+      <workItem from="1537992385829" duration="281000" />
+      <workItem from="1537992891943" duration="106000" />
+      <workItem from="1538098555261" duration="6776000" />
+      <workItem from="1538183611110" duration="6930000" />
+      <workItem from="1538248863378" duration="10899000" />
+      <workItem from="1538262626997" duration="13827000" />
+      <workItem from="1538321136675" duration="14747000" />
+      <workItem from="1538596626741" duration="5707000" />
+      <workItem from="1538767967955" duration="37000" />
+    </task>
+    <task id="LOCAL-00001" summary="* field_taxId made REQUIRED">
+      <created>1534264711574</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1534264711574</updated>
+    </task>
+    <task id="LOCAL-00002" summary="* source generated by DAEMON">
+      <created>1534264780537</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1534264780537</updated>
+    </task>
+    <task id="LOCAL-00003" summary="* added REQUIRED field_taxId">
+      <created>1534264812715</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1534264812715</updated>
+    </task>
+    <task id="LOCAL-00004" summary="* XML 'extends' attribute made optional, defaults to MTable">
+      <created>1534341813552</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1534341813552</updated>
+    </task>
+    <task id="LOCAL-00005" summary="* return empty value per type">
+      <created>1534341912710</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1534341912710</updated>
+    </task>
+    <task id="LOCAL-00006" summary="* code cleanup">
+      <created>1534341973535</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1534341973535</updated>
+    </task>
+    <task id="LOCAL-00007" summary="! added twice field to mFieldList">
+      <created>1534342023879</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1534342023879</updated>
+    </task>
+    <task id="LOCAL-00008" summary="* allowed to use any valid mongodb type for _id value">
+      <created>1535558155297</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1535558155297</updated>
+    </task>
+    <task id="LOCAL-00009" summary="* renamed class">
+      <created>1535558267403</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1535558267403</updated>
+    </task>
+    <task id="LOCAL-00010" summary="* artifacts and drivers update">
+      <created>1535558348785</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1535558348785</updated>
+    </task>
+    <task id="LOCAL-00011" summary="* updated jar config for lib">
+      <created>1535990254588</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1535990254588</updated>
+    </task>
+    <task id="LOCAL-00012" summary="* added field type enum, code cleanup">
+      <created>1535990395302</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1535990395302</updated>
+    </task>
+    <task id="LOCAL-00013" summary="* moved to external module">
+      <created>1535990740779</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1535990740779</updated>
+    </task>
+    <task id="LOCAL-00014" summary="* renamed artifact name">
+      <created>1535990846984</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1535990846984</updated>
+    </task>
+    <task id="LOCAL-00015" summary="* updated">
+      <created>1535991017011</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1535991017011</updated>
+    </task>
+    <task id="LOCAL-00016" summary="+ Test module">
+      <created>1535991065504</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1535991065504</updated>
+    </task>
+    <task id="LOCAL-00017" summary="* updated xsd">
+      <created>1535991101016</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1535991101016</updated>
+    </task>
+    <task id="LOCAL-00018" summary="* updated">
+      <created>1535991124479</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1535991124479</updated>
+    </task>
+    <task id="LOCAL-00019" summary="* added genre(), genres(), added validate field attribute">
+      <created>1536670742232</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1536670742232</updated>
+    </task>
+    <task id="LOCAL-00020" summary="* updated">
+      <created>1536670765353</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1536670765353</updated>
+    </task>
+    <task id="LOCAL-00021" summary="* updated">
+      <created>1536670838445</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1536670838445</updated>
+    </task>
+    <task id="LOCAL-00022" summary="* updated">
+      <created>1536671042216</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1536671042216</updated>
+    </task>
+    <task id="LOCAL-00023" summary="* valid values list per field type">
+      <created>1536675305229</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1536675305229</updated>
+    </task>
+    <task id="LOCAL-00024" summary="* renamed attribute">
+      <created>1536693772835</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1536693772835</updated>
+    </task>
+    <task id="LOCAL-00025" summary="* enforce empty value on notNullable fields">
+      <created>1536694677512</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1536694677512</updated>
+    </task>
+    <task id="LOCAL-00026" summary="* moved logic for assigning values on linkedTable fields to UI">
+      <created>1536776747829</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1536776747829</updated>
+    </task>
+    <task id="LOCAL-00027" summary="* code cleanup&#10;* protection against null values">
+      <created>1536776915528</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1536776915528</updated>
+    </task>
+    <task id="LOCAL-00028" summary="% capability to push/pull table/fields state to stack&#10;* code cleanup">
+      <created>1536946650322</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1536946650322</updated>
+    </task>
+    <task id="LOCAL-00029" summary="* keep table/field state class on private field">
+      <created>1537141614259</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1537141614259</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
+    <servers>
+      <Gitlab url="https://gitlab.com/tfonrouge">
+        <password>dfdbdfd2dfcedfe2dfcddff0dfd0dfc5dfc3dfe1dfdbdf87dff5dfc2dffcdff8dffadfc4dff2dfe9</password>
+      </Gitlab>
+    </servers>
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="518301000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="23" width="1680" height="1027" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22344323" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Image Layers" order="2" />
+      <window_info id="Designer" order="3" />
+      <window_info id="UI Designer" order="4" />
+      <window_info id="Favorites" order="5" side_tool="true" />
+      <window_info id="Capture Tool" order="6" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3262032" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.498779" weight="0.32406417" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.2812834" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32941177" />
+      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32834226" />
+      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.501221" side_tool="true" weight="0.32406417" />
+      <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="10" weight="0.32941177" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.3262032" />
+      <window_info anchor="bottom" id="Inspection Results" order="12" weight="0.32941177" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Palette" order="3" />
+      <window_info anchor="right" id="Capture Analysis" order="4" />
+      <window_info anchor="right" id="Theme Preview" order="5" />
+      <window_info anchor="right" id="Maven Projects" order="6" weight="0.32967034" />
+      <window_info anchor="right" id="Palette&#9;" order="7" />
+      <window_info anchor="right" id="Coverage" order="8" side_tool="true" weight="0.32967034" />
+      <window_info anchor="right" id="Database" order="9" weight="0.3297568" />
+      <window_info anchor="right" x="0" y="0" width="300" height="637" id="Documentation" order="10" side_tool="true" />
+      <window_info anchor="right" id="Mongo Explorer" order="11" weight="0.32967034" />
+    </layout>
+    <layout-to-restore>
+      <window_info content_ui="combo" id="Project" order="0" weight="0.22344323" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Image Layers" order="2" />
+      <window_info id="Designer" order="3" />
+      <window_info id="UI Designer" order="4" />
+      <window_info id="Favorites" order="5" side_tool="true" />
+      <window_info id="Capture Tool" order="6" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3262032" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.498779" visible="true" weight="0.32406417" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.2812834" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32941177" />
+      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32834226" />
+      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.501221" side_tool="true" weight="0.32406417" />
+      <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="10" weight="0.32941177" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.3262032" />
+      <window_info anchor="bottom" id="Inspection Results" order="12" weight="0.32941177" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Palette" order="3" />
+      <window_info anchor="right" id="Capture Analysis" order="4" />
+      <window_info anchor="right" id="Theme Preview" order="5" />
+      <window_info anchor="right" id="Maven Projects" order="6" weight="0.32967034" />
+      <window_info anchor="right" id="Palette&#9;" order="7" />
+      <window_info anchor="right" id="Coverage" order="8" side_tool="true" weight="0.32967034" />
+      <window_info anchor="right" id="Database" order="9" weight="0.3297568" />
+      <window_info anchor="right" x="0" y="0" width="300" height="637" id="Documentation" order="10" side_tool="true" />
+      <window_info anchor="right" id="Mongo Explorer" order="11" weight="0.32967034" />
+    </layout-to-restore>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$" />
+    </ignored-roots>
+    <MESSAGE value="* field_taxId made REQUIRED" />
+    <MESSAGE value="* source generated by DAEMON" />
+    <MESSAGE value="* added REQUIRED field_taxId" />
+    <MESSAGE value="* XML 'extends' attribute made optional, defaults to MTable" />
+    <MESSAGE value="* return empty value per type" />
+    <MESSAGE value="* code cleanup" />
+    <MESSAGE value="! added twice field to mFieldList" />
+    <MESSAGE value="* allowed to use any valid mongodb type for _id value" />
+    <MESSAGE value="* renamed class" />
+    <MESSAGE value="* artifacts and drivers update" />
+    <MESSAGE value="* updated jar config for lib" />
+    <MESSAGE value="* added field type enum, code cleanup" />
+    <MESSAGE value="* moved to external module" />
+    <MESSAGE value="* renamed artifact name" />
+    <MESSAGE value="+ Test module" />
+    <MESSAGE value="* updated xsd" />
+    <MESSAGE value="* added genre(), genres(), added validate field attribute" />
+    <MESSAGE value="* updated" />
+    <MESSAGE value="* valid values list per field type" />
+    <MESSAGE value="* renamed attribute" />
+    <MESSAGE value="* enforce empty value on notNullable fields" />
+    <MESSAGE value="* moved logic for assigning values on linkedTable fields to UI" />
+    <MESSAGE value="* code cleanup&#10;* protection against null values" />
+    <MESSAGE value="% capability to push/pull table/fields state to stack&#10;* code cleanup" />
+    <MESSAGE value="* keep table/field state class on private field" />
+    <option name="LAST_COMMIT_MESSAGE" value="* keep table/field state class on private field" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <condition expression="mField.fieldType()==FIELD_TYPE.DATE" language="JAVA" />
+          <url>file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MTable.java</url>
+          <line>355</line>
+          <properties />
+          <option name="timeStamp" value="187" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MTable.java</url>
+          <line>150</line>
+          <properties />
+          <option name="timeStamp" value="192" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/tech/fonrouge/daemon/build/FileMaker.java</url>
+          <line>340</line>
+          <properties />
+          <option name="timeStamp" value="224" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/tech/fonrouge/daemon/build/FileMaker.java</url>
+          <line>345</line>
+          <properties />
+          <option name="timeStamp" value="225" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Test/src/test02/MainCtrl.java</url>
+          <line>96</line>
+          <properties />
+          <option name="timeStamp" value="226" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XPathView.XPathProjectComponent">
+    <history />
+    <find-history />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand>
+      <path>
+        <item name="OODB" type="b2602c69:ProjectViewProjectNode" />
+        <item name="OODB" type="462c0819:PsiDirectoryNode" />
+      </path>
+      <path>
+        <item name="OODB" type="b2602c69:ProjectViewProjectNode" />
+        <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="breakpointCondition">
+      <expression>
+        <expression-string>mField.fieldType()==FIELD_TYPE.DATE</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>node.getLocalName().equals(&quot;userLevel&quot;)</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>fieldName.equals(&quot;userLevel&quot;)</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+    <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>fieldModel.type</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>fieldModel.className</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>node1.getChildNodes().getLength()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>nodeListValidValues.item(0)</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>nodeListValidValues.getLength()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>nodeListValidValues</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>node1.getChildNodes()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>node1</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>node1.getAttributes().item(0).getChildNodes().item(0).getNodeValue()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/Test/src/test02/InventarioData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test02/BaseData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="25" lean-forward="true" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/data/InvoiceItem_XInvoice.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="45" lean-forward="true" selection-start-line="11" selection-start-column="45" selection-end-line="11" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home/src.zip!/java/util/HashMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="610" column="13" selection-start-line="610" selection-start-column="13" selection-end-line="610" selection-end-column="13" />
+          <folding>
+            <element signature="e#24329#24330#0" expanded="true" />
+            <element signature="e#24394#24395#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/T.java" />
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home/src.zip!/java/util/Map.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="672">
+          <caret line="605" column="6" lean-forward="true" selection-start-line="605" selection-start-column="6" selection-end-line="605" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.8.1/mongo-java-driver-3.8.1.jar!/org/bson/Document.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="69" column="17" selection-start-line="69" selection-start-column="17" selection-end-line="69" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="132">
+            <caret line="78" column="12" selection-start-line="78" selection-start-column="12" selection-end-line="78" selection-end-column="12" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/TestMain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="528">
+          <caret line="217" lean-forward="true" selection-start-line="217" selection-end-line="217" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/daemon/build/BuildMOODB.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/data/Base.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="18" selection-start-line="6" selection-start-column="18" selection-end-line="6" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/data/Inventory.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="435">
+          <caret line="29" lean-forward="true" selection-start-line="29" selection-end-line="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MDatabase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="22" selection-start-line="2" selection-start-column="22" selection-end-line="2" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldBoolean.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldDate.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="26" column="17" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldObjectId.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="30" column="13" selection-start-line="30" selection-start-column="13" selection-end-line="30" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldString.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="15" column="35" selection-start-line="15" selection-start-column="35" selection-end-line="15" selection-end-column="35" />
+          <folding>
+            <element signature="e#231#232#0" expanded="true" />
+            <element signature="e#278#279#0" expanded="true" />
+            <element signature="e#337#338#0" expanded="true" />
+            <element signature="e#381#382#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldTableField.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="45" column="45" selection-start-line="45" selection-start-column="45" selection-end-line="45" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldInteger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="22" selection-start-line="15" selection-end-line="22" />
+          <folding>
+            <element signature="e#234#235#0" expanded="true" />
+            <element signature="e#282#283#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldDouble.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
+          <folding>
+            <element signature="e#234#235#0" expanded="true" />
+            <element signature="e#281#282#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldLong.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldBinary.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="17" column="20" selection-start-line="17" selection-start-column="20" selection-end-line="17" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MFieldObject.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test02/datos/Test2Database.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home/src.zip!/java/util/function/Consumer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="48" column="9" selection-start-line="48" selection-start-column="9" selection-end-line="48" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.8.1/mongo-java-driver-3.8.1.jar!/com/mongodb/client/model/Indexes.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="35" column="23" selection-start-line="35" selection-start-column="23" selection-end-line="35" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.8.1/mongo-java-driver-3.8.1.jar!/org/bson/conversions/Bson.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="10" column="17" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/data/Entity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="373">
+          <caret line="71" lean-forward="true" selection-start-line="71" selection-end-line="71" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/data/Inventory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="298">
+          <caret line="66" lean-forward="true" selection-start-line="66" selection-end-line="66" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/data/Person.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="448">
+          <caret line="62" lean-forward="true" selection-start-line="62" selection-end-line="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/data/Invoice.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="34" selection-start-line="34" selection-end-line="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/data/Customer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="15" selection-start-line="15" selection-end-line="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/data/InvoiceItem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="283">
+          <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/data/User.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="358">
+          <caret line="47" selection-start-line="47" selection-end-line="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test01/data/InvoiceItem_XInvoice.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test02/datos/Base.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.8.1/mongo-java-driver-3.8.1.jar!/com/mongodb/client/model/Filters.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="82" column="23" selection-start-line="82" selection-start-column="23" selection-end-line="82" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test02/datos/Base.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" selection-start-line="18" selection-end-line="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/daemon/build/IndexModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="30" selection-start-line="13" selection-start-column="30" selection-end-line="13" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/moodbxml.xsd">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="329">
+          <caret line="36" column="79" selection-start-line="36" selection-start-column="79" selection-end-line="36" selection-end-column="79" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/daemon/build/FieldModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="149">
+          <caret line="16" column="21" lean-forward="true" selection-start-line="16" selection-start-column="21" selection-end-line="16" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test02/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="13" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MIndex.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1635">
+          <caret line="118" column="8" selection-start-line="118" selection-start-column="8" selection-end-line="118" selection-end-column="8" />
+          <folding>
+            <element signature="docComment;method#keyField#0;class#MIndex#0" />
+            <element signature="docComment;method#masterKeyField#0;class#MIndex#0" />
+            <element signature="docComment;method#name#0;class#MIndex#0" />
+            <element signature="docComment;method#unique#0;class#MIndex#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test02/datos/Inventario.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="495">
+          <caret line="33" column="27" selection-start-line="33" selection-start-column="27" selection-end-line="33" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test02/datos/Inventario.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="930">
+          <caret line="74" column="17" selection-start-line="74" selection-start-column="17" selection-end-line="74" selection-end-column="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1488#1489#0" expanded="true" />
+            <element signature="e#1528#1529#0" expanded="true" />
+            <element signature="e#2115#2116#0" expanded="true" />
+            <element signature="e#2170#2171#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MEngine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1470">
+          <caret line="113" column="20" selection-start-line="113" selection-start-column="12" selection-end-line="113" selection-end-column="20" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/src/test02/MainCtrl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1245">
+          <caret line="96" selection-start-line="96" selection-end-line="96" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/daemon/build/FileMaker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3255">
+          <caret line="230" selection-start-line="230" selection-end-line="230" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="243">
+          <caret line="25" column="29" lean-forward="true" selection-start-line="25" selection-start-column="29" selection-end-line="25" selection-end-column="29" />
+          <folding>
+            <element signature="e#242#302#0" />
+            <element signature="e#812#929#0" />
+            <element signature="e#935#966#0" />
+            <element signature="e#1138#1304#0" />
+            <element signature="e#1310#1394#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MBaseData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="258">
+          <caret line="28" column="10" selection-start-line="28" selection-start-column="10" selection-end-line="28" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tech/fonrouge/MOODB/MField.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="23" column="17" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <last-edited>MOODB:jar</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.5" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>No facets are configured</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>MOODB</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>org.mongodb:mongo-java-driver:3.8.1</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>

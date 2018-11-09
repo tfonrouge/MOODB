@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MongoConfiguration">
+    <option name="serverConfigurations">
+      <list>
+        <ServerConfiguration>
+          <option name="authenticationDatabase" value="Cobra" />
+          <option name="label" value="Cobra" />
+          <option name="password" value="Cobra1_2018" />
+          <option name="serverUrls">
+            <list>
+              <option value="fonrouge.tech:27017" />
+            </list>
+          </option>
+          <option name="sshTunnelingConfiguration">
+            <SshTunnelingConfiguration />
+          </option>
+          <option name="username" value="cobra1" />
+        </ServerConfiguration>
+      </list>
+    </option>
+  </component>
+</project>
