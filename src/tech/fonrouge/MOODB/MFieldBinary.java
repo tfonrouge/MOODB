@@ -14,6 +14,11 @@ public class MFieldBinary extends MField<Binary> {
     }
 
     @Override
+    public boolean setValueAsString(String value) {
+        return false;
+    }
+
+    @Override
     public Binary getEmptyValue() {
         return new Binary(new byte[0]);
     }
@@ -25,9 +30,10 @@ public class MFieldBinary extends MField<Binary> {
 
     @Override
     public String valueAsString() {
-        if (fieldState.value == null) {
+        Binary value = value();
+        if (value == null) {
             return "";
         }
-        return fieldState.value.toString();
+        return value.toString();
     }
 }

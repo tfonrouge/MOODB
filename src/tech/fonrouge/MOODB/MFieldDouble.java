@@ -12,6 +12,17 @@ public class MFieldDouble extends MField<Double> {
     }
 
     @Override
+    public boolean setValueAsString(String value) {
+        Double aDouble;
+        try {
+            aDouble = Double.valueOf(value);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return super.setValue(aDouble);
+    }
+
+    @Override
     public Double getEmptyValue() {
         return 0.0;
     }
@@ -23,9 +34,10 @@ public class MFieldDouble extends MField<Double> {
 
     @Override
     public String valueAsString() {
-        if (fieldState.value == null) {
+        Double value = value();
+        if (value == null) {
             return "";
         }
-        return fieldState.value.toString();
+        return value.toString();
     }
 }

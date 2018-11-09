@@ -12,6 +12,11 @@ public class MFieldString extends MField<String> {
     }
 
     @Override
+    public boolean setValueAsString(String value) {
+        return super.setValue(value);
+    }
+
+    @Override
     public String getEmptyValue() {
         return "";
     }
@@ -23,9 +28,10 @@ public class MFieldString extends MField<String> {
 
     @Override
     public String valueAsString() {
-        if (fieldState.value==null) {
+        String value = value();
+        if (value == null) {
             return "";
         }
-        return fieldState.value;
+        return value;
     }
 }

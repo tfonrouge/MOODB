@@ -12,6 +12,17 @@ public class MFieldLong extends MField<Long> {
     }
 
     @Override
+    public boolean setValueAsString(String value) {
+        Long aLong;
+        try {
+            aLong = Long.valueOf(value);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return super.setValue(aLong);
+    }
+
+    @Override
     public Long getEmptyValue() {
         return 0L;
     }
@@ -23,9 +34,10 @@ public class MFieldLong extends MField<Long> {
 
     @Override
     public String valueAsString() {
-        if (fieldState.value == null) {
+        Long value = value();
+        if (value == null) {
             return "";
         }
-        return fieldState.value.toString();
+        return value.toString();
     }
 }

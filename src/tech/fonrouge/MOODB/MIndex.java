@@ -3,29 +3,31 @@ package tech.fonrouge.MOODB;
 import com.mongodb.Block;
 import com.mongodb.client.ListIndexesIterable;
 import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
-public class MIndex {
-    private boolean descending;
+public abstract class MIndex {
+    protected Bson partialFilter;
     private String keyField;
     private String masterKeyField;
     private String name;
     private boolean unique;
     private MTable table;
+    private List<Integer> keyFieldList = new ArrayList<>();
 
-    public MIndex(MTable table, String name, String masterKeyField, String keyField, boolean descending, boolean unique) {
+    public MIndex(MTable table, String name, String masterKeyField, String keyField, boolean unique) {
         this.table = table;
         this.name = name;
         this.masterKeyField = masterKeyField;
         this.keyField = keyField;
-        this.descending = descending;
         this.unique = unique;
         this.table.indices.add(this);
+        initialize();
         buildIndex();
     }
 
@@ -33,13 +35,25 @@ public class MIndex {
     /* private methods */
     /* *************** */
 
-    private ArrayList<String> getFields(String s) {
-        ArrayList<String> strings = new ArrayList<>();
+    private Document getFields(String s) {
+        Document document = new Document();
+
         Scanner scanner = new Scanner(s).useDelimiter(",");
         while (scanner.hasNext()) {
-            strings.add(scanner.next());
+            String field = scanner.next();
+            if (field.contains(":")) {
+                Scanner scanner1 = new Scanner(field).useDelimiter(":");
+                while (scanner1.hasNext()) {
+                    String indexField = scanner1.next();
+                    String indexSortOrder = scanner1.next();
+                    int index = Integer.parseInt(indexSortOrder);
+                    document.append(indexField, index);
+                }
+            } else {
+                document.append(field, 1);
+            }
         }
-        return strings;
+        return document;
     }
 
     /* ***************** */
@@ -51,37 +65,37 @@ public class MIndex {
         Bson bson;
         String s;
 
-        for (MIndex mIndex : table.indices) {
-            s = mIndex.masterKeyField;
-            if (!mIndex.masterKeyField.isEmpty()) {
-                if (!mIndex.keyField.isEmpty()) {
-                    s += "," + mIndex.keyField;
-                }
-            } else {
-                s = mIndex.keyField;
+        s = masterKeyField;
+        if (!masterKeyField.isEmpty()) {
+            if (!keyField.isEmpty()) {
+                s += "," + keyField;
             }
-            if (mIndex.descending) {
-                bson = Indexes.descending(getFields(s));
+        } else {
+            s = keyField;
+        }
 
-            } else {
-                bson = Indexes.ascending(getFields(s));
-            }
-            indexOptions = new IndexOptions();
-            indexOptions.name(mIndex.name);
-            if (mIndex.unique) {
-                indexOptions.unique(true);
-            }
+        bson = getFields(s);
 
-            ListIndexesIterable<Document> indices = table.engine.collection.listIndexes();
-            final boolean[] buildIndex = {true};
-            indices.forEach((Block<? super Document>) document -> {
-                if (document.containsKey("name") && document.getString("name").contentEquals(mIndex.name)) {
-                    buildIndex[0] = false;
-                }
-            });
-            if (buildIndex[0]) {
-                table.engine.collection.createIndex(bson, indexOptions);
+        indexOptions = new IndexOptions();
+        indexOptions.name(name);
+
+        if (unique) {
+            indexOptions.unique(true);
+        }
+
+        if (partialFilter != null) {
+            indexOptions.partialFilterExpression(partialFilter);
+        }
+
+        ListIndexesIterable<Document> indices = table.engine.collection.listIndexes();
+        final boolean[] buildIndex = {true};
+        indices.forEach((Block<? super Document>) document -> {
+            if (document.containsKey("name") && document.getString("name").contentEquals(name)) {
+                buildIndex[0] = false;
             }
+        });
+        if (buildIndex[0]) {
+            table.engine.collection.createIndex(bson, indexOptions);
         }
     }
 
@@ -89,14 +103,38 @@ public class MIndex {
     /* public methods */
     /* ************** */
 
-    /**
-     * descending
-     *
-     * @return boolean for descending index value
-     */
-    public boolean descending() {
-        return descending;
+    public boolean find(Object... objects) {
+        Document document = getMasterKeyFindExpression(masterKeyField);
+        getKeyFieldFindExpression(document, objects);
+        List<? extends Bson> pipeline = Collections.singletonList(new Document().append("$match", document));
+        return table.setTableDocument(table.engine.executeAggregate(pipeline));
     }
+
+    private void getKeyFieldFindExpression(Document document, Object... objects) {
+        Scanner scanner = new Scanner(keyField).useDelimiter(",");
+        int i = 0;
+        while (scanner.hasNext()) {
+            String fieldName = scanner.next();
+            if (i < objects.length) {
+                document.append(fieldName, objects[i++]);
+            }
+        }
+    }
+
+    private Document getMasterKeyFindExpression(String masterKeyField) {
+        Document document = new Document();
+        Scanner scanner = new Scanner(masterKeyField).useDelimiter(",");
+        while (scanner.hasNext()) {
+            String fieldName = scanner.next();
+            MField mField = table.fieldByName(fieldName);
+            if (mField != null) {
+                document.append(fieldName, mField.getDefaultValue());
+            }
+        }
+        return document;
+    }
+
+    protected abstract void initialize();
 
     /**
      * keyField
@@ -133,4 +171,5 @@ public class MIndex {
     public boolean unique() {
         return unique;
     }
+
 }

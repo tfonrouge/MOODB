@@ -90,11 +90,14 @@
         </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="IndexType">
+        <xs:all minOccurs="0">
+            <xs:element name="PartialFilter" type="partialFilterType" minOccurs="0"/>
+        </xs:all>
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="masterKeyField" type="xs:string"/>
         <xs:attribute name="keyField" type="xs:string" use="required"/>
+        <xs:attribute name="partialFilter" type="xs:string"/>
         <xs:attribute name="unique" type="xs:boolean"/>
-        <xs:attribute name="descending" type="xs:boolean"/>
     </xs:complexType>
     <xs:complexType name="MasterSourceType">
         <xs:attribute name="class" type="xs:string" use="required"/>
@@ -112,4 +115,38 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
+    <xs:complexType name="partialFilterType">
+        <xs:sequence>
+            <xs:element name="field" type="partialFilterField" maxOccurs="unbounded"/>
+            <xs:element name="PartialFilter" type="partialFilterType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="operator" type="logicOperatorType" use="required">
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="partialFilterField">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="operator" type="operatorsType" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:simpleType name="operatorsType">
+        <xs:restriction>
+            <xs:enumeration value="$eq"/>
+            <xs:enumeration value="$exists"/>
+            <xs:enumeration value="$gt"/>
+            <xs:enumeration value="$gte"/>
+            <xs:enumeration value="$lt"/>
+            <xs:enumeration value="$lte"/>
+            <xs:enumeration value="$type"/>
+            <xs:enumeration value="$and"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="logicOperatorType">
+        <xs:restriction>
+            <xs:enumeration value="and"/>
+            <xs:enumeration value="or"/>
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>

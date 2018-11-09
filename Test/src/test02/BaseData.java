@@ -1,6 +1,7 @@
 package test02;
 
 import javafx.beans.property.SimpleStringProperty;
+import test02.datos.Base;
 
 public abstract class BaseData {
 

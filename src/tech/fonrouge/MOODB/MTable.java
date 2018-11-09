@@ -6,6 +6,7 @@ import org.bson.Document;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.stream.Stream;
 
 abstract public class MTable {
 
@@ -14,7 +15,7 @@ abstract public class MTable {
      */
     public final MFieldObject field__id = new MFieldObject(this, "_id");
 
-    HashMap<String, MField> fieldList;
+    ArrayList<MField> fieldList;
     ArrayList<MIndex> indices = new ArrayList<>();
     MEngine engine;
     TableState tableState = new TableState();
@@ -65,6 +66,16 @@ abstract public class MTable {
 
     void set_id(Object value) {
         field__id.fieldState.value = value;
+    }
+
+    MField fieldByName(String fieldName) {
+        final MField[] mField = {null};
+        fieldList.forEach(mField1 -> {
+            if (mField1.name.contentEquals(fieldName)) {
+                mField[0] = mField1;
+            }
+        });
+        return mField[0];
     }
 
     /**
@@ -140,7 +151,7 @@ abstract public class MTable {
 
         tableState.eof = document == null;
 
-        fieldList.forEach((fieldName, mField) -> {
+        fieldList.forEach(mField -> {
             if (!mField.calculated) {
                 mField.fieldState.value = document == null ? null : document.getOrDefault(mField.name, null);
                 if (mField.fieldState.value == null && mField.notNullable) {
@@ -207,7 +218,7 @@ abstract public class MTable {
         }
 
         /* fill field values */
-        fieldList.forEach((fieldName, mField) -> {
+        fieldList.forEach(mField -> {
             if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
                 ((MFieldTableField) mField).notSynced = true;
             }
@@ -226,6 +237,8 @@ abstract public class MTable {
     /* ************** */
     /* public methods */
     /* ************** */
+
+    public abstract MBaseData getData();
 
     /**
      * getEof
@@ -246,12 +259,12 @@ abstract public class MTable {
     }
 
     /**
-     * getFieldList
+     * getFieldListStream
      *
-     * @return array of field list
+     * @return stream of field list
      */
-    public HashMap<String, MField> getFieldList() {
-        return fieldList;
+    public Stream<MField> getFieldListStream() {
+        return fieldList.stream();
     }
 
     /**
@@ -279,7 +292,7 @@ abstract public class MTable {
      */
     public HashMap<String, String> getInvalidFieldList() {
         HashMap<String, String> result = new HashMap<>();
-        fieldList.forEach((fieldName, mField) -> {
+        fieldList.forEach(mField -> {
             String item = null;
             if (!mField.getValidStatus()) {
                 item = mField.getInvalidCause();
@@ -341,7 +354,7 @@ abstract public class MTable {
             return false;
         }
 
-        fieldList.forEach((s, mField) -> {
+        fieldList.forEach(mField -> {
             if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
                 ((MFieldTableField) mField).notSynced = true;
             }
@@ -349,7 +362,7 @@ abstract public class MTable {
         });
 
         /* fill field values */
-        fieldList.forEach((fieldName, mField) -> {
+        fieldList.forEach(mField -> {
             if (!mField.calculated) {
                 if (tableState.masterSource != null && mField.equals(tableState.masterSourceField)) {
                     mField.fieldState.value = tableState.masterSource._id();
@@ -357,6 +370,10 @@ abstract public class MTable {
                     if (mField.fieldType == FIELD_TYPE.DATE && ((MFieldDate) mField).mNewDate) {
                         mField.fieldState.value = new Date();
                     } else {
+                        Object value = mField.getNewValue();
+                        if (mField.notNullable && mField.valueItems != null && !mField.valueItems.containsKey(value)) {
+                            throw new RuntimeException("Invalid new value [" + value + "] on field '" + mField.name + "'.");
+                        }
                         mField.fieldState.value = mField.getNewValue();
                     }
                     if (mField.fieldState.value == null && mField.notNullable) {
@@ -393,7 +410,7 @@ abstract public class MTable {
         }
 
         /* checks for empty values on required fields */
-        fieldList.forEach((fieldName, mField) -> {
+        fieldList.forEach(mField -> {
             if (!mField.calculated && mField.required && mField.isEmpty()) {
                 tableState.exception = new Exception("Empty Value on Required Field: '" + mField.name + "'");
             }
@@ -411,18 +428,18 @@ abstract public class MTable {
             boolean result;
             switch (tableState.state) {
                 case EDIT:
-                    fieldList.forEach((fieldName, mField) -> {
-                        if (!mField.calculated && !fieldName.contentEquals("_id") && mField.valueChanged()) {
-                            document.put(fieldName, mField.value());
+                    fieldList.forEach(mField -> {
+                        if (!mField.calculated && !mField.getName().contentEquals("_id") && mField.valueChanged()) {
+                            document.put(mField.getName(), mField.value());
                         }
                     });
                     result = engine.update(document);
                     break;
                 case INSERT:
-                    fieldList.forEach((fieldName, mField) -> {
+                    fieldList.forEach(mField -> {
                         if (!mField.calculated) {
-                            if (!(mField instanceof MFieldObjectId && fieldName.contentEquals("_id")) && !(mField.fieldState.value == null)) {
-                                document.put(fieldName, mField.value());
+                            if (!(mField instanceof MFieldObjectId && mField.getName().contentEquals("_id")) && !(mField.fieldState.value == null)) {
+                                document.put(mField.getName(), mField.value());
                             }
                         }
                     });
@@ -448,7 +465,7 @@ abstract public class MTable {
         if (tableStateIndex == 0) {
             throw new RuntimeException("tableStateIndex out of bounds.");
         }
-        fieldList.forEach((s, mField) -> mField.fieldStatePull());
+        fieldList.forEach(MField::fieldStatePull);
         tableState = tableStateList.get(--tableStateIndex);
     }
 
@@ -459,7 +476,7 @@ abstract public class MTable {
         ++tableStateIndex;
         tableState = new TableState();
         tableStateList.add(tableState);
-        fieldList.forEach((s, mField) -> mField.fieldStatePush());
+        fieldList.forEach(MField::fieldStatePush);
     }
 
     public enum FIELD_TYPE {

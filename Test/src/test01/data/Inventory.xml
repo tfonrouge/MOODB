@@ -14,6 +14,12 @@
         <oons:FieldDouble name="unitPrice" description="Unit price" required="true"/>
         <oons:FieldDate name="date" calculated="true"/>
         <oons:FieldBinary name="image"/>
+        <oons:FieldString name="type">
+            <oons:validValues>
+                <oons:value label="ANA"/>
+
+            </oons:validValues>
+        </oons:FieldString>
 
     </oons:Fields>
 

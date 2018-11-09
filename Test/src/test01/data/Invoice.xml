@@ -9,8 +9,7 @@
 
         <oons:FieldInteger name="docNumber" description="Invoice number" required="true"/>
         <oons:FieldTableField name="customer" class="Customer" required="true"/>
-        <oons:FieldDate name="date" required="true">
-            <oons:newValue type="">new Date();</oons:newValue>
+        <oons:FieldDate name="date" required="true" newDate="true">
         </oons:FieldDate>
 
     </oons:Fields>

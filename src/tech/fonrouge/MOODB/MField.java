@@ -22,8 +22,8 @@ public abstract class MField<T> {
     protected HashMap<T, String> valueItems;
     protected Callable<T> calcValue = null;
     protected Callable<Boolean> onValidate = null;
-    String name;
     FieldState fieldState = new FieldState();
+    String name;
     private String invalidCause = null;
     private int fieldStateIndex = 0;
     private ArrayList<FieldState> fieldStateList = new ArrayList<>();
@@ -33,10 +33,10 @@ public abstract class MField<T> {
         table = owner;
 
         if (table.fieldList == null) {
-            table.fieldList = new HashMap<>();
+            table.fieldList = new ArrayList<>();
         }
 
-        if (name.contentEquals("_id") && table.fieldList.containsKey("_id")) {
+        if (name.contentEquals("_id") && table.fieldList.stream().anyMatch(mField -> mField.getName().contentEquals("_id"))) {
             throw new RuntimeException("attempt to re-assign_id field");
         }
 
@@ -44,7 +44,7 @@ public abstract class MField<T> {
         calculated = false;
         required = false;
         notNullable = false;
-        table.fieldList.put(name, this);
+        table.fieldList.add(this);
         initialize();
     }
 
@@ -186,8 +186,12 @@ public abstract class MField<T> {
      *
      * @return
      */
-    protected T getNewValue() {
-        return null;
+    final protected T getNewValue() {
+        return fieldState.newValue;
+    }
+
+    final public void setNewValue(T newValue) {
+        fieldState.newValue = newValue;
     }
 
     /**
@@ -233,6 +237,10 @@ public abstract class MField<T> {
 
     }
 
+    public boolean isCalculated() {
+        return calculated;
+    }
+
     /**
      * isEmpty
      *
@@ -271,6 +279,8 @@ public abstract class MField<T> {
         return true;
     }
 
+    abstract public boolean setValueAsString(String value);
+
     /**
      * value
      *
@@ -303,8 +313,21 @@ public abstract class MField<T> {
                 origValue);
     }
 
+    final public Object getDefaultValue() {
+        if (fieldState.defaultValue == null) {
+            return fieldState.newValue;
+        }
+        return fieldState.defaultValue;
+    }
+
+    final public void setDefaultValue(T defaultValue) {
+        fieldState.defaultValue = defaultValue;
+    }
+
     class FieldState {
         T value;
+        T newValue;
+        T defaultValue;
         T origValue;
     }
 }

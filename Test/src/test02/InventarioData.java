@@ -2,6 +2,7 @@ package test02;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
+import test02.datos.Inventario;
 
 public class InventarioData extends BaseData {
 

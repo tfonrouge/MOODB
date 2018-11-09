@@ -1,5 +1,7 @@
 package tech.fonrouge.MOODB;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class MFieldDate extends MField<Date> {
@@ -16,6 +18,12 @@ public class MFieldDate extends MField<Date> {
     }
 
     @Override
+    public boolean setValueAsString(String value) {
+        Date date = Date.from(LocalDateTime.parse(value).atZone(ZoneId.systemDefault()).toInstant());
+        return super.setValue(date);
+    }
+
+    @Override
     public Date getEmptyValue() {
         return null;
     }
@@ -27,9 +35,10 @@ public class MFieldDate extends MField<Date> {
 
     @Override
     public String valueAsString() {
-        if (fieldState.value == null) {
+        Date value = value();
+        if (value == null) {
             return "";
         }
-        return fieldState.value.toString();
+        return value.toString();
     }
 }

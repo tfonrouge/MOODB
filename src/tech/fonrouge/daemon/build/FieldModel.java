@@ -17,7 +17,8 @@ class FieldModel {
     boolean required;
     String className;
     HashMap<String, String> keyValueItems;
-    String newValue = "";
+    String newValue;
+    String defaultValue;
     private boolean valid = true;
 
     FieldModel(Node node) {
@@ -72,7 +73,12 @@ class FieldModel {
                                 Node nodeKeyValue = nodeListValidValues.item(j);
                                 if (nodeKeyValue.getNodeType() == Node.ELEMENT_NODE && nodeKeyValue.getLocalName().contentEquals("value")) {
                                     String label = nodeKeyValue.getAttributes().getNamedItem("label").getNodeValue();
-                                    String value = nodeKeyValue.getChildNodes().item(0).getNodeValue();
+                                    String value;
+                                    if (nodeKeyValue.getChildNodes().item(0) != null) {
+                                        value = nodeKeyValue.getChildNodes().item(0).getNodeValue();
+                                    } else {
+                                        value = "\"" + label + "\"";
+                                    }
                                     keyValueItems.put(value, label);
                                 }
                             }
@@ -83,6 +89,13 @@ class FieldModel {
                         NodeList nodeNewValue = node1.getChildNodes();
                         if (nodeNewValue.getLength() > 0) {
                             newValue = nodeNewValue.item(0).getNodeValue();
+                        }
+                    }
+                    /* default value */
+                    if (node1.getNodeType() == Node.ELEMENT_NODE && node1.getLocalName().contentEquals("defaultValue")) {
+                        NodeList nodeNewValue = node1.getChildNodes();
+                        if (nodeNewValue.getLength() > 0) {
+                            defaultValue = nodeNewValue.item(0).getNodeValue();
                         }
                     }
                 }

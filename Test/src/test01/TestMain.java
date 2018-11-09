@@ -63,31 +63,31 @@ public class TestMain {
                             invoiceItem.field_qty.setValue((double) (random.nextInt(10) + 1));
                             invoiceItem.field_unitPrice.setValue(inventory.field_unitPrice.value());
                             if (!invoiceItem.post()) {
-                                System.out.println(invoiceItem.exception().getLocalizedMessage());
+                                System.out.println(invoiceItem.getException().getLocalizedMessage());
                                 invoiceItem.cancel();
                             }
                         }
                     }
                 } else {
-                    System.out.println(invoice.exception().getLocalizedMessage());
+                    System.out.println(invoice.getException().getLocalizedMessage());
                     invoice.cancel();
                 }
             }
         }
 
         if (invoice.find()) {
-            while (!invoice.eof()) {
+            while (!invoice.getEof()) {
                 System.out.println("Invoice #" + invoice.field_docNumber.value());
-                System.out.println("    Customer: " + invoice.field_customer.dataField().field_name.value());
+                System.out.println("    Customer: " + invoice.field_customer.syncLinkedTable().field_name.value());
                 System.out.println("        DATE: " + invoice.field_date.value());
                 InvoiceItem_XInvoice invoiceItem = new InvoiceItem_XInvoice(invoice);
                 if (invoiceItem.find()) {
                     int row = 0;
-                    while (!invoiceItem.eof()) {
+                    while (!invoiceItem.getEof()) {
                         System.out.println("    * #" +
-                                invoiceItem.field_invoice.dataField().field_docNumber.value() + " : " +
+                                invoiceItem.field_invoice.syncLinkedTable().field_docNumber.value() + " : " +
                                 ++row + " = " +
-                                invoiceItem.field_invItem.dataField().field_name.value() + " \t" +
+                                invoiceItem.field_invItem.syncLinkedTable().field_name.value() + " \t" +
                                 invoiceItem.field_qty.value() + " \t" +
                                 invoiceItem.field_unitPrice.value() + " total $" +
                                 invoiceItem.field_total.value());
@@ -227,7 +227,7 @@ public class TestMain {
             user.field_password.setValue("drowssap");
             user.field_userId.setValue("9999");
             if (!user.post()) {
-                System.out.println("Error: " + user.exception().getLocalizedMessage());
+                System.out.println("Error: " + user.getException().getLocalizedMessage());
                 user.cancel();
             }
         }

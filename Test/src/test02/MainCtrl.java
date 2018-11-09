@@ -8,6 +8,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import test02.datos.Inventario;
 
 import java.util.Date;
 import java.util.Random;
@@ -93,8 +94,9 @@ public class MainCtrl {
         Inventario inventario = new Inventario();
 
         inventario.find();
+        inventario.index_tipo_nombre.find(1);
 
-        while (!inventario.eof()) {
+        while (!inventario.getEof()) {
             observableList.add(new InventarioData(inventario));
             inventario.next();
         }

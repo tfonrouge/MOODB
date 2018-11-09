@@ -7,9 +7,7 @@
 
     <oons:Fields>
 
-        <oons:FieldDate name="fecha" required="true">
-            <oons:newValue>new Date();</oons:newValue>
-        </oons:FieldDate>
+        <oons:FieldDate name="fecha" required="true" newDate="true"/>
 
     </oons:Fields>
 

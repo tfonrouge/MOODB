@@ -31,11 +31,11 @@ class FileMaker {
     private int numCalcFields = 0;
     private int numValidateFields = 0;
     private List<FieldModel> fieldModels;
-    private ArrayList<IndexItem> mIndices;
+    private List<IndexModel> indexModels;
     private List<String> calcFieldList = new ArrayList<>();
     private List<String> onValidateList = new ArrayList<>();
 
-    FileMaker(Path pathExtLess, Document document, String className) {
+    FileMaker(final Path pathExtLess, final Document document, String className) {
 
         NamedNodeMap namedNodeMap = document.getElementsByTagNameNS("*", "Table").item(0).getAttributes();
         isAbstract = namedNodeMap.getNamedItem("abstract") != null && namedNodeMap.getNamedItem("abstract").getNodeValue().equals("true");
@@ -49,7 +49,7 @@ class FileMaker {
         this.pathModel = Paths.get(pathExtLess.toString() + "Model.java");
         this.className = className;
         fieldModels = new ArrayList<>();
-        mIndices = new ArrayList<>();
+        indexModels = new ArrayList<>();
 
         NodeList nodeList = document.getElementsByTagNameNS("*", "Fields").item(0).getChildNodes();
 
@@ -71,25 +71,9 @@ class FileMaker {
 
         for (int i = 0; i < document.getElementsByTagNameNS("*", "Index").getLength(); i++) {
             Node node = document.getElementsByTagNameNS("*", "Index").item(i);
-            Node node1;
-
-            NamedNodeMap nodeMap = node.getAttributes();
-
-            String name = nodeMap.getNamedItem("name").getNodeValue();
-
-            node1 = nodeMap.getNamedItem("keyField");
-            String keyField = node1 == null ? "" : node1.getNodeValue();
-
-            node1 = nodeMap.getNamedItem("masterKeyField");
-            String masterKeyField = node1 == null ? "" : node1.getNodeValue();
-
-            node1 = nodeMap.getNamedItem("descending");
-            boolean ascending = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
-
-            node1 = nodeMap.getNamedItem("unique");
-            boolean unique = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
-
-            mIndices.add(new IndexItem(name, keyField, masterKeyField, ascending, unique));
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                indexModels.add(new IndexModel(node));
+            }
         }
 
         nodeList = document.getElementsByTagNameNS("*", "MasterSource");
@@ -164,6 +148,14 @@ class FileMaker {
                     initializeString += "            mNewDate = true;\n";
                 }
 
+                if (fieldModel.newValue != null) {
+                    initializeString += "            setNewValue(" + fieldModel.newValue + ");\n";
+                }
+
+                if (fieldModel.defaultValue != null) {
+                    initializeString += "            setDefaultValue(" + fieldModel.defaultValue + ");\n";
+                }
+
                 if (fieldModel.keyValueItems.size() > 0) {
                     initializeString += "\n            valueItems = new HashMap<>();\n";
                     final String[] line = {""};
@@ -191,49 +183,52 @@ class FileMaker {
                             append("        }\n");
                 }
 
-                /* newValue */
-                if (!fieldModel.newValue.isEmpty()) {
-                    buffer.
-                            append("\n").
-                            append("        @Override\n").
-                            append("        protected ");
-                    if (fieldModel.type.contentEquals("TableField")) {
-                        buffer.append("Object");
-                    } else {
-                        buffer.append(fieldModel.type);
-                    }
-                    buffer.
-                            append(" getNewValue() {\n").
-                            append("            return ").
-                            append(fieldModel.newValue).
-                            append("\n").
-                            append("        }\n");
-                }
-
                 buffer.append("    };\n");
             }
         }
 
         buffer.append("\n");
 
-        if (mIndices.size() > 0) {
-            mIndices.forEach(mIndex -> buffer.
-                    append("    public final MIndex index_").
-                    append(mIndex.mName).
-                    append(" = new MIndex(").
-                    append("this, \"").
-                    append(mIndex.name()).
-                    append("\", \"").
-                    append(mIndex.masterKeyField()).
-                    append("\", \"").
-                    append(mIndex.keyField()).
-                    append("\", ").
-                    append(mIndex.descending()).
-                    append(", ").
-                    append(mIndex.unique()).
-                    append(");\n")
-            );
-            buffer.append("\n");
+        if (indexModels.size() > 0) {
+            indexModels.forEach(indexModel -> {
+                buffer.
+                        append("    public final MIndex index_").
+                        append(indexModel.getName()).
+                        append(" = new MIndex(").
+                        append("this, \"").
+                        append(indexModel.getName()).
+                        append("\", \"").
+                        append(indexModel.getMasterKeyField()).
+                        append("\", \"").
+                        append(indexModel.getKeyField()).
+                        append("\", ").
+                        append(indexModel.isUnique()).
+                        append(") {\n").
+                        append("        @Override\n").
+                        append("        protected void initialize() {\n");
+                if (indexModel.getIndexFieldItems().size() > 0) {
+                    indexModel.getIndexFieldItems().forEach(indexFieldItem -> {
+                        buffer.append("            partialFilter = Filters.").append(indexFieldItem.getLogicOperator()).append("(");
+                        if (indexFieldItem.getPartialFilterItems().size() > 0) {
+                            final String[] s = {""};
+                            indexFieldItem.getPartialFilterItems().forEach((value) -> {
+                                s[0] += s[0].isEmpty() ? value : (", " + value);
+                            });
+                            buffer.append(s[0]);
+                        }
+                    });
+                    buffer.append(");\n");
+                }
+                buffer.append("        }\n\n");
+                /*
+                buffer.append("        public boolean find(");
+                buffer.append(getFindParams(indexModel.getKeyField()));
+                buffer.append(") {\n");
+                buffer.append("            return super.find(").append(getFindArrayList(indexModel.getKeyField())).append(");\n");
+                buffer.append("        }\n");
+                buffer.append("    };\n");
+                */
+            });
         }
 
         if (!isAbstract) {
@@ -250,9 +245,12 @@ class FileMaker {
             buffer.
                     append("\n").
                     append("    public ").
-                    append(className).
-                    append("(" + masterSourceClass + " masterSource) {\n").
-                    append("        setMasterSource(masterSource, field_" + masterSourceField + ");\n").
+                    append(className).append("(").
+                    append(masterSourceClass).
+                    append(" masterSource) {\n").
+                    append("        setMasterSource(masterSource, field_").
+                    append(masterSourceField).
+                    append(");\n").
                     append("    }\n");
         }
 
@@ -319,6 +317,40 @@ class FileMaker {
         }
 
         return buffer.toString();
+    }
+
+    private String getFindArrayList(String keyField) {
+        int numParams = 0;
+        StringBuilder result = new StringBuilder();
+        Scanner scanner = new Scanner(keyField).useDelimiter(",");
+        while (scanner.hasNext()) {
+            ++numParams;
+            Scanner scanner1 = new Scanner(scanner.next()).useDelimiter(":");
+            String fieldName = scanner1.next();
+            result.append((result.length() == 0) ? fieldName : ", " + fieldName);
+        }
+        if (numParams == 1) {
+            return "new ArrayList<>(Collections.singletonList(" + result.toString() + "))";
+        }
+        return "new ArrayList<>(Arrays.asList(" + result.toString() + "))";
+    }
+
+    private String getFindParams(String keyField) {
+        StringBuilder result = new StringBuilder();
+        Scanner scanner = new Scanner(keyField).useDelimiter(",");
+        while (scanner.hasNext()) {
+            Scanner scanner1 = new Scanner(scanner.next()).useDelimiter(":");
+            String fieldName = scanner1.next();
+            final String[] qualifier = {"Object"};
+            fieldModels.forEach(fieldModel -> {
+                if (fieldModel.fieldName.contentEquals(fieldName)) {
+                    qualifier[0] = fieldModel.type;
+                }
+            });
+            String s = qualifier[0] + " " + fieldName;
+            result.append((result.length() == 0) ? s : ", " + s);
+        }
+        return result.toString();
     }
 
     private void createFileTable() {
@@ -566,32 +598,21 @@ class FileMaker {
     }
 
     class IndexItem {
-        boolean mDescending = true;
         String mKeyField;
         String mMasterKeyField;
         String mName;
-        boolean mUnique = false;
+        boolean mUnique;
 
-        IndexItem(String name, String keyField, String masterKeyField, boolean descending, boolean unique) {
+        IndexItem(String name, String keyField, String masterKeyField, boolean unique) {
             mName = name;
             mKeyField = keyField;
             mMasterKeyField = masterKeyField;
-            mDescending = descending;
             mUnique = unique;
         }
 
         /* ************** */
         /* public methods */
         /* ************** */
-
-        /**
-         * descending
-         *
-         * @return boolean for descending index value
-         */
-        boolean descending() {
-            return mDescending;
-        }
 
         /**
          * keyField

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<oons:Table extends="Base" tableName="inventory" database="Test2Database"
+<oons:Table extends="Base" tableName="inventory"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:oons="http://fonrouge.tech/MOODB"
             xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
@@ -8,14 +8,41 @@
     <oons:Fields>
 
         <oons:FieldString name="nombre" description="Nombre" required="true"/>
-        <oons:FieldString name="udem" required="true">
+        <oons:FieldString name="udem" required="true"/>
+        <oons:FieldString name="tipo" required="true">
+            <oons:validValues>
+                <oons:value label="Grupo">"G"</oons:value>
+                <oons:value label="Articulo">"A"</oons:value>
+                <oons:value label="Servicio">"S"</oons:value>
+            </oons:validValues>
         </oons:FieldString>
+
+        <oons:FieldInteger name="level">
+            <oons:validValues>
+                <oons:value label="one">1</oons:value>
+                <oons:value label="two">2</oons:value>
+                <oons:value label="three">3</oons:value>
+            </oons:validValues>
+        </oons:FieldInteger>
         <oons:FieldDouble name="existencia">
-            <oons:newValue>0.0;</oons:newValue>
+            <oons:newValue>0.0</oons:newValue>
         </oons:FieldDouble>
+
+        <oons:FieldString name="status" required="true">
+            <oons:newValue>"1"</oons:newValue>
+            <oons:defaultValue>"2"</oons:defaultValue>
+        </oons:FieldString>
+
 
     </oons:Fields>
 
-    <oons:Index name="nombre" keyField="nombre" unique="true"/>
+    <oons:Index name="tipo_nombre" keyField="tipo:1,nombre:1" unique="true">
+        <oons:PartialFilter operator="and">
+            <oons:field name="tipo" operator="$eq">"A"</oons:field>
+            <oons:field name="nombre" operator="$gte">"CILINDRO"</oons:field>
+        </oons:PartialFilter>
+    </oons:Index>
+
+    <oons:Index name="nombre" keyField="nombre"/>
 
 </oons:Table>

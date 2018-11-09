@@ -12,6 +12,17 @@ public class MFieldInteger extends MField<Integer> {
     }
 
     @Override
+    public boolean setValueAsString(String value) {
+        Integer integer;
+        try {
+            integer = Integer.valueOf(value);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return super.setValue(integer);
+    }
+
+    @Override
     public Integer getEmptyValue() {
         return 0;
     }
@@ -29,9 +40,10 @@ public class MFieldInteger extends MField<Integer> {
 
     @Override
     public String valueAsString() {
-        if (fieldState.value == null) {
+        Integer value = value();
+        if (value == null) {
             return "";
         }
-        return fieldState.value.toString();
+        return value.toString();
     }
 }
