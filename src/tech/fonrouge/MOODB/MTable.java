@@ -68,7 +68,7 @@ abstract public class MTable {
         field__id.fieldState.value = value;
     }
 
-    MField fieldByName(String fieldName) {
+    public MField fieldByName(String fieldName) {
         final MField[] mField = {null};
         fieldList.forEach(mField1 -> {
             if (mField1.name.contentEquals(fieldName)) {
