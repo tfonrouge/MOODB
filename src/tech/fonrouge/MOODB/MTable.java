@@ -313,6 +313,15 @@ abstract public class MTable {
     }
 
     /**
+     * getMasterSource
+     *
+     * @return masgter source table
+     */
+    public MTable getMasterSource() {
+        return tableState.masterSource;
+    }
+
+    /**
      * getState
      *
      * @return STATE of Table
