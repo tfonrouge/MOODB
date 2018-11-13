@@ -252,6 +252,17 @@ class FileMaker {
                     append(masterSourceField).
                     append(");\n").
                     append("    }\n");
+
+            buffer.
+                    append("\n").
+                    append("    @Override\n").
+                    append("    public ").
+                    append(masterSourceClass).
+                    append(" getMasterSource() {\n").
+                    append("        return (").
+                    append(masterSourceClass).
+                    append(") super.getMasterSource();\n").
+                    append("    }\n");
         }
 
         /* getTableName */
