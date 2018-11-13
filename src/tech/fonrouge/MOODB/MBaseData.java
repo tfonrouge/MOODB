@@ -26,7 +26,7 @@ public abstract class MBaseData {
         return fieldValues.get(fieldName);
     }
 
-    protected Object fieldValue(String fieldName) {
+    public Object fieldValue(String fieldName) {
         return fieldValues.get(fieldName).getValue();
     }
 
