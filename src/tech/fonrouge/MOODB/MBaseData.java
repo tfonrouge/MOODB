@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 public abstract class MBaseData {
 
+    public final HashMap<String, DataValueItem> fieldValues;
     protected final MTable table;
-    private HashMap<String, DataValueItem> fieldValues;
 
     public MBaseData(MTable base) {
 
