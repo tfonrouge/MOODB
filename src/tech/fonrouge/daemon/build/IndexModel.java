@@ -11,6 +11,7 @@ public class IndexModel {
     private String keyField;
     private String masterKeyField;
     private boolean unique;
+    private boolean sparse;
     private ArrayList<IndexFieldItem> indexFieldItems = new ArrayList<>();
 
     IndexModel(Node node) {
@@ -29,6 +30,9 @@ public class IndexModel {
 
         node1 = nodeMap.getNamedItem("unique");
         unique = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
+
+        node1 = nodeMap.getNamedItem("sparse");
+        sparse = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
         NodeList nodeList = node.getChildNodes();
 
@@ -80,6 +84,10 @@ public class IndexModel {
 
     public boolean isUnique() {
         return unique;
+    }
+
+    public boolean isSparse() {
+        return sparse;
     }
 
     class IndexFieldItem {
