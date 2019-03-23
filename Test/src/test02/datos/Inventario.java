@@ -4,7 +4,6 @@ import com.mongodb.client.model.Filters;
 import tech.fonrouge.MOODB.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -61,7 +60,7 @@ public class Inventario extends Base {
         }
     };
 
-    public final MIndex index_tipo_nombre = new MIndex(this, "tipo_nombre", "", "tipo:1,nombre:1", true) {
+    public final MIndex index_tipo_nombre = new MIndex(this, "tipo_nombre", "", "tipo:1,nombre:1", true, false) {
         @Override
         protected void initialize() {
             partialFilter = Filters.and(Filters.eq("tipo", "A"), Filters.gte("nombre", "CILINDRO"));
@@ -71,7 +70,7 @@ public class Inventario extends Base {
             return super.find(tipo, nombre);
         }
     };
-    public final MIndex index_nombre = new MIndex(this, "nombre", "", "nombre", false) {
+    public final MIndex index_nombre = new MIndex(this, "nombre", "", "nombre", false, false) {
         @Override
         protected void initialize() {
         }
