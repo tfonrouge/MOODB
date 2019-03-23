@@ -1,6 +1,5 @@
 package tech.fonrouge.MOODB;
 
-import com.mongodb.Block;
 import com.mongodb.client.ListIndexesIterable;
 import com.mongodb.client.model.IndexOptions;
 import org.bson.Document;
@@ -17,15 +16,16 @@ public abstract class MIndex {
     private String masterKeyField;
     private String name;
     private boolean unique;
+    private boolean sparse;
     private MTable table;
-    private List<Integer> keyFieldList = new ArrayList<>();
 
-    public MIndex(MTable table, String name, String masterKeyField, String keyField, boolean unique) {
+    public MIndex(MTable table, String name, String masterKeyField, String keyField, boolean unique, boolean sparse) {
         this.table = table;
         this.name = name;
         this.masterKeyField = masterKeyField;
         this.keyField = keyField;
         this.unique = unique;
+        this.sparse = sparse;
         this.table.indices.add(this);
         initialize();
         buildIndex();
@@ -79,17 +79,18 @@ public abstract class MIndex {
         indexOptions = new IndexOptions();
         indexOptions.name(name);
 
-        if (unique) {
-            indexOptions.unique(true);
-        }
+        indexOptions.unique(unique);
+
+        indexOptions.sparse(sparse);
 
         if (partialFilter != null) {
             indexOptions.partialFilterExpression(partialFilter);
         }
 
-        ListIndexesIterable<Document> indices = table.engine.collection.listIndexes();
+        ListIndexesIterable<Document> indexes = table.engine.collection.listIndexes();
+
         final boolean[] buildIndex = {true};
-        indices.forEach((Block<? super Document>) document -> {
+        indexes.iterator().forEachRemaining(document -> {
             if (document.containsKey("name") && document.getString("name").contentEquals(name)) {
                 buildIndex[0] = false;
             }
