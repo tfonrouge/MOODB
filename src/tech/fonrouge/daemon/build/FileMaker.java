@@ -203,6 +203,8 @@ class FileMaker {
                         append(indexModel.getKeyField()).
                         append("\", ").
                         append(indexModel.isUnique()).
+                        append(", ").
+                        append(indexModel.isSparse()).
                         append(") {\n").
                         append("        @Override\n").
                         append("        protected void initialize() {\n");
@@ -219,7 +221,7 @@ class FileMaker {
                     });
                     buffer.append(");\n");
                 }
-                buffer.append("        }\n\n");
+                buffer.append("        }\n");
                 /*
                 buffer.append("        public boolean find(");
                 buffer.append(getFindParams(indexModel.getKeyField()));
@@ -228,6 +230,7 @@ class FileMaker {
                 buffer.append("        }\n");
                 buffer.append("    };\n");
                 */
+                buffer.append("    };\n\n");
             });
         }
 
@@ -613,12 +616,14 @@ class FileMaker {
         String mMasterKeyField;
         String mName;
         boolean mUnique;
+        boolean mSparse;
 
-        IndexItem(String name, String keyField, String masterKeyField, boolean unique) {
+        IndexItem(String name, String keyField, String masterKeyField, boolean unique, boolean sparse) {
             mName = name;
             mKeyField = keyField;
             mMasterKeyField = masterKeyField;
             mUnique = unique;
+            mSparse = sparse;
         }
 
         /* ************** */
@@ -659,6 +664,15 @@ class FileMaker {
          */
         public boolean unique() {
             return mUnique;
+        }
+
+        /**
+         * sparse
+         *
+         * @return boolean for sparse index value
+         */
+        public boolean sparse() {
+            return mSparse;
         }
     }
 
