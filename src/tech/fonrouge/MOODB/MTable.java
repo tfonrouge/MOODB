@@ -1,6 +1,7 @@
 package tech.fonrouge.MOODB;
 
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ abstract public class MTable {
     private MDatabase database;
     private int tableStateIndex = 0;
     private ArrayList<TableState> tableStateList = new ArrayList<>();
+    private Document rawDocument;
+    private Document document;
 
     /* ******************* */
     /* constructor methods */
@@ -33,6 +36,14 @@ abstract public class MTable {
     public MTable(MTable masterSource) {
         this.tableState.masterSource = masterSource;
         initialize();
+    }
+
+    public Document getRawDocument() {
+        return rawDocument;
+    }
+
+    public Document getDocument() {
+        return document;
     }
 
     /**
@@ -58,7 +69,7 @@ abstract public class MTable {
     /**
      * _id
      *
-     * @return OBJECT_ID for current document in table
+     * @return OBJECT_ID for current rawDocument in table
      */
     public Object _id() {
         return field__id.fieldState.value;
@@ -147,16 +158,21 @@ abstract public class MTable {
 
         tableState.mongoCursor = mongoCursor;
 
-        final Document document = (mongoCursor == null || !mongoCursor.hasNext()) ? null : mongoCursor.next();
+        rawDocument = (mongoCursor == null || !mongoCursor.hasNext()) ? null : mongoCursor.next();
 
-        tableState.eof = document == null;
+        tableState.eof = rawDocument == null;
+
+        document = new Document();
 
         fieldList.forEach(mField -> {
             if (!mField.calculated) {
-                mField.fieldState.value = document == null ? null : document.getOrDefault(mField.name, null);
-                if (mField.fieldState.value == null && mField.notNullable) {
+                Object value = rawDocument == null ? null : rawDocument.getOrDefault(mField.name, null);
+                if (value == null && mField.notNullable) {
                     mField.fieldState.value = mField.getEmptyValue();
+                } else {
+                    mField.fieldState.value = value;
                 }
+                document.put(mField.name, mField.fieldState.value);
             }
         });
 
@@ -340,7 +356,7 @@ abstract public class MTable {
     /**
      * goTo
      *
-     * @param objectId : _id of document to go
+     * @param objectId : _id of rawDocument to go
      */
     public boolean goTo(Object objectId) {
         return engine.goTo(objectId);
@@ -431,7 +447,7 @@ abstract public class MTable {
 
         Document document = new Document();
 
-        /* build document and checks for validation on fields */
+        /* build rawDocument and checks for validation on fields */
 
         if (onBeforePost()) {
             boolean result;
