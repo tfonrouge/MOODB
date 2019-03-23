@@ -23,6 +23,7 @@ public class MEngine {
     Exception exception;
     private MTable table;
     private List<? extends Bson> pipeline;
+    private MongoDatabase mongoDatabase;
 
     /* ******************* */
     /* constructor methods */
@@ -72,7 +73,7 @@ public class MEngine {
         } else {
             MongoClientURI mongoClientURI = new MongoClientURI(clientURI);
             MongoClient mongoClient = new MongoClient(mongoClientURI);
-            MongoDatabase mongoDatabase = mongoClient.getDatabase(table.getDatabase().getDatabaseName());
+            mongoDatabase = mongoClient.getDatabase(table.getDatabase().getDatabaseName());
             collection = mongoDatabase.getCollection(tableName);
             collections.put(key, collection);
         }
@@ -118,6 +119,10 @@ public class MEngine {
             pipeline = Arrays.asList();
         }
         return table.setTableDocument(executeAggregate(pipeline));
+    }
+
+    public MongoDatabase getMongoDatabase() {
+        return mongoDatabase;
     }
 
     /**
