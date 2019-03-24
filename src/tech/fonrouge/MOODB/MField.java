@@ -22,6 +22,7 @@ public abstract class MField<T> {
     protected HashMap<T, String> valueItems;
     protected Callable<T> calcValue = null;
     protected Callable<Boolean> onValidate = null;
+    protected boolean autoInc;
     FieldState fieldState = new FieldState();
     String name;
     private String invalidCause = null;
@@ -138,6 +139,10 @@ public abstract class MField<T> {
         return invalidCause;
     }
 
+    protected T getNextSequence() {
+        return null;
+    }
+
     /**
      * getValueItems
      *
@@ -187,15 +192,21 @@ public abstract class MField<T> {
      * @return
      */
     final protected T getNewValue() {
-        return fieldState.newValue;
+        if (fieldState.callableNewValue != null) {
+            try {
+                return fieldState.callableNewValue.call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
-    final public void setNewValue(T newValue) {
-        fieldState.newValue = newValue;
+    final public void setCallableNewValue(Callable<T> callable) {
+        fieldState.callableNewValue = callable;
     }
 
     /**
-     * getName
      *
      * @return
      */
@@ -204,7 +215,6 @@ public abstract class MField<T> {
     }
 
     /**
-     * getValidStatus
      *
      * @return on invalid status, returns string with detail
      */
@@ -315,7 +325,7 @@ public abstract class MField<T> {
 
     final public Object getDefaultValue() {
         if (fieldState.defaultValue == null) {
-            return fieldState.newValue;
+            return fieldState.callableNewValue;
         }
         return fieldState.defaultValue;
     }
@@ -326,7 +336,7 @@ public abstract class MField<T> {
 
     class FieldState {
         T value;
-        T newValue;
+        Callable<T> callableNewValue;
         T defaultValue;
         T origValue;
     }
