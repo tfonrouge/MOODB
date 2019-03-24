@@ -48,14 +48,14 @@ public class Inventario extends Base {
     public final MFieldDouble field_existencia = new MFieldDouble(this, "existencia") {
         @Override
         protected void initialize() {
-            setNewValue(0.0);
+            setCallableNewValue(() -> 0.0);
         }
     };
     public final MFieldString field_status = new MFieldString(this, "status") {
         @Override
         protected void initialize() {
             required = true;
-            setNewValue("1");
+            setCallableNewValue(() -> "1");
             setDefaultValue("2");
         }
     };
