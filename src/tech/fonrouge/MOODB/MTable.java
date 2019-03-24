@@ -1,7 +1,6 @@
 package tech.fonrouge.MOODB;
 
 import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
 import java.util.ArrayList;
@@ -320,6 +319,9 @@ abstract public class MTable {
         return result;
     }
 
+    /**
+     * @return linkedField
+     */
     public MFieldTableField<? extends MTable> getLinkedField() {
         return tableState.linkedField;
     }
@@ -399,7 +401,7 @@ abstract public class MTable {
                         if (mField.notNullable && mField.valueItems != null && !mField.valueItems.containsKey(value)) {
                             throw new RuntimeException("Invalid new value [" + value + "] on field '" + mField.name + "'.");
                         }
-                        mField.fieldState.value = mField.getNewValue();
+                        mField.fieldState.value = value;
                     }
                     if (mField.fieldState.value == null && mField.notNullable) {
                         mField.fieldState.value = mField.getEmptyValue();
@@ -417,8 +419,6 @@ abstract public class MTable {
     }
 
     /**
-     * post
-     *
      * @return boolean
      */
     public boolean post() {
@@ -436,7 +436,7 @@ abstract public class MTable {
 
         /* checks for empty values on required fields */
         fieldList.forEach(mField -> {
-            if (!mField.calculated && mField.required && mField.isEmpty()) {
+            if (!mField.calculated && mField.required && mField.isEmpty() && !mField.autoInc) {
                 tableState.exception = new Exception("Empty Value on Required Field: '" + mField.name + "'");
             }
         });
@@ -463,7 +463,9 @@ abstract public class MTable {
                 case INSERT:
                     fieldList.forEach(mField -> {
                         if (!mField.calculated) {
-                            if (!(mField instanceof MFieldObjectId && mField.getName().contentEquals("_id")) && !(mField.fieldState.value == null)) {
+                            if (mField.autoInc) {
+                                document.put(mField.name, mField.getNextSequence());
+                            } else if (!(mField instanceof MFieldObjectId && mField.getName().contentEquals("_id")) && !(mField.fieldState.value == null)) {
                                 document.put(mField.getName(), mField.value());
                             }
                         }
