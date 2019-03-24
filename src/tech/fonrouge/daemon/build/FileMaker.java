@@ -119,6 +119,10 @@ class FileMaker {
 
                 String initializeString = "";
 
+                if (fieldModel.autoInc) {
+                    initializeString += "            autoInc = true;\n";
+                }
+
                 if (fieldModel.calculated) {
                     initializeString += "            calculated = true;\n";
                     initializeString += "            calcValue = () -> calcField_" + fieldModel.fieldName + "();\n";
@@ -149,7 +153,7 @@ class FileMaker {
                 }
 
                 if (fieldModel.newValue != null) {
-                    initializeString += "            setNewValue(" + fieldModel.newValue + ");\n";
+                    initializeString += "            setCallableNewValue(() -> " + fieldModel.newValue + ");\n";
                 }
 
                 if (fieldModel.defaultValue != null) {

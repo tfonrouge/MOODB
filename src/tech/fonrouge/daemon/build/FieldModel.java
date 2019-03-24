@@ -20,6 +20,7 @@ class FieldModel {
     String newValue;
     String defaultValue;
     private boolean valid = true;
+    boolean autoInc;
 
     FieldModel(Node node) {
         Node node1;
@@ -43,6 +44,9 @@ class FieldModel {
 
             node1 = node.getAttributes().getNamedItem("newDate");
             newDate = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
+
+            node1 = node.getAttributes().getNamedItem("autoInc");
+            autoInc = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
             node1 = node.getAttributes().getNamedItem("class");
             if (node1 != null) {
