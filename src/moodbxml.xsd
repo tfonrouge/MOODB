@@ -66,6 +66,7 @@
     <xs:complexType name="FieldIntegerType">
         <xs:complexContent>
             <xs:extension base="FieldBaseType">
+                <xs:attribute name="autoInc" type="xs:boolean"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
