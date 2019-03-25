@@ -5,7 +5,6 @@ import com.mongodb.client.model.IndexOptions;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
@@ -107,7 +106,7 @@ public abstract class MIndex {
     public boolean find(Object... objects) {
         Document document = getMasterKeyFindExpression(masterKeyField);
         getKeyFieldFindExpression(document, objects);
-        List<? extends Bson> pipeline = Collections.singletonList(new Document().append("$match", document));
+        List<Document> pipeline = Collections.singletonList(new Document().append("$match", document));
         return table.setTableDocument(table.engine.executeAggregate(pipeline));
     }
 
@@ -151,6 +150,7 @@ public abstract class MIndex {
      *
      * @return String of master key field
      */
+    @SuppressWarnings("unused")
     public String masterKeyField() {
         return masterKeyField;
     }
