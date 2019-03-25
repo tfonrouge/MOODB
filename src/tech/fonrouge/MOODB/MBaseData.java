@@ -12,6 +12,14 @@ public abstract class MBaseData {
         populateFieldValues();
     }
 
+    public MTable getTable() {
+        return table;
+    }
+
+    public Document getDocument() {
+        return document;
+    }
+
     private void populateFieldValues() {
         document = table.getDocument();
     }
