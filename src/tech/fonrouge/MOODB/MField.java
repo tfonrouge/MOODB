@@ -2,7 +2,6 @@ package tech.fonrouge.MOODB;
 
 import com.mongodb.client.MongoCursor;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +65,7 @@ public abstract class MField<T> {
     }
 
     public boolean find() {
-        List<? extends Bson> pipeline = Arrays.asList(
+        List<Document> pipeline = Arrays.asList(
                 new Document().
                         append("$sort", new Document().
                                 append(name, 1))
@@ -81,13 +80,14 @@ public abstract class MField<T> {
      * @return
      */
     public <V extends T> boolean find(V keyValue) {
-        List<? extends Bson> pipeline = Arrays.asList(
+        ArrayList<Document> pipeline = new ArrayList<>();
+        pipeline.add(
                 new Document().
                         append("$match", new Document().
-                                append(name, keyValue)),
+                                append(name, keyValue)));
+        pipeline.add(
                 new Document().
-                        append("$limit", 1)
-        );
+                        append("$limit", 1));
         return table.setTableDocument(table.engine.executeAggregate(pipeline));
     }
 
@@ -166,16 +166,18 @@ public abstract class MField<T> {
 
     public T getMaxValue() {
         T value;
-        List<? extends Bson> pipeline = Arrays.asList(
+        ArrayList<Document> pipeline = new ArrayList<>();
+        pipeline.add(
                 new Document().
                         append("$sort", new Document().
-                                append(name, -1)),
+                                append(name, -1)));
+        pipeline.add(
                 new Document().
-                        append("$limit", 1),
+                        append("$limit", 1));
+        pipeline.add(
                 new Document().
                         append("$project", new Document().
-                                append("folio", 1))
-        );
+                                append("folio", 1)));
         MongoCursor<Document> mongoCursor = table.engine.executeAggregate(pipeline);
         if (mongoCursor.hasNext()) {
             Document d = mongoCursor.next();
@@ -207,7 +209,6 @@ public abstract class MField<T> {
     }
 
     /**
-     *
      * @return
      */
     public String getName() {
@@ -215,7 +216,6 @@ public abstract class MField<T> {
     }
 
     /**
-     *
      * @return on invalid status, returns string with detail
      */
     public boolean getValidStatus() {
