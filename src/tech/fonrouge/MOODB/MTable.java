@@ -6,6 +6,7 @@ import org.bson.Document;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Stream;
 
 abstract public class MTable {
@@ -19,6 +20,7 @@ abstract public class MTable {
     ArrayList<MIndex> indices = new ArrayList<>();
     MEngine engine;
     TableState tableState = new TableState();
+    List<String[]> lookupFieldList = new ArrayList<>();
     private MDatabase database;
     private int tableStateIndex = 0;
     private ArrayList<TableState> tableStateList = new ArrayList<>();
@@ -37,12 +39,11 @@ abstract public class MTable {
         initialize();
     }
 
-    public Document getRawDocument() {
-        return rawDocument;
-    }
-
-    public Document getDocument() {
-        return document;
+    @SuppressWarnings("unused")
+    public void addLookupField(String fieldExpression) {
+        String[] fields = fieldExpression.split("\\.");
+        lookupFieldList.remove(fields);
+        lookupFieldList.add(fields);
     }
 
     /**
@@ -65,27 +66,27 @@ abstract public class MTable {
         buildIndices();
     }
 
-    /**
-     * _id
-     *
-     * @return OBJECT_ID for current rawDocument in table
-     */
-    public Object _id() {
-        return field__id.fieldState.value;
-    }
-
     void set_id(Object value) {
         field__id.fieldState.value = value;
     }
 
     public MField fieldByName(String fieldName) {
-        final MField[] mField = {null};
-        fieldList.forEach(mField1 -> {
-            if (mField1.name.contentEquals(fieldName)) {
-                mField[0] = mField1;
+        for (MField mField : fieldList) {
+            if (mField.name.contentEquals(fieldName)) {
+                return mField;
             }
-        });
-        return mField[0];
+        }
+        return null;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public MFieldTableField fieldTableFieldByName(String name) {
+        for (MField mField : fieldList) {
+            if (mField.name.contentEquals(name) && mField instanceof MFieldTableField) {
+                return (MFieldTableField) mField;
+            }
+        }
+        return null;
     }
 
     /**
@@ -175,6 +176,12 @@ abstract public class MTable {
             }
         });
 
+        if (rawDocument != null) {
+            lookupFieldList.forEach(fields -> {
+                document.put("@" + fields[0], rawDocument.get("@" + fields[0]));
+            });
+        }
+
         if (tableState.linkedField != null && tableState.linkedField.table.tableState.state != STATE.NORMAL) {
             Object value = tableState.linkedField.fieldState.value;
             if ((value == null && _id() != null) || _id() != null && !_id().equals(value)) {
@@ -253,7 +260,18 @@ abstract public class MTable {
     /* public methods */
     /* ************** */
 
+    /**
+     * @return OBJECT_ID for current rawDocument in table
+     */
+    public Object _id() {
+        return field__id.fieldState.value;
+    }
+
     public abstract MBaseData getData();
+
+    public Document getDocument() {
+        return document;
+    }
 
     /**
      * getEof
@@ -339,6 +357,10 @@ abstract public class MTable {
         return tableState.masterSource;
     }
 
+    public Document getRawDocument() {
+        return rawDocument;
+    }
+
     /**
      * getState
      *
@@ -403,7 +425,7 @@ abstract public class MTable {
                         }
                         mField.fieldState.value = value;
                     }
-                    if (mField.fieldState.value == null && mField.notNullable) {
+                    if (mField.fieldState.value == null && (mField.notNullable || mField.autoInc)) {
                         mField.fieldState.value = mField.getEmptyValue();
                     }
                 }
@@ -488,6 +510,7 @@ abstract public class MTable {
         return true;
     }
 
+    @SuppressWarnings("unused")
     public final synchronized void tableStatePull() {
         if (tableStateIndex == 0) {
             throw new RuntimeException("tableStateIndex out of bounds.");
@@ -496,6 +519,7 @@ abstract public class MTable {
         tableState = tableStateList.get(--tableStateIndex);
     }
 
+    @SuppressWarnings("unused")
     public final synchronized void tableStatePush() {
         if (tableStateIndex == 0) {
             tableStateList.add(tableState);
