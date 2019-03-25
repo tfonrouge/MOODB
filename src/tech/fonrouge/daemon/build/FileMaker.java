@@ -1,5 +1,6 @@
 package tech.fonrouge.daemon.build;
 
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -46,7 +47,7 @@ class FileMaker {
         database = namedNodeMap.getNamedItem("database") == null ? null : namedNodeMap.getNamedItem("database").getNodeValue();
 
         this.pathTable = Paths.get(pathExtLess.toString() + ".java");
-        this.pathModel = Paths.get(pathExtLess.toString() + "Model.java");
+        this.pathModel = Paths.get(pathExtLess.toString() + "Data.java");
         this.className = className;
         fieldModels = new ArrayList<>();
         indexModels = new ArrayList<>();
@@ -90,14 +91,18 @@ class FileMaker {
         } else {
             createFileTable();
         }
-        //writeModel();
+        if (Files.exists(pathModel) && Files.size(pathModel) > 0) {
+            updateDataModel();
+        } else {
+            createDataModel();
+        }
     }
 
     private String getTableDescriptorBuffer() {
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
 
         if (fieldModels.size() > 0) {
-            buffer.append("\n");
+            builder.append("\n");
             for (FieldModel fieldModel : fieldModels) {
                 String cast = "";
                 if (fieldModel.type.contentEquals("TableField")) {
@@ -105,7 +110,7 @@ class FileMaker {
                 } else {
                     cast = "";
                 }
-                buffer.
+                builder.
                         append("    public final MField").
                         append(fieldModel.type).append(cast).
                         append(" field_").
@@ -168,7 +173,7 @@ class FileMaker {
                 }
 
                 /* initialize method */
-                buffer.
+                builder.
                         append(" {\n").
                         append("        @Override\n").
                         append("        protected void initialize() {\n").
@@ -177,7 +182,7 @@ class FileMaker {
 
                 /* FieldTableField */
                 if (fieldModel.type.contentEquals("TableField")) {
-                    buffer.
+                    builder.
                             append("\n").
                             append("        @Override\n").
                             append("        protected " + fieldModel.className + " buildTableField() {\n").
@@ -187,15 +192,15 @@ class FileMaker {
                             append("        }\n");
                 }
 
-                buffer.append("    };\n");
+                builder.append("    };\n");
             }
         }
 
-        buffer.append("\n");
+        builder.append("\n");
 
         if (indexModels.size() > 0) {
             indexModels.forEach(indexModel -> {
-                buffer.
+                builder.
                         append("    public final MIndex index_").
                         append(indexModel.getName()).
                         append(" = new MIndex(").
@@ -214,27 +219,19 @@ class FileMaker {
                         append("        protected void initialize() {\n");
                 if (indexModel.getIndexFieldItems().size() > 0) {
                     indexModel.getIndexFieldItems().forEach(indexFieldItem -> {
-                        buffer.append("            partialFilter = Filters.").append(indexFieldItem.getLogicOperator()).append("(");
+                        builder.append("            partialFilter = Filters.").append(indexFieldItem.getLogicOperator()).append("(");
                         if (indexFieldItem.getPartialFilterItems().size() > 0) {
                             final String[] s = {""};
                             indexFieldItem.getPartialFilterItems().forEach((value) -> {
                                 s[0] += s[0].isEmpty() ? value : (", " + value);
                             });
-                            buffer.append(s[0]);
+                            builder.append(s[0]);
                         }
                     });
-                    buffer.append(");\n");
+                    builder.append(");\n");
                 }
-                buffer.append("        }\n");
-                /*
-                buffer.append("        public boolean find(");
-                buffer.append(getFindParams(indexModel.getKeyField()));
-                buffer.append(") {\n");
-                buffer.append("            return super.find(").append(getFindArrayList(indexModel.getKeyField())).append(");\n");
-                buffer.append("        }\n");
-                buffer.append("    };\n");
-                */
-                buffer.append("    };\n\n");
+                builder.append("        }\n");
+                builder.append("    };\n\n");
             });
         }
 
@@ -249,7 +246,7 @@ class FileMaker {
 
         /* masterSource */
         if (masterSourceClass != null) {
-            buffer.
+            builder.
                     append("\n").
                     append("    public ").
                     append(className).append("(").
@@ -260,7 +257,7 @@ class FileMaker {
                     append(");\n").
                     append("    }\n");
 
-            buffer.
+            builder.
                     append("\n").
                     append("    @Override\n").
                     append("    public ").
@@ -274,7 +271,7 @@ class FileMaker {
 
         /* getTableName */
         if (tableName != null) {
-            buffer.
+            builder.
                     append("\n").
                     append("    @Override\n").
                     append("    public final String getTableName() {\n").
@@ -286,7 +283,7 @@ class FileMaker {
 
         /* getGenre */
         if (genre != null) {
-            buffer.
+            builder.
                     append("\n").
                     append("    @Override\n").
                     append("    public final String getGenre() {\n").
@@ -298,7 +295,7 @@ class FileMaker {
 
         /* getGenres */
         if (genre != null) {
-            buffer.
+            builder.
                     append("\n").
                     append("    @Override\n").
                     append("    public final String getGenres() {\n").
@@ -310,7 +307,7 @@ class FileMaker {
 
         /* newDatabase */
         if (database != null) {
-            buffer.
+            builder.
                     append("\n").
                     append("    @Override\n").
                     append("    protected MDatabase newDatabase() {\n").
@@ -334,7 +331,7 @@ class FileMaker {
                     */
         }
 
-        return buffer.toString();
+        return builder.toString();
     }
 
     private String getFindArrayList(String keyField) {
@@ -353,27 +350,17 @@ class FileMaker {
         return "new ArrayList<>(Arrays.asList(" + result.toString() + "))";
     }
 
-    private String getFindParams(String keyField) {
-        StringBuilder result = new StringBuilder();
-        Scanner scanner = new Scanner(keyField).useDelimiter(",");
-        while (scanner.hasNext()) {
-            Scanner scanner1 = new Scanner(scanner.next()).useDelimiter(":");
-            String fieldName = scanner1.next();
-            final String[] qualifier = {"Object"};
-            fieldModels.forEach(fieldModel -> {
-                if (fieldModel.fieldName.contentEquals(fieldName)) {
-                    qualifier[0] = fieldModel.type;
-                }
-            });
-            String s = qualifier[0] + " " + fieldName;
-            result.append((result.length() == 0) ? s : ", " + s);
-        }
-        return result.toString();
-    }
-
     private void createFileTable() {
+        PrintWriter writer = null;
+
         try {
-            PrintWriter writer = new PrintWriter(pathTable.toString());
+            writer = new PrintWriter(pathTable.toString());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (writer != null) {
+
             writer.println("package " + getPackageName() + ";");
             writer.println();
             writer.println("import tech.fonrouge.MOODB.*;");
@@ -403,8 +390,6 @@ class FileMaker {
             }
             writer.println("}");
             writer.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
     }
 
@@ -449,6 +434,7 @@ class FileMaker {
         Scanner scanner = null;
         StringBuilder calculatedFieldsBuffer = new StringBuilder();
         StringBuilder validateFieldsBuffer = new StringBuilder();
+
         try {
             scanner = new Scanner(pathTable).useDelimiter("\n");
         } catch (IOException e) {
@@ -476,18 +462,7 @@ class FileMaker {
                     }
                 } else {
                     /* check abstract */
-                    if (line.contains("class " + className + " extends")) {
-                        if (isAbstract && !line.contains("abstract")) {
-                            line = line.replace(" class", " abstract class");
-                        }
-                        if (!isAbstract && line.contains("abstract")) {
-                            line = line.replace(" abstract ", " ");
-                        }
-                        /* checks extends class */
-                        if (!line.matches(".* +extends +" + extendClass + " +" + extendClass + ".*")) {
-                            line = line.replaceFirst("(extends +\\w+ \\{)", "extends " + extendClass + " {");
-                        }
-                    }
+                    line = getClassNameNormalized(line);
                 }
                 stringList.add(line);
             }
@@ -511,28 +486,21 @@ class FileMaker {
                     }
             }
 
-            PrintWriter writer = null;
+            PrintWriter writer = getPrintWriter(pathTable);
 
-            try {
-                //Files.deleteIfExists(pathTable);
-                writer = new PrintWriter(pathTable.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            boolean insideFieldDescriptor = false;
+            boolean insideDescriptor = false;
 
             if (writer != null) {
                 for (String s : stringList) {
-                    if (!insideFieldDescriptor) {
+                    if (!insideDescriptor) {
                         writer.println(s);
                     }
                     if (s.contains("/* @@ begin field descriptor @@ */")) {
                         writer.print(getTableDescriptorBuffer());
-                        insideFieldDescriptor = true;
+                        insideDescriptor = true;
                     }
                     if (s.contains("/* @@ end field descriptor @@ */")) {
-                        insideFieldDescriptor = false;
+                        insideDescriptor = false;
                         writer.println(s);
                         if (calculatedFieldsBuffer.length() > 0) {
                             writer.println(calculatedFieldsBuffer);
@@ -547,8 +515,59 @@ class FileMaker {
         }
     }
 
-    private void writeModel() {
+    private String getModelDescriptorBuffer() {
+        StringBuilder builder = new StringBuilder();
 
+        builder.append("    public ").
+                append(className).
+                append("Data(").
+                append(className).
+                append(" ").
+                append(className.toLowerCase()).
+                append(") {\n");
+        builder.append("        super(").
+                append(className.toLowerCase()).
+                append(");\n");
+        builder.append("    }\n");
+
+        for (FieldModel fieldModel : fieldModels) {
+            builder.append("\n");
+            builder.append("    public ");
+            if ("TableField".equals(fieldModel.type)) {
+                builder.append("ObjectId");
+            } else {
+                builder.append(fieldModel.type);
+            }
+            builder.append(" get").
+                    append(fieldModel.fieldName.substring(0, 1).toUpperCase()).
+                    append(fieldModel.fieldName.substring(1)).
+                    append("() {\n");
+            builder.append("        return document.get");
+            switch (fieldModel.type) {
+                case "Binary":
+                    break;
+                case "TableField":
+                    builder.append("ObjectId");
+                    break;
+                default:
+                    builder.append(fieldModel.type);
+            }
+            builder.append("(\"").
+                    append(fieldModel.fieldName).
+                    append("\"");
+            if ("Binary".equals(fieldModel.type)) {
+                builder.append(", ").
+                        append(fieldModel.type).
+                        append(".class");
+            }
+            builder.append(");\n");
+            builder.append("    }\n");
+        }
+
+        return builder.toString();
+    }
+
+    private void createDataModel() {
         PrintWriter writer = null;
 
         try {
@@ -567,8 +586,6 @@ class FileMaker {
                 if (!importOTable && fieldModel.type.equals("TableField")) {
                     importOTable = true;
                 }
-                if (!importDate && fieldModel.type.equals("Binary")) {
-                }
             }
             writer.println("package " + getPackageName() + ";");
             writer.println();
@@ -585,99 +602,96 @@ class FileMaker {
             if (isAbstract) {
                 writer.print("abstract ");
             }
-            writer.print("class " + className + "Model ");
-            if (!extendClass.contentEquals("MTable")) {
-                writer.print("extends " + extendClass + "Model ");
+            writer.print("class " + className + "Data ");
+            if (extendClass.contentEquals("MTable")) {
+                writer.print("extends " + "MBaseData");
+            } else {
+                writer.print("extends " + extendClass + "Data ");
             }
             writer.println("{");
             writer.println();
-            writer.println("    protected " + className + " " + className.toLowerCase() + ";");
-            writer.println();
-            writer.println("    public void setTable(" + className + " " + className.toLowerCase() + ") {");
-            writer.println("        this." + className.toLowerCase() + " = " + className.toLowerCase() + ";");
-            writer.println("    }");
+            writer.println("    /* @@ begin field descriptor @@ */");
+            writer.print(getModelDescriptorBuffer());
+            writer.println("    /* @@ end field descriptor @@ */");
+            writer.println("}\n");
 
-            for (FieldModel fieldModel : fieldModels) {
-                String s;
-                if (fieldModel.type.contentEquals("TableField")) {
-                    s = "ObjectId";
-                } else {
-                    s = fieldModel.type;
-                }
-                writer.println();
-                writer.println("    public " + s + " get" + fieldModel.fieldName.substring(0, 1).toUpperCase() + fieldModel.fieldName.substring(1) + "() {");
-                writer.println("        return " + className.toLowerCase() + ".field_" + fieldModel.fieldName + ".value();");
-                writer.println("    }");
-            }
-
-            writer.println("}");
             writer.close();
         }
     }
 
-    class IndexItem {
-        String mKeyField;
-        String mMasterKeyField;
-        String mName;
-        boolean mUnique;
-        boolean mSparse;
+    private void updateDataModel() {
+        Scanner scanner = null;
+        boolean hasFieldDescriptor = false;
 
-        IndexItem(String name, String keyField, String masterKeyField, boolean unique, boolean sparse) {
-            mName = name;
-            mKeyField = keyField;
-            mMasterKeyField = masterKeyField;
-            mUnique = unique;
-            mSparse = sparse;
+        try {
+            scanner = new Scanner(pathModel).useDelimiter("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        /* ************** */
-        /* public methods */
-        /* ************** */
+        if (scanner != null) {
+            List<String> stringList = new ArrayList<>();
 
-        /**
-         * keyField
-         *
-         * @return String of key field
-         */
-        public String keyField() {
-            return mKeyField;
-        }
+            String line;
 
-        /**
-         * masterKeyField
-         *
-         * @return String of master key field
-         */
-        String masterKeyField() {
-            return mMasterKeyField;
-        }
+            while (scanner.hasNext()) {
+                line = scanner.next();
+                line = getClassNameNormalized(line);
+                stringList.add(line);
+            }
 
-        /**
-         * name
-         *
-         * @return String name of index
-         */
-        public String name() {
-            return mName;
-        }
+            PrintWriter writer = getPrintWriter(pathModel);
 
-        /**
-         * unique
-         *
-         * @return boolean for unique index value
-         */
-        public boolean unique() {
-            return mUnique;
-        }
+            boolean insideDescriptor = false;
 
-        /**
-         * sparse
-         *
-         * @return boolean for sparse index value
-         */
-        public boolean sparse() {
-            return mSparse;
+            if (writer != null) {
+                for (String s : stringList) {
+                    if (!insideDescriptor) {
+                        writer.println(s);
+                    }
+                    if (s.contains("/* @@ begin field descriptor @@ */")) {
+                        writer.print(getModelDescriptorBuffer());
+                        insideDescriptor = true;
+                        hasFieldDescriptor = true;
+                    }
+                    if (s.contains("/* @@ end field descriptor @@ */")) {
+                        insideDescriptor = false;
+                        writer.println(s);
+                    }
+                }
+                if (!hasFieldDescriptor) {
+                    writer.println("/* ERROR: can't find field descriptor delimiters */");
+                }
+                writer.close();
+            }
         }
     }
 
+    private PrintWriter getPrintWriter(Path path) {
+        PrintWriter writer = null;
+
+        try {
+            writer = new PrintWriter(path.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return writer;
+    }
+
+    @NotNull
+    private String getClassNameNormalized(String line) {
+        if (line.contains("class " + className + " extends")) {
+            if (isAbstract && !line.contains("abstract")) {
+                line = line.replace(" class", " abstract class");
+            }
+            if (!isAbstract && line.contains("abstract")) {
+                line = line.replace(" abstract ", " ");
+            }
+            /* checks extends class */
+            if (!line.matches(".* +extends +" + extendClass + " +" + extendClass + ".*")) {
+                line = line.replaceFirst("(extends +\\w+ \\{)", "extends " + extendClass + " {");
+            }
+        }
+        return line;
+    }
 }
