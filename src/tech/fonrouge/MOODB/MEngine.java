@@ -9,20 +9,21 @@ import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
-public class MEngine {
+class MEngine {
 
     private static HashMap<String, MongoCollection<Document>> collections;
 
     MongoCollection<Document> collection;
     Exception exception;
     private MTable table;
-    private List<? extends Bson> pipeline;
+    private ArrayList<Document> pipeline;
     private MongoDatabase mongoDatabase;
 
     /* ******************* */
@@ -88,6 +89,7 @@ public class MEngine {
      *
      * @return true if operation successful
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean delete() {
         Document document = new Document().append("_id", table._id());
         DeleteResult result = collection.deleteOne(document);
@@ -97,30 +99,82 @@ public class MEngine {
     /**
      * executeAggregate
      *
-     * @param bsonList bson list for executeAggregate function
+     * @param documentList bson list for executeAggregate function
      * @return iterable
      */
-    public MongoCursor<Document> executeAggregate(List<? extends Bson> bsonList) {
-        return collection.aggregate(bsonList).iterator();
+    @SuppressWarnings("WeakerAccess")
+    public MongoCursor<Document> executeAggregate(List<Document> documentList) {
+        if (table.lookupFieldList.size() > 0) {
+            table.lookupFieldList.forEach(s -> documentList.addAll(getLookupStage(s)));
+        }
+        return collection.aggregate(documentList).iterator();
+    }
+
+    private List<Document> getLookupStage(String[] fields) {
+        List<Document> documents = new ArrayList<>();
+
+        MFieldTableField mFieldTableField = table.fieldTableFieldByName(fields[0]);
+
+        if (mFieldTableField != null) {
+            String lookupFieldName = mFieldTableField.name;
+            String lookupTableName = mFieldTableField.getLinkedTable().getTableName();
+            documents.add(
+                    new Document()
+                            .append("$lookup", new Document()
+                                    .append("from", lookupTableName)
+                                    .append("let", new Document()
+                                            .append(lookupFieldName + "_id", "$" + lookupFieldName)
+                                    )
+                                    .append("pipeline", Arrays.asList(
+                                            new Document()
+                                                    .append("$match", new Document()
+                                                            .append("$expr", new Document()
+                                                                    .append("$eq", Arrays.asList(
+                                                                            "$_id",
+                                                                            "$$" + lookupFieldName + "_id"
+                                                                            )
+                                                                    )
+                                                            )
+                                                    ),
+                                            new Document()
+                                                    .append("$limit", 1)
+                                            )
+                                    )
+                                    .append("as", "@" + lookupFieldName)
+                            ));
+
+            documents.add(
+                    new Document().
+                            append("$unwind", new Document().
+                                    append("path", "$@" + lookupFieldName))
+
+            );
+
+        }
+
+        return documents;
     }
 
     /**
      * find : go to the first document in scope
      *
-     * @return
+     * @return success on find
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean find() {
         Document masterSourceFilter = buildMasterSourceFilter();
         if (masterSourceFilter != null) {
-            pipeline = Arrays.asList(
+            pipeline = new ArrayList<>();
+            pipeline.add(
                     new Document().
                             append("$match", masterSourceFilter));
         } else {
-            pipeline = Arrays.asList();
+            pipeline = new ArrayList<>();
         }
         return table.setTableDocument(executeAggregate(pipeline));
     }
 
+    @SuppressWarnings("WeakerAccess")
     public MongoDatabase getMongoDatabase() {
         return mongoDatabase;
     }
@@ -130,14 +184,16 @@ public class MEngine {
      *
      * @param objectId of document to go
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean goTo(Object objectId) {
-        pipeline = Arrays.asList(
+        pipeline = new ArrayList<>();
+        pipeline.add(
                 new Document().
                         append("$match", new Document().
-                                append("_id", objectId)),
+                                append("_id", objectId)));
+        pipeline.add(
                 new Document().
-                        append("$limit", 1)
-        );
+                        append("$limit", 1));
         return table.setTableDocument(executeAggregate(pipeline));
     }
 
@@ -147,6 +203,7 @@ public class MEngine {
      * @param document document to insert
      * @return iterable
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean insert(Document document) {
         try {
             collection.insertOne(document);
@@ -164,6 +221,7 @@ public class MEngine {
      *
      * @return boolean if next is valid document
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean next() {
         if (table.tableState.mongoCursor != null) {
             if (table.tableState.mongoCursor.hasNext()) {
@@ -179,6 +237,7 @@ public class MEngine {
      * @param document document to update
      * @return boolean on success
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean update(Document document) {
         try {
             Bson bson = new Document("$set", document);
