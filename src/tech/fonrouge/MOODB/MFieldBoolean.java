@@ -26,6 +26,11 @@ public class MFieldBoolean extends MField<Boolean> {
     }
 
     @Override
+    protected Boolean getTypedValue() {
+        return table.tableState.getFieldValue(this, Boolean.class);
+    }
+
+    @Override
     public String valueAsString() {
         Boolean value = value();
         if (value == null) {

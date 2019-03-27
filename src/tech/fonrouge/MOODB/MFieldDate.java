@@ -24,6 +24,11 @@ public class MFieldDate extends MField<Date> {
     }
 
     @Override
+    protected Date getTypedValue() {
+        return table.tableState.getFieldValue(this, Date.class);
+    }
+
+    @Override
     public Date getEmptyValue() {
         return null;
     }

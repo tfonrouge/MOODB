@@ -51,11 +51,21 @@ public class InvoiceItem extends Base {
         }
     };
 
+    public final MIndex index_date = new MIndex(this, "date", "", "date", false, false) {
+        @Override
+        protected void initialize() {
+        }
+    };
 
 
     @Override
     public final String getTableName() {
         return "invoiceItem";
+    }
+
+    @Override
+    public InvoiceItemData getData() {
+        return new InvoiceItemData<>(this);
     }
     /* @@ end field descriptor @@ */
 
@@ -64,10 +74,4 @@ public class InvoiceItem extends Base {
         return null;
     }
     /* @@ end calcField_total @@ */
-
-    @Override
-    public MBaseData getData() {
-        return null;
-    }
-
 }

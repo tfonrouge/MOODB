@@ -64,10 +64,27 @@ public class Inventory extends Base {
         }
     };
 
+    public final MIndex index_itemId = new MIndex(this, "itemId", "", "itemId", true, false) {
+        @Override
+        protected void initialize() {
+        }
+    };
+
+    public final MIndex index_name = new MIndex(this, "name", "", "name", false, false) {
+        @Override
+        protected void initialize() {
+        }
+    };
+
 
     @Override
     public final String getTableName() {
         return "inventory";
+    }
+
+    @Override
+    public InventoryData getData() {
+        return new InventoryData<>(this);
     }
     /* @@ end field descriptor @@ */
 
@@ -76,10 +93,4 @@ public class Inventory extends Base {
         return null;
     }
     /* @@ end calcField_date @@ */
-
-    @Override
-    public MBaseData getData() {
-        return null;
-    }
-
 }

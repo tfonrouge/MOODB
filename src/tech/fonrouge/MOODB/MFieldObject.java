@@ -17,6 +17,11 @@ public class MFieldObject extends MField<Object> {
     }
 
     @Override
+    protected Object getTypedValue() {
+        return table.tableState.getFieldValue(index);
+    }
+
+    @Override
     public Object getEmptyValue() {
         return null;
     }

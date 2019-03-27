@@ -1,6 +1,5 @@
 package tech.fonrouge.daemon.build;
 
-import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -331,6 +330,19 @@ class FileMaker {
                     */
         }
 
+        if (!isAbstract) {
+            builder.
+                    append("\n").
+                    append("    @Override\n").
+                    append("    public ").
+                    append(className).
+                    append("Data getData() {\n").
+                    append("        return new ").
+                    append(className).
+                    append("Data<>(this);\n").
+                    append("    }\n");
+        }
+
         return builder.toString();
     }
 
@@ -462,7 +474,18 @@ class FileMaker {
                     }
                 } else {
                     /* check abstract */
-                    line = getClassNameNormalized(line);
+                    if (line.contains("class " + className + " extends")) {
+                        if (isAbstract && !line.contains("abstract")) {
+                            line = line.replace(" class", " abstract class");
+                        }
+                        if (!isAbstract && line.contains("abstract")) {
+                            line = line.replace(" abstract ", " ");
+                        }
+                        /* checks extends class */
+                        if (!line.matches(".* +extends +" + extendClass + " +" + extendClass + ".*")) {
+                            line = line.replaceFirst("(extends +\\w+ \\{)", "extends " + extendClass + " {");
+                        }
+                    }
                 }
                 stringList.add(line);
             }
@@ -521,7 +544,7 @@ class FileMaker {
         builder.append("    public ").
                 append(className).
                 append("Data(").
-                append(className).
+                append("T").
                 append(" ").
                 append(className.toLowerCase()).
                 append(") {\n");
@@ -533,34 +556,24 @@ class FileMaker {
         for (FieldModel fieldModel : fieldModels) {
             builder.append("\n");
             builder.append("    public ");
+            String type;
             if ("TableField".equals(fieldModel.type)) {
-                builder.append("ObjectId");
+                type = "ObjectId";
             } else {
-                builder.append(fieldModel.type);
+                type = fieldModel.type;
             }
+            builder.append(type);
             builder.append(" get").
                     append(fieldModel.fieldName.substring(0, 1).toUpperCase()).
                     append(fieldModel.fieldName.substring(1)).
                     append("() {\n");
-            builder.append("        return document.get");
-            switch (fieldModel.type) {
-                case "Binary":
-                    break;
-                case "TableField":
-                    builder.append("ObjectId");
-                    break;
-                default:
-                    builder.append(fieldModel.type);
-            }
-            builder.append("(\"").
+            builder.append("        return tableState.getFieldValue(");
+            builder.append("table.field_").
                     append(fieldModel.fieldName).
-                    append("\"");
-            if ("Binary".equals(fieldModel.type)) {
-                builder.append(", ").
-                        append(fieldModel.type).
-                        append(".class");
-            }
-            builder.append(");\n");
+                    append(", ").
+                    append(type).
+                    append(".").
+                    append("class);\n");
             builder.append("    }\n");
         }
 
@@ -598,17 +611,9 @@ class FileMaker {
             if (importDate) {
                 writer.println("import java.util.Date;\n");
             }
-            writer.print("public ");
-            if (isAbstract) {
-                writer.print("abstract ");
-            }
-            writer.print("class " + className + "Data ");
-            if (extendClass.contentEquals("MTable")) {
-                writer.print("extends " + "MBaseData");
-            } else {
-                writer.print("extends " + extendClass + "Data ");
-            }
-            writer.println("{");
+
+            writer.println(classInit());
+
             writer.println();
             writer.println("    /* @@ begin field descriptor @@ */");
             writer.print(getModelDescriptorBuffer());
@@ -619,9 +624,25 @@ class FileMaker {
         }
     }
 
+    private String classInit() {
+        String classInit = "public ";
+        if (isAbstract) {
+            classInit += "abstract ";
+        }
+        classInit += ("class " + className + "Data<T extends " + className + "> ");
+        if (extendClass.contentEquals("MTable")) {
+            classInit += ("extends " + "MBaseData");
+        } else {
+            classInit += ("extends " + extendClass + "Data");
+        }
+        classInit += ("<T> {");
+        return classInit;
+    }
+
     private void updateDataModel() {
         Scanner scanner = null;
         boolean hasFieldDescriptor = false;
+        boolean findClassInit = false;
 
         try {
             scanner = new Scanner(pathModel).useDelimiter("\n");
@@ -636,7 +657,10 @@ class FileMaker {
 
             while (scanner.hasNext()) {
                 line = scanner.next();
-                line = getClassNameNormalized(line);
+                if (!findClassInit && line.matches(" *public +(abstract +)*class .*")) {
+                    findClassInit = true;
+                    line = classInit();
+                }
                 stringList.add(line);
             }
 
@@ -676,22 +700,5 @@ class FileMaker {
             e.printStackTrace();
         }
         return writer;
-    }
-
-    @NotNull
-    private String getClassNameNormalized(String line) {
-        if (line.contains("class " + className + " extends")) {
-            if (isAbstract && !line.contains("abstract")) {
-                line = line.replace(" class", " abstract class");
-            }
-            if (!isAbstract && line.contains("abstract")) {
-                line = line.replace(" abstract ", " ");
-            }
-            /* checks extends class */
-            if (!line.matches(".* +extends +" + extendClass + " +" + extendClass + ".*")) {
-                line = line.replaceFirst("(extends +\\w+ \\{)", "extends " + extendClass + " {");
-            }
-        }
-        return line;
     }
 }

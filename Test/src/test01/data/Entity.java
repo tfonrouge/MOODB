@@ -69,13 +69,11 @@ public abstract class Entity extends Base {
         }
     };
 
-
-    public Entity() {
-    }
-
-    public Entity(MTable masterSource) {
-        super(masterSource);
-    }
+    public final MIndex index_taxId = new MIndex(this, "taxId", "", "taxId", true, false) {
+        @Override
+        protected void initialize() {
+        }
+    };
 
     /* @@ end field descriptor @@ */
 }

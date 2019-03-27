@@ -104,8 +104,8 @@ class MEngine {
      */
     @SuppressWarnings("WeakerAccess")
     public MongoCursor<Document> executeAggregate(List<Document> documentList) {
-        if (table.lookupFieldList.size() > 0) {
-            table.lookupFieldList.forEach(s -> documentList.addAll(getLookupStage(s)));
+        if (table.tableState.lookupFieldList != null && table.tableState.lookupFieldList.size() > 0) {
+            table.tableState.lookupFieldList.forEach(s -> documentList.addAll(getLookupStage(s)));
         }
         return collection.aggregate(documentList).iterator();
     }

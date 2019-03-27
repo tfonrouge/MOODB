@@ -41,11 +41,6 @@ public abstract class Person extends Base {
         @Override
         protected void initialize() {
             required = true;
-
-            valueItems = new HashMap<>();
-            valueItems.put("F", "Female");
-            valueItems.put("M", "Male");
-            valueItems.put("?", "Undetermined");
         }
     };
     public final MFieldBoolean field_married = new MFieldBoolean(this, "married") {
@@ -60,6 +55,11 @@ public abstract class Person extends Base {
         }
     };
 
+    public final MIndex index_personId = new MIndex(this, "personId", "", "personId", true, false) {
+        @Override
+        protected void initialize() {
+        }
+    };
 
     /* @@ end field descriptor @@ */
 }

@@ -7,6 +7,7 @@
 
     <oons:Fields>
 
+        <oons:FieldDate name="fechaRegistro" calculated="true"/>
         <oons:FieldDate name="fecha" required="true" newDate="true"/>
 
     </oons:Fields>

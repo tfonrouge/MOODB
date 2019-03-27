@@ -28,6 +28,11 @@ public class MFieldInteger extends MField<Integer> {
     }
 
     @Override
+    protected Integer getTypedValue() {
+        return table.tableState.getFieldValue(this, Integer.class);
+    }
+
+    @Override
     public Integer getEmptyValue() {
         return 0;
     }

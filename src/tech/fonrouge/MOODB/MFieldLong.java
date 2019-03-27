@@ -23,6 +23,11 @@ public class MFieldLong extends MField<Long> {
     }
 
     @Override
+    protected Long getTypedValue() {
+        return table.tableState.getFieldValue(this, Long.class);
+    }
+
+    @Override
     public Long getEmptyValue() {
         return 0L;
     }

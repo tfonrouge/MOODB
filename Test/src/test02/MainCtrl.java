@@ -9,6 +9,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import test02.datos.Inventario;
+import test02.datos.InventarioData;
 
 import java.util.Date;
 import java.util.Random;
@@ -17,6 +18,7 @@ public class MainCtrl {
 
     public TableView<InventarioData> tableView = new TableView<>();
 
+    public TableColumn<InventarioData, Date> columnFechaRegistro = new TableColumn<>();
     public TableColumn<InventarioData, String> columnNombre = new TableColumn<>();
     public TableColumn<InventarioData, String> columnUdem = new TableColumn<>();
     public TableColumn<InventarioData, Double> columnExistencia = new TableColumn<>();
@@ -38,6 +40,7 @@ public class MainCtrl {
             TableColumn<InventarioData, a> column = new TableColumn<>();
         }
 
+        tableView.getColumns().add(columnFechaRegistro);
         tableView.getColumns().add(columnNombre);
         tableView.getColumns().add(columnUdem);
         tableView.getColumns().add(columnExistencia);
@@ -53,6 +56,7 @@ public class MainCtrl {
 
     void initialize() {
 
+        columnFechaRegistro.setCellValueFactory(new PropertyValueFactory<>("fechaRegistro"));
         columnNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         columnUdem.setCellValueFactory(new PropertyValueFactory<>("udem"));
         columnExistencia.setCellValueFactory(new PropertyValueFactory<>("existencia"));
@@ -81,6 +85,7 @@ public class MainCtrl {
             if (inventario.insert()) {
                 inventario.field_nombre.setValue("name " + i);
                 inventario.field_udem.setValue("pz");
+                inventario.field_tipo.setValue("A");
                 inventario.field_existencia.setValue((double) new Random().nextInt(100));
                 if (!inventario.post()) {
                     inventario.cancel();
@@ -94,10 +99,11 @@ public class MainCtrl {
         Inventario inventario = new Inventario();
 
         inventario.find();
-        inventario.index_tipo_nombre.find(1);
 
         while (!inventario.getEof()) {
-            observableList.add(new InventarioData(inventario));
+            InventarioData data = inventario.getData();
+            System.out.println(data.getFecha() + ", " + data.getNombre());
+            observableList.add(data);
             inventario.next();
         }
     }

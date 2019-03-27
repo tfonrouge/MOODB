@@ -30,9 +30,7 @@
 
         <oons:FieldString name="status" required="true">
             <oons:newValue>"1"</oons:newValue>
-            <oons:defaultValue>"2"</oons:defaultValue>
         </oons:FieldString>
-
 
     </oons:Fields>
 

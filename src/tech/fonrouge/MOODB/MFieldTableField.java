@@ -42,8 +42,8 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
 
         Object objectId = linkedTable._id();
 
-        if (objectId == null || !objectId.equals(fieldState.value)) {
-            linkedTable.goTo(fieldState.value);
+        if (objectId == null || !objectId.equals(table.tableState.getFieldValue(index))) {
+            linkedTable.goTo(table.tableState.getFieldValue(index));
         }
 
         return linkedTable;

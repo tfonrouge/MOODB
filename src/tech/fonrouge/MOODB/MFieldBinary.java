@@ -19,6 +19,11 @@ public class MFieldBinary extends MField<Binary> {
     }
 
     @Override
+    protected Binary getTypedValue() {
+        return table.tableState.getFieldValue(this, Binary.class);
+    }
+
+    @Override
     public Binary getEmptyValue() {
         return new Binary(new byte[0]);
     }

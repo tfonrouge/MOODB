@@ -56,7 +56,6 @@ public class Inventario extends Base {
         protected void initialize() {
             required = true;
             setCallableNewValue(() -> "1");
-            setDefaultValue("2");
         }
     };
 
@@ -65,29 +64,24 @@ public class Inventario extends Base {
         protected void initialize() {
             partialFilter = Filters.and(Filters.eq("tipo", "A"), Filters.gte("nombre", "CILINDRO"));
         }
-
-        public boolean find(String tipo, String nombre) {
-            return super.find(tipo, nombre);
-        }
     };
+
     public final MIndex index_nombre = new MIndex(this, "nombre", "", "nombre", false, false) {
         @Override
         protected void initialize() {
         }
-
-        public boolean find(String nombre) {
-            return super.find(new ArrayList<>(Collections.singletonList(nombre)));
-        }
     };
+
 
     @Override
     public final String getTableName() {
         return "inventory";
     }
-    /* @@ end field descriptor @@ */
 
     @Override
-    public MBaseData getData() {
-        return null;
+    public InventarioData getData() {
+        return new InventarioData<>(this);
     }
+    /* @@ end field descriptor @@ */
+
 }

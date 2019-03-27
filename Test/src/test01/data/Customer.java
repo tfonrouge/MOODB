@@ -13,17 +13,21 @@ public class Customer extends Entity {
         }
     };
 
+    public final MIndex index_customerId = new MIndex(this, "customerId", "", "customerId", true, false) {
+        @Override
+        protected void initialize() {
+        }
+    };
 
 
     @Override
     public final String getTableName() {
         return "customer";
     }
-    /* @@ end field descriptor @@ */
 
     @Override
-    public MBaseData getData() {
-        return null;
+    public CustomerData getData() {
+        return new CustomerData<>(this);
     }
-
+    /* @@ end field descriptor @@ */
 }

@@ -29,6 +29,11 @@ public class MFieldObjectId extends MField<ObjectId> {
     }
 
     @Override
+    protected ObjectId getTypedValue() {
+        return table.tableState.getFieldValue(this, ObjectId.class);
+    }
+
+    @Override
     public String valueAsString() {
         ObjectId value = value();
         if (value == null) {

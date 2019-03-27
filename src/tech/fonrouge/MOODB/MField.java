@@ -4,15 +4,14 @@ import com.mongodb.client.MongoCursor;
 import org.bson.Document;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 public abstract class MField<T> {
 
     final MTable.FIELD_TYPE fieldType = getFieldType();
     final MTable table;
+    public final int index;
     protected boolean notNullable;
     protected boolean required;
     protected boolean calculated;
@@ -24,6 +23,7 @@ public abstract class MField<T> {
     protected boolean autoInc;
     FieldState fieldState = new FieldState();
     String name;
+    Callable<T> callableNewValue;
     private String invalidCause = null;
     private int fieldStateIndex = 0;
     private ArrayList<FieldState> fieldStateList = new ArrayList<>();
@@ -44,7 +44,12 @@ public abstract class MField<T> {
         calculated = false;
         required = false;
         notNullable = false;
+        index = table.fieldList.size();
         table.fieldList.add(this);
+        if (table.tableState == null) {
+            table.tableState = new TableState();
+        }
+        table.tableState.fieldValueList.add(name);
         initialize();
     }
 
@@ -65,7 +70,8 @@ public abstract class MField<T> {
     }
 
     public boolean find() {
-        List<Document> pipeline = Arrays.asList(
+        ArrayList<Document> pipeline = new ArrayList<>();
+        pipeline.add(
                 new Document().
                         append("$sort", new Document().
                                 append(name, 1))
@@ -79,7 +85,7 @@ public abstract class MField<T> {
      * @param keyValue
      * @return
      */
-    public <V extends T> boolean find(V keyValue) {
+    public boolean find(T keyValue) {
         ArrayList<Document> pipeline = new ArrayList<>();
         pipeline.add(
                 new Document().
@@ -194,9 +200,9 @@ public abstract class MField<T> {
      * @return
      */
     final protected T getNewValue() {
-        if (fieldState.callableNewValue != null) {
+        if (callableNewValue != null) {
             try {
-                return fieldState.callableNewValue.call();
+                return callableNewValue.call();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -205,7 +211,7 @@ public abstract class MField<T> {
     }
 
     final public void setCallableNewValue(Callable<T> callable) {
-        fieldState.callableNewValue = callable;
+        callableNewValue = callable;
     }
 
     /**
@@ -284,7 +290,8 @@ public abstract class MField<T> {
         }
 
         /* TODO: validate against notNullable value */
-        this.fieldState.value = value;
+        //this.fieldState.value = value;
+        table.tableState.setFieldValue(index, value);
 
         return true;
     }
@@ -300,8 +307,11 @@ public abstract class MField<T> {
         if (calculated) {
             return getCalculatedValue();
         }
-        return fieldState.value;
+        return getTypedValue();
+        //return fieldState.value;
     }
+
+    protected abstract T getTypedValue();
 
     public final T value(T defaultValue) {
         T value = value();
@@ -319,24 +329,28 @@ public abstract class MField<T> {
      * @return boolean if value has changed
      */
     boolean valueChanged() {
-        return !(fieldState.value == fieldState.
+        return !(getTypedValue() == fieldState.
                 origValue);
     }
 
-    final public Object getDefaultValue() {
+    @SuppressWarnings("WeakerAccess")
+    final public T getDefaultValue() {
         if (fieldState.defaultValue == null) {
-            return fieldState.callableNewValue;
+            try {
+                return callableNewValue.call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return fieldState.defaultValue;
     }
 
+    @SuppressWarnings("WeakerAccess")
     final public void setDefaultValue(T defaultValue) {
         fieldState.defaultValue = defaultValue;
     }
 
     class FieldState {
-        T value;
-        Callable<T> callableNewValue;
         T defaultValue;
         T origValue;
     }

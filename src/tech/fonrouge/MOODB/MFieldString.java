@@ -17,6 +17,11 @@ public class MFieldString extends MField<String> {
     }
 
     @Override
+    protected String getTypedValue() {
+        return table.tableState.getFieldValue(this, String.class);
+    }
+
+    @Override
     public String getEmptyValue() {
         return "";
     }

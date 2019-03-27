@@ -1,30 +1,28 @@
 package tech.fonrouge.MOODB;
 
-import org.bson.Document;
+public abstract class MBaseData<T extends MTable> {
 
-public abstract class MBaseData {
+    protected final T table;
+    protected TableState tableState;
 
-    protected final MTable table;
-    protected Document document;
-
-    public MBaseData(MTable base) {
+    public MBaseData(T base) {
         table = base;
-        populateFieldValues();
+        try {
+            tableState = table.tableState.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
     }
 
     public MTable getTable() {
         return table;
     }
 
-    public Document getDocument() {
-        return document;
-    }
-
-    private void populateFieldValues() {
-        document = table.getDocument();
+    public TableState getTableState() {
+        return tableState;
     }
 
     public Object get_id() {
-        return document.get("_id");
+        return tableState.getFieldValue(table.field__id, Object.class);
     }
 }

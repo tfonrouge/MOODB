@@ -23,6 +23,11 @@ public class MFieldDouble extends MField<Double> {
     }
 
     @Override
+    protected Double getTypedValue() {
+        return table.tableState.getFieldValue(this, Double.class);
+    }
+
+    @Override
     public Double getEmptyValue() {
         return 0.0;
     }

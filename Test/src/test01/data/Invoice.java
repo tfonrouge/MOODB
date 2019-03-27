@@ -32,23 +32,21 @@ public class Invoice extends Base {
         }
     };
 
+    public final MIndex index_docNumber = new MIndex(this, "docNumber", "", "docNumber", true, false) {
+        @Override
+        protected void initialize() {
+        }
+    };
 
-    public Invoice() {
-    }
-
-    public Invoice(MTable masterSource) {
-        super(masterSource);
-    }
 
     @Override
     public final String getTableName() {
         return "invoice";
     }
-    /* @@ end field descriptor @@ */
 
     @Override
-    public MBaseData getData() {
-        return null;
+    public InvoiceData getData() {
+        return new InvoiceData<>(this);
     }
-
+    /* @@ end field descriptor @@ */
 }

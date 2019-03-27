@@ -6,7 +6,6 @@ import org.bson.Document;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Stream;
 
 abstract public class MTable {
@@ -19,13 +18,11 @@ abstract public class MTable {
     ArrayList<MField> fieldList;
     ArrayList<MIndex> indices = new ArrayList<>();
     MEngine engine;
-    TableState tableState = new TableState();
-    List<String[]> lookupFieldList = new ArrayList<>();
+
+    TableState tableState;
     private MDatabase database;
     private int tableStateIndex = 0;
     private ArrayList<TableState> tableStateList = new ArrayList<>();
-    private Document rawDocument;
-    private Document document;
 
     /* ******************* */
     /* constructor methods */
@@ -41,9 +38,7 @@ abstract public class MTable {
 
     @SuppressWarnings("unused")
     public void addLookupField(String fieldExpression) {
-        String[] fields = fieldExpression.split("\\.");
-        lookupFieldList.remove(fields);
-        lookupFieldList.add(fields);
+        tableState.lookupDocument.put(fieldExpression, new Document());
     }
 
     /**
@@ -67,7 +62,7 @@ abstract public class MTable {
     }
 
     void set_id(Object value) {
-        field__id.fieldState.value = value;
+        field__id.table.tableState.setFieldValue(field__id.index, value);
     }
 
     public MField fieldByName(String fieldName) {
@@ -158,32 +153,32 @@ abstract public class MTable {
 
         tableState.mongoCursor = mongoCursor;
 
-        rawDocument = (mongoCursor == null || !mongoCursor.hasNext()) ? null : mongoCursor.next();
+        Document rawDocument = (mongoCursor == null || !mongoCursor.hasNext()) ? null : mongoCursor.next();
 
         tableState.eof = rawDocument == null;
 
-        document = new Document();
+        if (tableState.fieldValueList == null) {
+            tableState.fieldValueList = new ArrayList<>(fieldList.size());
+        }
 
         fieldList.forEach(mField -> {
             if (!mField.calculated) {
                 Object value = rawDocument == null ? null : rawDocument.getOrDefault(mField.name, null);
                 if (value == null && mField.notNullable) {
-                    mField.fieldState.value = mField.getEmptyValue();
-                } else {
-                    mField.fieldState.value = value;
+                    value = mField.getEmptyValue();
                 }
-                document.put(mField.name, mField.fieldState.value);
+                tableState.setFieldValue(mField.index, value);
             }
         });
 
-        if (rawDocument != null) {
-            lookupFieldList.forEach(fields -> {
-                document.put("@" + fields[0], rawDocument.get("@" + fields[0]));
+        if (rawDocument != null && tableState.lookupFieldList != null) {
+            tableState.lookupFieldList.forEach(fields -> {
+                tableState.lookupDocument.put("@" + fields[0], rawDocument.get("@" + fields[0]));
             });
         }
 
         if (tableState.linkedField != null && tableState.linkedField.table.tableState.state != STATE.NORMAL) {
-            Object value = tableState.linkedField.fieldState.value;
+            Object value = tableState.linkedField.getTypedValue();
             if ((value == null && _id() != null) || _id() != null && !_id().equals(value)) {
                 tableState.linkedField.setValue(_id());
             }
@@ -201,7 +196,7 @@ abstract public class MTable {
             throw new RuntimeException("Attempt to Cancel on Table at Normal State.");
         }
 
-        goTo(field__id.fieldState.value);
+        goTo(field__id.getTypedValue());
 
         tableState.state = STATE.NORMAL;
     }
@@ -244,7 +239,7 @@ abstract public class MTable {
             if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
                 ((MFieldTableField) mField).notSynced = true;
             }
-            mField.fieldState.origValue = mField.fieldState.value;
+            mField.fieldState.origValue = mField.getTypedValue();
         });
 
         tableState.state = STATE.EDIT;
@@ -264,14 +259,10 @@ abstract public class MTable {
      * @return OBJECT_ID for current rawDocument in table
      */
     public Object _id() {
-        return field__id.fieldState.value;
+        return field__id.getTypedValue();
     }
 
     public abstract MBaseData getData();
-
-    public Document getDocument() {
-        return document;
-    }
 
     /**
      * getEof
@@ -357,10 +348,6 @@ abstract public class MTable {
         return tableState.masterSource;
     }
 
-    public Document getRawDocument() {
-        return rawDocument;
-    }
-
     /**
      * getState
      *
@@ -407,26 +394,26 @@ abstract public class MTable {
             if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
                 ((MFieldTableField) mField).notSynced = true;
             }
-            mField.fieldState.value = null;
+            tableState.setFieldValue(mField.index, null);
         });
 
         /* fill field values */
         fieldList.forEach(mField -> {
             if (!mField.calculated) {
                 if (tableState.masterSource != null && mField.equals(tableState.masterSourceField)) {
-                    mField.fieldState.value = tableState.masterSource._id();
+                    tableState.setFieldValue(mField.index, tableState.masterSource._id());
                 } else {
                     if (mField.fieldType == FIELD_TYPE.DATE && ((MFieldDate) mField).mNewDate) {
-                        mField.fieldState.value = new Date();
+                        tableState.setFieldValue(mField.index, new Date());
                     } else {
                         Object value = mField.getNewValue();
                         if (mField.notNullable && mField.valueItems != null && !mField.valueItems.containsKey(value)) {
                             throw new RuntimeException("Invalid new value [" + value + "] on field '" + mField.name + "'.");
                         }
-                        mField.fieldState.value = value;
+                        tableState.setFieldValue(mField.index, value);
                     }
-                    if (mField.fieldState.value == null && (mField.notNullable || mField.autoInc)) {
-                        mField.fieldState.value = mField.getEmptyValue();
+                    if (tableState.getFieldValue(mField.index) == null && (mField.notNullable || mField.autoInc)) {
+                        tableState.setFieldValue(mField.index, mField.getEmptyValue());
                     }
                 }
             }
@@ -487,7 +474,7 @@ abstract public class MTable {
                         if (!mField.calculated) {
                             if (mField.autoInc) {
                                 document.put(mField.name, mField.getNextSequence());
-                            } else if (!(mField instanceof MFieldObjectId && mField.getName().contentEquals("_id")) && !(mField.fieldState.value == null)) {
+                            } else if (!(mField instanceof MFieldObjectId && mField.getName().contentEquals("_id")) && !(tableState.getFieldValue(mField.index) == null)) {
                                 document.put(mField.getName(), mField.value());
                             }
                         }
@@ -548,16 +535,5 @@ abstract public class MTable {
         NORMAL,
         EDIT,
         INSERT
-    }
-
-    class TableState {
-        MTable masterSource = null;
-        MFieldTableField masterSourceField;
-        STATE state = STATE.NORMAL;
-        MongoCursor<Document> mongoCursor;
-        boolean eof = true;
-        Exception exception;
-        MFieldTableField<? extends MTable> linkedField;
-
     }
 }

@@ -19,10 +19,6 @@ public class User extends Person {
         @Override
         protected void initialize() {
             description = "User level";
-
-            valueItems = new HashMap<>();
-            valueItems.put("0", "General user");
-            valueItems.put("1", "Admin user");
         }
     };
     public final MFieldString field_password = new MFieldString(this, "password") {
@@ -45,16 +41,21 @@ public class User extends Person {
         }
     };
 
+    public final MIndex index_userId = new MIndex(this, "userId", "", "userId", true, false) {
+        @Override
+        protected void initialize() {
+        }
+    };
 
 
     @Override
     public final String getTableName() {
         return "users";
     }
-    /* @@ end field descriptor @@ */
 
     @Override
-    public MBaseData getData() {
-        return null;
+    public UserData getData() {
+        return new UserData<>(this);
     }
+    /* @@ end field descriptor @@ */
 }
