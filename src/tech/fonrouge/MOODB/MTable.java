@@ -38,7 +38,11 @@ abstract public class MTable {
 
     @SuppressWarnings("unused")
     public void addLookupField(String fieldExpression) {
-        tableState.lookupDocument.put(fieldExpression, new Document());
+
+        String[] fields = fieldExpression.split("\\.");
+        if (fields.length > 1) {
+            tableState.lookupDocument.put("@" + fields[0], null);
+        }
     }
 
     /**
@@ -171,10 +175,12 @@ abstract public class MTable {
             }
         });
 
-        if (rawDocument != null && tableState.lookupFieldList != null) {
-            tableState.lookupFieldList.forEach(fields -> {
-                tableState.lookupDocument.put("@" + fields[0], rawDocument.get("@" + fields[0]));
-            });
+        if (tableState.lookupDocument != null && tableState.lookupDocument.size() > 0) {
+            if (rawDocument == null) {
+                tableState.lookupDocument.forEach((fieldName, o) -> tableState.lookupDocument.put(fieldName, null));
+            } else {
+                tableState.lookupDocument.forEach((fieldName, o) -> tableState.lookupDocument.put(fieldName, rawDocument.get(fieldName)));
+            }
         }
 
         if (tableState.linkedField != null && tableState.linkedField.table.tableState.state != STATE.NORMAL) {
@@ -373,6 +379,9 @@ abstract public class MTable {
         return engine.goTo(objectId);
     }
 
+    /**
+     * @return true if current cursor is valid and his hasNext() is true
+     */
     public boolean hasNext() {
         return tableState.mongoCursor != null && tableState.mongoCursor.hasNext();
     }

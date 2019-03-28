@@ -13,7 +13,7 @@ public abstract class MDatabase {
         return table;
     }
 
-    public final String getDatabaseURI() {
+    final String getDatabaseURI() {
         String uri = "mongodb://";
 
         if (getUserName().isEmpty()) {

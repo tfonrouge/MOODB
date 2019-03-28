@@ -104,16 +104,16 @@ class MEngine {
      */
     @SuppressWarnings("WeakerAccess")
     public MongoCursor<Document> executeAggregate(List<Document> documentList) {
-        if (table.tableState.lookupFieldList != null && table.tableState.lookupFieldList.size() > 0) {
-            table.tableState.lookupFieldList.forEach(s -> documentList.addAll(getLookupStage(s)));
+        if (table.tableState.lookupDocument != null) {
+            table.tableState.lookupDocument.forEach((fieldName, o) -> documentList.addAll(getLookupStage(fieldName.substring(1))));
         }
         return collection.aggregate(documentList).iterator();
     }
 
-    private List<Document> getLookupStage(String[] fields) {
+    private List<Document> getLookupStage(String fieldName) {
         List<Document> documents = new ArrayList<>();
 
-        MFieldTableField mFieldTableField = table.fieldTableFieldByName(fields[0]);
+        MFieldTableField mFieldTableField = table.fieldTableFieldByName(fieldName);
 
         if (mFieldTableField != null) {
             String lookupFieldName = mFieldTableField.name;
@@ -160,7 +160,6 @@ class MEngine {
      *
      * @return success on find
      */
-    @SuppressWarnings("WeakerAccess")
     public boolean find() {
         Document masterSourceFilter = buildMasterSourceFilter();
         if (masterSourceFilter != null) {
@@ -221,7 +220,6 @@ class MEngine {
      *
      * @return boolean if next is valid document
      */
-    @SuppressWarnings("WeakerAccess")
     public boolean next() {
         if (table.tableState.mongoCursor != null) {
             if (table.tableState.mongoCursor.hasNext()) {

@@ -19,8 +19,8 @@ class FieldModel {
     HashMap<String, String> keyValueItems;
     String newValue;
     String defaultValue;
-    private boolean valid = true;
     boolean autoInc;
+    private boolean valid = true;
 
     FieldModel(Node node) {
         Node node1;

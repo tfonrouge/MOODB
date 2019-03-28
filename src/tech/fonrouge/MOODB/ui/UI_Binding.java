@@ -11,8 +11,10 @@ import java.util.HashMap;
 
 public class UI_Binding {
 
+    @SuppressWarnings("WeakerAccess")
     protected final HashMap<String, Node> nodeHashMap = new HashMap<>();
 
+    @SuppressWarnings("unused")
     final protected <T extends MTable> void bindControl(ComboBox<Object> comboBox, MFieldTableField<T> fieldTableField, String detailField) {
         nodeHashMap.put(fieldTableField.getName(), comboBox);
         final boolean[] ignore = {false};
@@ -50,6 +52,7 @@ public class UI_Binding {
         comboBox.setItems(o);
     }
 
+    @SuppressWarnings("unused")
     final protected void bindControl(ComboBox<String> comboBox, MFieldString fieldString) {
         nodeHashMap.put(fieldString.getName(), comboBox);
         final boolean[] ignore = {false};
@@ -73,6 +76,7 @@ public class UI_Binding {
         comboBox.setPromptText(fieldString.getDescription());
     }
 
+    @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldInteger fieldInteger) {
         nodeHashMap.put(fieldInteger.getName(), textField);
 
@@ -81,6 +85,7 @@ public class UI_Binding {
         textField.setPromptText(fieldInteger.getDescription());
     }
 
+    @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldDouble fieldDouble) {
         nodeHashMap.put(fieldDouble.getName(), textField);
 
@@ -89,6 +94,7 @@ public class UI_Binding {
         textField.setPromptText(fieldDouble.getDescription());
     }
 
+    @SuppressWarnings("unused")
     final protected void bindControl(TextInputControl textField, MFieldString fieldString) {
         nodeHashMap.put(fieldString.getName(), textField);
 
@@ -97,6 +103,7 @@ public class UI_Binding {
         textField.setPromptText(fieldString.getDescription());
     }
 
+    @SuppressWarnings("unused")
     final protected void bindControl(Spinner<Integer> integerSpinner, MFieldInteger fieldInteger) {
         nodeHashMap.put(fieldInteger.getName(), integerSpinner);
 
@@ -104,6 +111,7 @@ public class UI_Binding {
         integerSpinner.getValueFactory().valueProperty().addListener((observable, oldValue, newValue) -> fieldInteger.setValue(newValue));
     }
 
+    @SuppressWarnings("unused")
     final protected void bindControl(CheckBox checkBox, MFieldBoolean mFieldBoolean) {
         nodeHashMap.put(mFieldBoolean.getName(), checkBox);
 

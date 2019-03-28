@@ -15,7 +15,6 @@ public class TableState implements Cloneable {
     Exception exception;
     MFieldTableField<? extends MTable> linkedField;
     ArrayList<Object> fieldValueList = new ArrayList<>();
-    ArrayList<String[]> lookupFieldList;
     Document lookupDocument = new Document();
 
     public Document getLookupDocument() {
@@ -38,7 +37,7 @@ public class TableState implements Cloneable {
     public <T> T getFieldValue(MField mField, Class<T> clazz) {
         if (fieldValueList != null) {
             Object o;
-            if (mField.calculated) {
+            if (mField.isCalculated()) {
                 TableState tableState = mField.table.tableState;
                 mField.table.tableState = this;
                 o = mField.table.fieldList.get(mField.index).value();
@@ -57,8 +56,8 @@ public class TableState implements Cloneable {
         if (fieldValueList != null) {
             cloned.fieldValueList = new ArrayList<>(fieldValueList);
         }
-        if (lookupFieldList != null) {
-            cloned.lookupFieldList = new ArrayList<>(lookupFieldList);
+        if (lookupDocument != null) {
+            cloned.lookupDocument = new Document(lookupDocument);
         }
         return cloned;
     }

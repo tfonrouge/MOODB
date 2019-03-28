@@ -29,20 +29,25 @@ public abstract class UI_CtrlList<T extends MTable> {
 
     private final ObservableList<MBaseData> observableList = FXCollections.observableArrayList();
     private T table = getTable();
+    @SuppressWarnings("unused")
     @FXML
     private MenuItem menuItem_cerrar;
+    @SuppressWarnings("unused")
     @FXML
     private MenuItem menuItem_agregar;
+    @SuppressWarnings("unused")
     @FXML
     private MenuItem menuItem_modificar;
+    @SuppressWarnings("unused")
     @FXML
     private MenuItem menuItem_eliminar;
+    @SuppressWarnings("unused")
     @FXML
     private TableView<MBaseData> tableView;
 
     protected abstract String[] getColumns();
 
-    public void buildUI(@NotNull Parent parent) {
+    void buildUI(@NotNull Parent parent) {
 
         menuItem_cerrar.setAccelerator(new KeyCodeCombination(KeyCode.ESCAPE));
         menuItem_agregar.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
@@ -168,7 +173,7 @@ public abstract class UI_CtrlList<T extends MTable> {
         }
     }
 
-    protected abstract T buildTable();
+    abstract protected T buildTable();
 
     public T getTable() {
         if (table == null) {
@@ -177,7 +182,7 @@ public abstract class UI_CtrlList<T extends MTable> {
         return table;
     }
 
-    protected abstract String getResourceRecordName();
+    abstract protected String getResourceRecordName();
 
     private void doInsertEdit() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(getResourceRecordName()));

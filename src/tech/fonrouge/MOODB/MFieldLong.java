@@ -1,5 +1,6 @@
 package tech.fonrouge.MOODB;
 
+@SuppressWarnings("unused")
 public class MFieldLong extends MField<Long> {
 
     protected MFieldLong(MTable owner, String name) {

@@ -9,9 +9,9 @@ import java.util.concurrent.Callable;
 
 public abstract class MField<T> {
 
+    public final int index;
     final MTable.FIELD_TYPE fieldType = getFieldType();
     final MTable table;
-    public final int index;
     protected boolean notNullable;
     protected boolean required;
     protected boolean calculated;
@@ -345,7 +345,7 @@ public abstract class MField<T> {
         return fieldState.defaultValue;
     }
 
-    @SuppressWarnings("WeakerAccess")
+    @SuppressWarnings("unused")
     final public void setDefaultValue(T defaultValue) {
         fieldState.defaultValue = defaultValue;
     }

@@ -7,7 +7,7 @@ import org.bson.Document;
 
 public class MFieldInteger extends MField<Integer> {
 
-    public MFieldInteger(MTable owner, String name) {
+    protected MFieldInteger(MTable owner, String name) {
         super(owner, name);
     }
 
