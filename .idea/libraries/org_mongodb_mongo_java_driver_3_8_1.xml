@@ -2,10 +2,10 @@
   <library name="org.mongodb:mongo-java-driver:3.8.1" type="repository">
     <properties maven-id="org.mongodb:mongo-java-driver:RELEASE" />
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.11.0-beta1/mongo-java-driver-3.11.0-beta1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.11.0-beta2/mongo-java-driver-3.11.0-beta2.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.11.0-beta1/mongo-java-driver-3.11.0-beta1-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.11.0-beta2/mongo-java-driver-3.11.0-beta2-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES />
   </library>
