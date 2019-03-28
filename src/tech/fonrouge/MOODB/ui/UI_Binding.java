@@ -118,4 +118,12 @@ public class UI_Binding {
         checkBox.setSelected(mFieldBoolean.value());
         checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> mFieldBoolean.setValue(newValue));
     }
+
+    final protected void bindControl(TextField textField, MFieldDate mFieldDate) {
+        nodeHashMap.put(mFieldDate.getName(), textField);
+
+        textField.textProperty().set(mFieldDate.valueAsString());
+        textField.textProperty().addListener((observable, oldValue, newValue) -> mFieldDate.setValueAsString(newValue));
+        textField.setPromptText(mFieldDate.getDescription());
+    }
 }
