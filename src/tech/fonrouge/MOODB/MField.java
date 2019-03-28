@@ -226,7 +226,7 @@ public abstract class MField<T> {
      */
     public boolean getValidStatus() {
         invalidCause = null;
-        if (!calculated && required && isEmpty()) {
+        if (!calculated && required && isEmpty() && !autoInc) {
             invalidCause = "Empty value on required field";
             return false;
         }
@@ -277,6 +277,10 @@ public abstract class MField<T> {
 
         if (table.tableState.state == MTable.STATE.NORMAL) {
             return false; //throw new RuntimeException("Attempt to setValue() to Table in Normal State.");
+        }
+
+        if (autoInc) {
+            return false;
         }
 
         if (value != null && valueItems != null) {
