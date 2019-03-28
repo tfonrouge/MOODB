@@ -521,7 +521,11 @@ abstract public class MTable {
             tableStateList.add(tableState);
         }
         ++tableStateIndex;
-        tableState = new TableState();
+        try {
+            tableState = this.tableState.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
         tableStateList.add(tableState);
         fieldList.forEach(MField::fieldStatePush);
     }
@@ -537,7 +541,6 @@ abstract public class MTable {
         OBJECT_ID,
         STRING,
         TABLE_FIELD
-
     }
 
     public enum STATE {
