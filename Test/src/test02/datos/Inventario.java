@@ -1,10 +1,11 @@
 package test02.datos;
 
 import com.mongodb.client.model.Filters;
-import tech.fonrouge.MOODB.*;
+import tech.fonrouge.MOODB.MFieldDouble;
+import tech.fonrouge.MOODB.MFieldInteger;
+import tech.fonrouge.MOODB.MFieldString;
+import tech.fonrouge.MOODB.MIndex;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 public class Inventario extends Base {

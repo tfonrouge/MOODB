@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<oons:Table xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oons="http://fonrouge.tech/MOODB"
+            extends="Base01"
+            tableName="invoiceItem"
+            xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
+
+    <oons:Fields>
+
+        <oons:FieldTableField name="invoice" class="Invoice" description="Invoice" required="true"/>
+        <oons:FieldTableField name="invItem" class="Inventory" required="true"/>
+        <oons:FieldDouble name="qty" description="Quantity" required="true"/>
+        <oons:FieldDouble name="unitPrice" description="Unit Price" required="true"/>
+
+        <oons:FieldDouble name="total" calculated="true"/>
+
+    </oons:Fields>
+
+    <oons:Index name="date" keyField="date"/>
+
+</oons:Table>

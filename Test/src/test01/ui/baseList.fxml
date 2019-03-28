@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="800.0" prefWidth="1200.0"
+            xmlns="http://javafx.com/javafx/8.0.121">
+    <center>
+        <TableView fx:id="tableView" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
+            <columns>
+                <TableColumn prefWidth="75.0" text="Column X"/>
+            </columns>
+        </TableView>
+    </center>
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <Menu mnemonicParsing="false" text="Archivo">
+                <MenuItem fx:id="menuItem_cerrar" mnemonicParsing="false" text="Cerrar"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Editar">
+                <MenuItem fx:id="menuItem_agregar" mnemonicParsing="false" onAction="#onActionMenuAgregar"
+                          text="Agregar"/>
+                <MenuItem fx:id="menuItem_modificar" mnemonicParsing="false" onAction="#onActionMenuModificar"
+                          text="Modificar"/>
+                <MenuItem fx:id="menuItem_eliminar" mnemonicParsing="false" onAction="#onActionMenuEliminar"
+                          text="Eliminar"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Ayuda">
+                <MenuItem mnemonicParsing="false" text="About"/>
+            </Menu>
+        </MenuBar>
+    </top>
+    <left>
+        <Accordion BorderPane.alignment="CENTER">
+            <panes>
+                <TitledPane animated="false" text="untitled 1">
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+                </TitledPane>
+                <TitledPane animated="false" text="untitled 2">
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+                </TitledPane>
+                <TitledPane animated="false" text="untitled 3">
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+                </TitledPane>
+            </panes>
+        </Accordion>
+    </left>
+    <bottom>
+    </bottom>
+</BorderPane>
