@@ -1,7 +1,7 @@
 package test01.data.invoiceItem;
 
 import org.bson.types.ObjectId;
-import test01.data.base.Base01Data;
+import test01.data.base01.Base01Data;
 
 public class InvoiceItemData<T extends InvoiceItem> extends Base01Data<T> {
 

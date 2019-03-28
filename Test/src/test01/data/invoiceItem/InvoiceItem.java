@@ -3,7 +3,7 @@ package test01.data.invoiceItem;
 import tech.fonrouge.MOODB.MFieldDouble;
 import tech.fonrouge.MOODB.MFieldTableField;
 import tech.fonrouge.MOODB.MIndex;
-import test01.data.base.Base01;
+import test01.data.base01.Base01;
 import test01.data.inventory.Inventory;
 import test01.data.invoice.Invoice;
 

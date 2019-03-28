@@ -2,7 +2,7 @@ package test01.data.entity;
 
 import tech.fonrouge.MOODB.MFieldString;
 import tech.fonrouge.MOODB.MIndex;
-import test01.data.base.Base01;
+import test01.data.base01.Base01;
 
 public abstract class Entity extends Base01 {
 

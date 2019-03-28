@@ -1,7 +1,7 @@
 package test01.data.inventory;
 
 import org.bson.types.Binary;
-import test01.data.base.Base01Data;
+import test01.data.base01.Base01Data;
 
 import java.util.Date;
 

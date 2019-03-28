@@ -1,6 +1,6 @@
 package test01.data.invoice;
 
-import test01.data.base.Base01CtrlList;
+import test01.data.base01.Base01CtrlList;
 
 public class InvoiceCtrlList extends Base01CtrlList<Invoice> {
 
@@ -11,7 +11,7 @@ public class InvoiceCtrlList extends Base01CtrlList<Invoice> {
 
     @Override
     protected String getResourceRecordName() {
-        return "/data/invoice/record.fxml";
+        return "/test01/data/invoice/record.fxml";
     }
 
     @Override

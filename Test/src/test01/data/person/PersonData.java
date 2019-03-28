@@ -1,6 +1,6 @@
 package test01.data.person;
 
-import test01.data.base.Base01Data;
+import test01.data.base01.Base01Data;
 
 import java.util.Date;
 

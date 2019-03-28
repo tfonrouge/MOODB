@@ -1,7 +1,7 @@
 package test01.data.inventory;
 
 import tech.fonrouge.MOODB.*;
-import test01.data.base.Base01;
+import test01.data.base01.Base01;
 
 import java.util.Date;
 import java.util.HashMap;
