@@ -5,7 +5,7 @@ MOODB is a ORM framework that allows to simplify Data Modeling when writting Jav
 For example, the following meta-descriptor XML:
 
 ```xml
-  <oons:Table extends="Base" tableName="inventory">
+  <oons:Table extends="Base" tableName="inventoryItem">
 
     <oons:Fields>
 
@@ -93,7 +93,7 @@ public class Inventory extends Base {
 
     @Override
     public final String getTableName() {
-        return "inventory";
+        return inventoryItem;
     }
 
     @Override
@@ -115,20 +115,20 @@ And then you can use this Java class in the form:
 
 ```java
 
-    Inventory inventory = new Inventory();
+    Inventory inventoryItem = new Inventory();
     
-    if (inventory.insert()) {
-        inventory.field_itemId.setValue("9198798734");
-        inventory.field_name.setValue("Mouse");
-        inventory.field_stock.setValue(50.0);
-        inventory.field_uom.setValue("pz");
-        inventory.field_unitPrice.setValue(2.74);
-        if (!inventory.post()) {
-            inventory.cancel();
+    if (inventoryItem.insert()) {
+        inventoryItem.field_itemId.setValue("9198798734");
+        inventoryItem.field_name.setValue("Mouse");
+        inventoryItem.field_stock.setValue(50.0);
+        inventoryItem.field_uom.setValue("pz");
+        inventoryItem.field_unitPrice.setValue(2.74);
+        if (!inventoryItem.post()) {
+            inventoryItem.cancel();
         }
     }
     
-    if (inventory.field_name.find("Mouse")) {
+    if (inventoryItem.field_name.find("Mouse")) {
         ...
     }
 
