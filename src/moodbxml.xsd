@@ -9,6 +9,7 @@
         <xs:sequence>
             <xs:element name="Fields" type="FieldsType"/>
             <xs:element name="MasterSource" type="MasterSourceType" minOccurs="0"/>
+            <xs:element name="ChildTable" type="ChildTableType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="Index" type="IndexType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="extends" type="xs:string"/>
@@ -29,7 +30,6 @@
             <xs:element name="FieldString" type="FieldStringType"/>
             <xs:element name="FieldBinary" type="FieldBaseType"/>
         </xs:choice>
-        <xs:attribute name="primaryKeyField" type="xs:string"/>
     </xs:complexType>
     <xs:complexType name="FieldBaseType">
         <xs:all minOccurs="0">
@@ -100,6 +100,10 @@
         <xs:attribute name="partialFilter" type="xs:string"/>
         <xs:attribute name="unique" type="xs:boolean"/>
         <xs:attribute name="sparse" type="xs:boolean"/>
+    </xs:complexType>
+    <xs:complexType name="ChildTableType">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="class" type="xs:string" use="required"/>
     </xs:complexType>
     <xs:complexType name="MasterSourceType">
         <xs:attribute name="class" type="xs:string" use="required"/>

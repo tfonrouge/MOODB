@@ -31,6 +31,7 @@ class FileMaker {
     private int numCalcFields = 0;
     private int numValidateFields = 0;
     private List<FieldModel> fieldModels;
+    private List<ChildTableModel> childTableModels;
     private List<IndexModel> indexModels;
     private List<String> calcFieldList = new ArrayList<>();
     private List<String> onValidateList = new ArrayList<>();
@@ -49,6 +50,7 @@ class FileMaker {
         this.pathModel = Paths.get(pathExtLess.toString() + "Data.java");
         this.className = className;
         fieldModels = new ArrayList<>();
+        childTableModels = new ArrayList<>();
         indexModels = new ArrayList<>();
 
         NodeList nodeList = document.getElementsByTagNameNS("*", "Fields").item(0).getChildNodes();
@@ -66,6 +68,13 @@ class FileMaker {
                         ++numValidateFields;
                     }
                 }
+            }
+        }
+
+        for (int i = 0; i < document.getElementsByTagNameNS("*", "ChildTable").getLength(); i++) {
+            Node node = document.getElementsByTagNameNS("*", "ChildTable").item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                childTableModels.add(new ChildTableModel(node));
             }
         }
 
@@ -184,7 +193,9 @@ class FileMaker {
                     builder.
                             append("\n").
                             append("        @Override\n").
-                            append("        protected " + fieldModel.className + " buildTableField() {\n").
+                            append("        protected ").
+                            append(fieldModel.className).
+                            append(" buildTableField() {\n").
                             append("            return new ").
                             append(fieldModel.className).
                             append("();\n").
@@ -241,6 +252,21 @@ class FileMaker {
                     append(className).
                     append("Model m;\n");
             */
+        }
+
+        if (childTableModels.size() > 0) {
+            childTableModels.forEach(childTableModel -> {
+                builder.
+                        append("    public final ").
+                        append(childTableModel.getClassName()).
+                        append(" childTable_").
+                        append(childTableModel.getName()).
+                        append("() {\n").
+                        append("        return new ").
+                        append(childTableModel.getClassName()).
+                        append("(this);\n").
+                        append("    }\n");
+            });
         }
 
         /* masterSource */
@@ -344,22 +370,6 @@ class FileMaker {
         }
 
         return builder.toString();
-    }
-
-    private String getFindArrayList(String keyField) {
-        int numParams = 0;
-        StringBuilder result = new StringBuilder();
-        Scanner scanner = new Scanner(keyField).useDelimiter(",");
-        while (scanner.hasNext()) {
-            ++numParams;
-            Scanner scanner1 = new Scanner(scanner.next()).useDelimiter(":");
-            String fieldName = scanner1.next();
-            result.append((result.length() == 0) ? fieldName : ", " + fieldName);
-        }
-        if (numParams == 1) {
-            return "new ArrayList<>(Collections.singletonList(" + result.toString() + "))";
-        }
-        return "new ArrayList<>(Arrays.asList(" + result.toString() + "))";
     }
 
     private void createFileTable() {
