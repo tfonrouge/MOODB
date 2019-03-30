@@ -7,11 +7,7 @@ public abstract class MBaseData<T extends MTable> {
 
     public MBaseData(T base) {
         table = base;
-        try {
-            tableState = table.tableState.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
+        tableState = new TableState(table.tableState);
     }
 
     public MTable getTable() {
