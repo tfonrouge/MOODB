@@ -4,8 +4,9 @@ import com.mongodb.client.MongoCursor;
 import org.bson.Document;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class TableState implements Cloneable {
+public class TableState {
 
     MTable masterSource = null;
     MFieldTableField masterSourceField;
@@ -14,51 +15,49 @@ public class TableState implements Cloneable {
     boolean eof = true;
     Exception exception;
     MFieldTableField<? extends MTable> linkedField;
-    ArrayList<Object> fieldValueList = new ArrayList<>();
-    Document lookupDocument = new Document();
+    List<MField.FieldState> fieldStateList;
+    Document lookupDocument;
+
+    TableState() {
+        fieldStateList = new ArrayList<>();
+        lookupDocument = new Document();
+    }
+
+    TableState(TableState tableState) {
+        masterSource = tableState.masterSource;
+        masterSourceField = tableState.masterSourceField;
+        state = tableState.state;
+        mongoCursor = tableState.mongoCursor;
+        eof = tableState.eof;
+        exception = tableState.exception;
+        linkedField = tableState.linkedField;
+        fieldStateList = new ArrayList<>();
+        tableState.fieldStateList.forEach(fieldState -> fieldStateList.add(fieldState.cloneThis()));
+        lookupDocument = new Document(tableState.lookupDocument);
+    }
 
     public Document getLookupDocument() {
         return lookupDocument;
     }
 
     <T> void setFieldValue(int index, T value) {
-        if (fieldValueList != null) {
-            fieldValueList.set(index, value);
-        }
+        fieldStateList.get(index).value = value;
     }
 
     public Object getFieldValue(int index) {
-        if (fieldValueList != null) {
-            return fieldValueList.get(index);
-        }
-        return null;
+        return fieldStateList.get(index).value;
     }
 
     public <T> T getFieldValue(MField mField, Class<T> clazz) {
-        if (fieldValueList != null) {
-            Object o;
-            if (mField.isCalculated()) {
-                TableState tableState = mField.table.tableState;
-                mField.table.tableState = this;
-                o = mField.table.fieldList.get(mField.index).value();
-                mField.table.tableState = tableState;
-            } else {
-                o = fieldValueList.get(mField.index);
-            }
-            return clazz.cast(o);
+        Object o;
+        if (mField.isCalculated()) {
+            TableState tableState = mField.table.tableState;
+            mField.table.tableState = this;
+            o = mField.table.fieldList.get(mField.index).value();
+            mField.table.tableState = tableState;
+        } else {
+            o = fieldStateList.get(mField.index).value;
         }
-        return null;
-    }
-
-    @Override
-    protected TableState clone() throws CloneNotSupportedException {
-        TableState cloned = (TableState) super.clone();
-        if (fieldValueList != null) {
-            cloned.fieldValueList = new ArrayList<>(fieldValueList);
-        }
-        if (lookupDocument != null) {
-            cloned.lookupDocument = new Document(lookupDocument);
-        }
-        return cloned;
+        return clazz.cast(o);
     }
 }

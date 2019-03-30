@@ -49,7 +49,7 @@ public abstract class MField<T> {
         if (table.tableState == null) {
             table.tableState = new TableState();
         }
-        table.tableState.fieldValueList.add(name);
+        table.tableState.fieldStateList.add(new FieldState());
         initialize();
     }
 
@@ -355,7 +355,16 @@ public abstract class MField<T> {
     }
 
     class FieldState {
+        T value;
         T defaultValue;
         T origValue;
+
+        FieldState cloneThis() {
+            FieldState fieldState = new FieldState();
+            fieldState.value = this.value;
+            fieldState.defaultValue = this.defaultValue;
+            fieldState.origValue = this.origValue;
+            return fieldState;
+        }
     }
 }

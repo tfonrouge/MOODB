@@ -56,7 +56,7 @@ abstract public class MTable {
     /* private methods */
     /* *************** */
 
-    private void initialize() {
+    protected void initialize() {
         indices = new ArrayList<>();
 
         database = newDatabase();
@@ -160,10 +160,6 @@ abstract public class MTable {
         Document rawDocument = (mongoCursor == null || !mongoCursor.hasNext()) ? null : mongoCursor.next();
 
         tableState.eof = rawDocument == null;
-
-        if (tableState.fieldValueList == null) {
-            tableState.fieldValueList = new ArrayList<>(fieldList.size());
-        }
 
         fieldList.forEach(mField -> {
             if (!mField.calculated) {
@@ -517,15 +513,13 @@ abstract public class MTable {
 
     @SuppressWarnings("unused")
     public final synchronized void tableStatePush() {
+        TableState currentTableState = tableState;
         if (tableStateIndex == 0) {
-            tableStateList.add(tableState);
+            tableStateList.add(currentTableState);
         }
         ++tableStateIndex;
-        try {
-            tableState = this.tableState.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
+        tableState = new TableState();
+        tableState.fieldStateList = new ArrayList<>(currentTableState.fieldStateList);
         tableStateList.add(tableState);
         fieldList.forEach(MField::fieldStatePush);
     }
@@ -540,7 +534,8 @@ abstract public class MTable {
         OBJECT,
         OBJECT_ID,
         STRING,
-        TABLE_FIELD
+        TABLE_FIELD,
+        TABLE
     }
 
     public enum STATE {
