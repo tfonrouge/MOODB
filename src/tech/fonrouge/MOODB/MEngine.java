@@ -107,7 +107,7 @@ class MEngine {
      */
     @SuppressWarnings("WeakerAccess")
     public MongoCursor<Document> executeAggregate(List<Document> documentList) {
-        if (table.tableState.lookupDocument != null) {
+        if (table.tableState.lookupDocument != null && table.tableState.lookupDocument.size() > 0) {
             table.tableState.lookupDocument.forEach((fieldName, o) -> documentList.addAll(getLookupStage(fieldName.substring(1))));
         }
         return collection.aggregate(documentList).iterator();
@@ -149,7 +149,9 @@ class MEngine {
             documents.add(
                     new Document().
                             append("$unwind", new Document().
-                                    append("path", "$@" + lookupFieldName))
+                                    append("path", "$@" + lookupFieldName).
+                                    append("preserveNullAndEmptyArrays", true)
+                            )
 
             );
 
