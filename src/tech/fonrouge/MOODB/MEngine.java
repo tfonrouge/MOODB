@@ -44,13 +44,16 @@ class MEngine {
      * @return long of number of documents
      */
     long count() {
+        Document document = buildMasterSourceFilter();
+        if (document != null) {
+            return collection.countDocuments(document);
+        }
         return collection.countDocuments();
     }
 
     /* *************** */
     /* private methods */
     /* *************** */
-
     private Document buildMasterSourceFilter() {
         Document document = null;
         if (table.tableState.masterSource != null) {
