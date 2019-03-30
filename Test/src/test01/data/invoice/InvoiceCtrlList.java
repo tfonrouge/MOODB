@@ -6,7 +6,7 @@ public class InvoiceCtrlList extends Base01CtrlList<Invoice> {
 
     @Override
     protected String[] getColumns() {
-        return new String[]{"docNumber", "date", "customer", "customer.name", "customer.address"};
+        return new String[]{"docNumber", "date", "customer", "customer.name", "customer.address", "itemsCount"};
     }
 
     @Override

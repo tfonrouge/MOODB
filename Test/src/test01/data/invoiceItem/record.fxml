@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.172-ea"
-      fx:controller="test01.data.invoice.InvoiceCtrlRecord">
+      fx:controller="test01.data.invoiceItem.InvoiceItemCtrlRecord">
     <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
     </padding>
@@ -33,7 +33,6 @@
     <ToolBar prefHeight="40.0" prefWidth="200.0">
         <Button alignment="CENTER" mnemonicParsing="false" text="Button"/>
     </ToolBar>
-    <fx:include source="../invoiceItem_xInvoice/tableView.fxml"/>
     <HBox alignment="CENTER_RIGHT">
         <padding>
             <Insets top="10.0"/>

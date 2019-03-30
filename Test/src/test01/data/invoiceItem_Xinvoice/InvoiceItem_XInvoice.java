@@ -1,10 +1,10 @@
-package test01.data.invoiceItem_Xinvoice;
+package test01.data.invoiceItem_xInvoice;
 
 import tech.fonrouge.MOODB.MIndex;
 import test01.data.invoice.Invoice;
 import test01.data.invoiceItem.InvoiceItem;
 
-public class InvoiceItem_XInvoice extends InvoiceItem {
+public class InvoiceItem_xInvoice extends InvoiceItem {
 
     /* @@ begin field descriptor @@ */
 
@@ -15,7 +15,7 @@ public class InvoiceItem_XInvoice extends InvoiceItem {
     };
 
 
-    public InvoiceItem_XInvoice(Invoice masterSource) {
+    public InvoiceItem_xInvoice(Invoice masterSource) {
         setMasterSource(masterSource, field_invoice);
     }
 
@@ -25,8 +25,14 @@ public class InvoiceItem_XInvoice extends InvoiceItem {
     }
 
     @Override
-    public InvoiceItem_XInvoiceData getData() {
-        return new InvoiceItem_XInvoiceData<>(this);
+    public InvoiceItem_xInvoiceData getData() {
+        return new InvoiceItem_xInvoiceData<>(this);
     }
     /* @@ end field descriptor @@ */
+
+    /* @@ begin calcField_itemsCount @@ */
+    private Long calcField_itemsCount() {
+        return null;
+    }
+    /* @@ end calcField_itemsCount @@ */
 }

@@ -1,4 +1,4 @@
-package test01.data.inventory;
+package test01.data.inventoryItem;
 
 import tech.fonrouge.MOODB.*;
 import test01.data.base01.Base01;
@@ -6,7 +6,7 @@ import test01.data.base01.Base01;
 import java.util.Date;
 import java.util.HashMap;
 
-public class Inventory extends Base01 {
+public class InventoryItem extends Base01 {
 
     /* @@ begin field descriptor @@ */
 
@@ -80,12 +80,12 @@ public class Inventory extends Base01 {
 
     @Override
     public final String getTableName() {
-        return "inventory";
+        return "inventoryItem";
     }
 
     @Override
-    public InventoryData getData() {
-        return new InventoryData<>(this);
+    public InventoryItemData getData() {
+        return new InventoryItemData<>(this);
     }
     /* @@ end field descriptor @@ */
 

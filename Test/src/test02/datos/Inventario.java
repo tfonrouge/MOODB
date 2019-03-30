@@ -76,7 +76,7 @@ public class Inventario extends Base {
 
     @Override
     public final String getTableName() {
-        return "inventory";
+        return "inventoryItem";
     }
 
     @Override

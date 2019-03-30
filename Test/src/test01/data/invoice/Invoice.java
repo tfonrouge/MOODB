@@ -1,11 +1,9 @@
 package test01.data.invoice;
 
-import tech.fonrouge.MOODB.MFieldDate;
-import tech.fonrouge.MOODB.MFieldInteger;
-import tech.fonrouge.MOODB.MFieldTableField;
-import tech.fonrouge.MOODB.MIndex;
+import tech.fonrouge.MOODB.*;
 import test01.data.base01.Base01;
 import test01.data.customer.Customer;
+import test01.data.invoiceItem_xInvoice.InvoiceItem_xInvoice;
 
 public class Invoice extends Base01 {
 
@@ -37,6 +35,13 @@ public class Invoice extends Base01 {
             mNewDate = true;
         }
     };
+    public final MFieldLong field_itemsCount = new MFieldLong(this, "itemsCount") {
+        @Override
+        protected void initialize() {
+            calculated = true;
+            calcValue = () -> calcField_itemsCount();
+        }
+    };
 
     public final MIndex index_docNumber = new MIndex(this, "docNumber", "", "docNumber", true, false) {
         @Override
@@ -44,6 +49,9 @@ public class Invoice extends Base01 {
         }
     };
 
+    public final InvoiceItem_xInvoice childTable_invoiceItem() {
+        return new InvoiceItem_xInvoice(this);
+    }
 
     @Override
     public final String getTableName() {
@@ -55,4 +63,10 @@ public class Invoice extends Base01 {
         return new InvoiceData<>(this);
     }
     /* @@ end field descriptor @@ */
+
+    /* @@ begin calcField_itemsCount @@ */
+    private Long calcField_itemsCount() {
+        return childTable_invoiceItem().count();
+    }
+    /* @@ end calcField_itemsCount @@ */
 }

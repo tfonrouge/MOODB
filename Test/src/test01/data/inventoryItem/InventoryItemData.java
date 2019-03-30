@@ -1,15 +1,15 @@
-package test01.data.inventory;
+package test01.data.inventoryItem;
 
 import org.bson.types.Binary;
 import test01.data.base01.Base01Data;
 
 import java.util.Date;
 
-public class InventoryData<T extends Inventory> extends Base01Data<T> {
+public class InventoryItemData<T extends InventoryItem> extends Base01Data<T> {
 
     /* @@ begin field descriptor @@ */
-    public InventoryData(T inventory) {
-        super(inventory);
+    public InventoryItemData(T inventoryitem) {
+        super(inventoryitem);
     }
 
     public String getItemId() {

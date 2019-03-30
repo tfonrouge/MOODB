@@ -2,7 +2,7 @@
 
 <oons:Table xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oons="http://fonrouge.tech/MOODB"
             extends="Base01"
-            tableName="inventory"
+            tableName="inventoryItem"
             xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
 
     <oons:Fields>
@@ -17,7 +17,6 @@
         <oons:FieldString name="type">
             <oons:validValues>
                 <oons:value label="ANA"/>
-
             </oons:validValues>
         </oons:FieldString>
 

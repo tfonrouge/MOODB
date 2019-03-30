@@ -3,12 +3,12 @@
 <oons:Table xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oons="http://fonrouge.tech/MOODB"
             extends="Base01"
             tableName="invoiceItem"
-            xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
+            xsi:schemaLocation="http://fonrouge.tech/MOODB http://fonrouge.tech/MOODB/moodbxml.xsd">
 
     <oons:Fields>
 
         <oons:FieldTableField name="invoice" class="Invoice" description="Invoice" required="true"/>
-        <oons:FieldTableField name="invItem" class="Inventory" required="true"/>
+        <oons:FieldTableField name="invItem" class="InventoryItem" required="true"/>
         <oons:FieldDouble name="qty" description="Quantity" required="true"/>
         <oons:FieldDouble name="unitPrice" description="Unit Price" required="true"/>
 

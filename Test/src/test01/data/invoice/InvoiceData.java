@@ -23,6 +23,10 @@ public class InvoiceData<T extends Invoice> extends Base01Data<T> {
     public Date getDate() {
         return tableState.getFieldValue(table.field_date, Date.class);
     }
+
+    public Long getItemsCount() {
+        return tableState.getFieldValue(table.field_itemsCount, Long.class);
+    }
     /* @@ end field descriptor @@ */
 }
 

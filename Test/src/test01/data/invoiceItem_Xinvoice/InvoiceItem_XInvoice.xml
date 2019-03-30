@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<oons:Table xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:oons="http://fonrouge.tech/MOODB"
+<oons:Table xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oons="http://fonrouge.tech/MOODB"
             extends="InvoiceItem"
-            xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
+            xsi:schemaLocation="http://fonrouge.tech/MOODB http://fonrouge.tech/MOODB/moodbxml.xsd">
 
     <oons:Fields>
 

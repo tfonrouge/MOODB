@@ -1,17 +1,15 @@
 package test01;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.bson.types.ObjectId;
 import test01.data.customer.Customer;
-import test01.data.inventory.Inventory;
+import test01.data.inventoryItem.InventoryItem;
 import test01.data.invoice.Invoice;
-import test01.data.invoice.InvoiceCtrlList;
-import test01.data.invoiceItem_Xinvoice.InvoiceItem_XInvoice;
+import test01.data.invoiceItem_xInvoice.InvoiceItem_xInvoice;
 import test01.data.user.User;
 
 import java.util.ArrayList;
@@ -44,7 +42,7 @@ public class Main extends Application {
                 System.out.println("Invoice #" + invoice.field_docNumber.value());
                 System.out.println("    Customer: " + invoice.field_customer.syncLinkedTable().field_name.value());
                 System.out.println("        DATE: " + invoice.field_date.value());
-                InvoiceItem_XInvoice invoiceItem = new InvoiceItem_XInvoice(invoice);
+                InvoiceItem_xInvoice invoiceItem = invoice.childTable_invoiceItem();
                 if (invoiceItem.find()) {
                     int row = 0;
                     while (!invoiceItem.getEof()) {
@@ -63,65 +61,65 @@ public class Main extends Application {
         }
     }
 
-    private static void createInventory(Inventory inventory) {
-        if (inventory.insert()) {
-            inventory.field_itemId.setValue("9198798734");
-            inventory.field_name.setValue("Mouse");
-            inventory.field_stock.setValue(50.0);
-            inventory.field_uom.setValue("pz");
-            inventory.field_unitPrice.setValue(2.74);
-            if (!inventory.post()) {
-                inventory.cancel();
+    private static void createInventory(InventoryItem inventoryItem) {
+        if (inventoryItem.insert()) {
+            inventoryItem.field_itemId.setValue("9198798734");
+            inventoryItem.field_name.setValue("Mouse");
+            inventoryItem.field_stock.setValue(50.0);
+            inventoryItem.field_uom.setValue("pz");
+            inventoryItem.field_unitPrice.setValue(2.74);
+            if (!inventoryItem.post()) {
+                inventoryItem.cancel();
             }
         }
-        if (inventory.insert()) {
-            inventory.field_itemId.setValue("9182389798");
-            inventory.field_name.setValue("Keyboard");
-            inventory.field_stock.setValue(75.0);
-            inventory.field_uom.setValue("pz");
-            inventory.field_unitPrice.setValue(3.5);
-            if (!inventory.post()) {
-                inventory.cancel();
+        if (inventoryItem.insert()) {
+            inventoryItem.field_itemId.setValue("9182389798");
+            inventoryItem.field_name.setValue("Keyboard");
+            inventoryItem.field_stock.setValue(75.0);
+            inventoryItem.field_uom.setValue("pz");
+            inventoryItem.field_unitPrice.setValue(3.5);
+            if (!inventoryItem.post()) {
+                inventoryItem.cancel();
             }
         }
-        if (inventory.insert()) {
-            inventory.field_itemId.setValue("9362876234");
-            inventory.field_name.setValue("Monitor");
-            inventory.field_stock.setValue(90.0);
-            inventory.field_uom.setValue("pz");
-            inventory.field_unitPrice.setValue(110.2);
-            if (!inventory.post()) {
-                inventory.cancel();
+        if (inventoryItem.insert()) {
+            inventoryItem.field_itemId.setValue("9362876234");
+            inventoryItem.field_name.setValue("Monitor");
+            inventoryItem.field_stock.setValue(90.0);
+            inventoryItem.field_uom.setValue("pz");
+            inventoryItem.field_unitPrice.setValue(110.2);
+            if (!inventoryItem.post()) {
+                inventoryItem.cancel();
             }
         }
-        if (inventory.insert()) {
-            inventory.field_itemId.setValue("1876238764");
-            inventory.field_name.setValue("Motherboard");
-            inventory.field_stock.setValue(70.0);
-            inventory.field_uom.setValue("pz");
-            inventory.field_unitPrice.setValue(275.3);
-            if (!inventory.post()) {
-                inventory.cancel();
+        if (inventoryItem.insert()) {
+            inventoryItem.field_itemId.setValue("1876238764");
+            inventoryItem.field_name.setValue("Motherboard");
+            inventoryItem.field_stock.setValue(70.0);
+            inventoryItem.field_uom.setValue("pz");
+            inventoryItem.field_unitPrice.setValue(275.3);
+            if (!inventoryItem.post()) {
+                inventoryItem.cancel();
             }
         }
-        if (inventory.insert()) {
-            inventory.field_itemId.setValue("1987238723");
-            inventory.field_name.setValue("UTP Cable");
-            inventory.field_stock.setValue(500.5);
-            inventory.field_uom.setValue("mt");
-            inventory.field_unitPrice.setValue(0.25);
-            if (!inventory.post()) {
-                inventory.cancel();
+        if (inventoryItem.insert()) {
+            inventoryItem.field_itemId.setValue("1987238723");
+            inventoryItem.field_name.setValue("UTP Cable");
+            inventoryItem.field_stock.setValue(500.5);
+            inventoryItem.field_uom.setValue("mt");
+            inventoryItem.field_unitPrice.setValue(0.25);
+            if (!inventoryItem.post()) {
+                inventoryItem.cancel();
             }
         }
-        if (inventory.insert()) {
-            inventory.field_itemId.setValue("91987987293");
-            inventory.field_name.setValue("Intel CPU");
-            inventory.field_stock.setValue(25.0);
-            inventory.field_uom.setValue("pz");
-            inventory.field_unitPrice.setValue(210.0);
-            if (!inventory.post()) {
-                inventory.cancel();
+        if (inventoryItem.insert()) {
+            inventoryItem.field_itemId.setValue("91987987293");
+            inventoryItem.field_name.setValue("Intel CPU");
+            inventoryItem.field_stock.setValue(25.0);
+            inventoryItem.field_uom.setValue("pz");
+            inventoryItem.field_unitPrice.setValue(210.0);
+            if (!inventoryItem.post()) {
+                inventoryItem.cancel();
             }
         }
     }
@@ -217,9 +215,9 @@ public class Main extends Application {
             createCustomers(customer);
         }
 
-        Inventory inventory = new Inventory();
-        if (inventory.count() == 0) {
-            createInventory(inventory);
+        InventoryItem inventoryItem = new InventoryItem();
+        if (inventoryItem.count() == 0) {
+            createInventory(inventoryItem);
         }
 
         //if (!customer.field_customerId.find("BOEING")) {
@@ -237,33 +235,33 @@ public class Main extends Application {
 
         Invoice invoice = new Invoice();
 
-        inventory.field_name.find();
+        inventoryItem.field_name.find();
 
         String[] strings = {"Mouse", "Keyboard", "Monitor", "Motherboard", "UTP Cable", "Intel CPU"};
 
-        for (int i = 0; i < 10; i++) {
-            Random random = new Random();
-            if (invoice.insert()) {
-                invoice.field_docNumber.setValue(i + 1);
-                invoice.field_customer.setValue(idCustomerList.get(random.nextInt(idCustomerList.size())));
-                //invoice.field_customer.setValue(customer);
-                if (invoice.post()) {
-                    InvoiceItem_XInvoice invoiceItem = new InvoiceItem_XInvoice(invoice);
-                    for (int j = 0; j < 3; j++) {
-                        if (invoiceItem.insert()) {
-                            inventory.field_name.find(strings[random.nextInt(strings.length)]);
-                            invoiceItem.field_invItem.setValue(inventory);
-                            invoiceItem.field_qty.setValue((double) (random.nextInt(10) + 1));
-                            invoiceItem.field_unitPrice.setValue(inventory.field_unitPrice.value());
-                            if (!invoiceItem.post()) {
-                                System.out.println(invoiceItem.getException().getLocalizedMessage());
-                                invoiceItem.cancel();
+        if (invoice.count() == 0) {
+            for (int i = 0; i < 5; i++) {
+                Random random = new Random();
+                if (invoice.insert()) {
+                    invoice.field_customer.setValue(idCustomerList.get(random.nextInt(idCustomerList.size())));
+                    if (invoice.post()) {
+                        InvoiceItem_xInvoice invoiceItem = invoice.childTable_invoiceItem();
+                        for (int j = 0; j < 3; j++) {
+                            if (invoiceItem.insert()) {
+                                inventoryItem.field_name.find(strings[random.nextInt(strings.length)]);
+                                invoiceItem.field_invItem.setValue(inventoryItem);
+                                invoiceItem.field_qty.setValue((double) (random.nextInt(10) + 1));
+                                invoiceItem.field_unitPrice.setValue(inventoryItem.field_unitPrice.value());
+                                if (!invoiceItem.post()) {
+                                    System.out.println(invoiceItem.getException().getLocalizedMessage());
+                                    invoiceItem.cancel();
+                                }
                             }
                         }
+                    } else {
+                        System.out.println(invoice.getException().getLocalizedMessage());
+                        invoice.cancel();
                     }
-                } else {
-                    System.out.println(invoice.getException().getLocalizedMessage());
-                    invoice.cancel();
                 }
             }
         }
@@ -275,11 +273,5 @@ public class Main extends Application {
         primaryStage.setTitle("Test 01");
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
-    }
-
-    public void onActionButton(ActionEvent actionEvent) {
-        Controller controller = new Controller();
-
-        controller.showList(new InvoiceCtrlList());
     }
 }
