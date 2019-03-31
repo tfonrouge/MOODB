@@ -202,11 +202,9 @@ class FileMaker {
                             append("        }\n");
                 }
 
-                builder.append("    };\n");
+                builder.append("    };\n\n");
             }
         }
-
-        builder.append("\n");
 
         if (indexModels.size() > 0) {
             indexModels.forEach(indexModel -> {
@@ -241,7 +239,7 @@ class FileMaker {
                     builder.append(");\n");
                 }
                 builder.append("        }\n");
-                builder.append("    };\n\n");
+                builder.append("    };\n");
             });
         }
 
