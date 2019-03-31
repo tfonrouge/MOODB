@@ -1,22 +1,22 @@
 package test01.data.invoiceItem;
 
+import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import test01.data.base01.Base01CtrlRecord;
-import test01.data.invoice.Invoice;
-import test01.data.invoice.InvoiceData;
 
-public class InvoiceItemCtrlRecord extends Base01CtrlRecord<Invoice> {
+public class InvoiceItemCtrlRecord extends Base01CtrlRecord<InvoiceItem> {
 
-    public TextField textField_docNumber;
-    public TextField textField_date;
-    public ComboBox<Object> comboBox_customer;
+    public TextField textField_price;
+    @FXML
+    private ComboBox<Object> comboBox_invItem;
+    @FXML
+    private TextField spinner_qty;
 
     @Override
     protected void initData() {
-        bindControl(textField_docNumber, table.field_docNumber);
-        bindControl(textField_date, table.field_date);
-        bindControl(comboBox_customer, table.field_customer, "name");
+        bindControl(comboBox_invItem, table.field_invItem, "name");
+        bindControl(spinner_qty, table.field_qty);
+        bindControl(textField_price, table.field_unitPrice);
     }
 }
