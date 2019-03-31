@@ -267,6 +267,10 @@ public abstract class MField<T> {
         return value == null || value.equals(getEmptyValue());
     }
 
+    public boolean isReadOnly() {
+        return calculated || autoInc;
+    }
+
     /**
      * setValue
      *
