@@ -79,6 +79,7 @@ public class UI_Binding {
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldInteger fieldInteger) {
         nodeHashMap.put(fieldInteger.getName(), textField);
+        textField.setEditable(!fieldInteger.isReadOnly());
 
         textField.textProperty().set(String.valueOf(fieldInteger.value()));
         textField.textProperty().addListener((observable, oldValue, newValue) -> fieldInteger.setValue(Integer.valueOf(newValue)));
