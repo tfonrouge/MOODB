@@ -17,11 +17,11 @@
                 <MenuItem fx:id="menuItem_cerrar" mnemonicParsing="false" text="Cerrar"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Editar">
-                <MenuItem fx:id="menuItem_agregar" mnemonicParsing="false" onAction="#onActionMenuAgregar"
+                <MenuItem fx:id="menuItem_agregar" mnemonicParsing="false" onAction="#onActionInsertDocument"
                           text="Agregar"/>
-                <MenuItem fx:id="menuItem_modificar" mnemonicParsing="false" onAction="#onActionMenuModificar"
+                <MenuItem fx:id="menuItem_modificar" mnemonicParsing="false" onAction="#onActionEditDocument"
                           text="Modificar"/>
-                <MenuItem fx:id="menuItem_eliminar" mnemonicParsing="false" onAction="#onActionMenuEliminar"
+                <MenuItem fx:id="menuItem_eliminar" mnemonicParsing="false" onAction="#onActionDeleteDocument"
                           text="Eliminar"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Ayuda">

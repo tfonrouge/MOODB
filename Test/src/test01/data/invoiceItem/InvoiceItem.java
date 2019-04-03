@@ -23,6 +23,7 @@ public class InvoiceItem extends Base01 {
             return new Invoice();
         }
     };
+
     public final MFieldTableField<InventoryItem> field_invItem = new MFieldTableField<InventoryItem>(this, "invItem") {
         @Override
         protected void initialize() {
@@ -34,20 +35,23 @@ public class InvoiceItem extends Base01 {
             return new InventoryItem();
         }
     };
+
     public final MFieldDouble field_qty = new MFieldDouble(this, "qty") {
         @Override
         protected void initialize() {
-            required = true;
+            notNullable = true;
             description = "Quantity";
         }
     };
+
     public final MFieldDouble field_unitPrice = new MFieldDouble(this, "unitPrice") {
         @Override
         protected void initialize() {
-            required = true;
+            notNullable = true;
             description = "Unit Price";
         }
     };
+
     public final MFieldDouble field_total = new MFieldDouble(this, "total") {
         @Override
         protected void initialize() {
@@ -61,7 +65,6 @@ public class InvoiceItem extends Base01 {
         protected void initialize() {
         }
     };
-
 
     @Override
     public final String getTableName() {

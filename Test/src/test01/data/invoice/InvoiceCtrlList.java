@@ -1,8 +1,12 @@
 package test01.data.invoice;
 
-import test01.data.base01.Base01CtrlList;
+import tech.fonrouge.MOODB.ui.UI_CtrlList;
 
-public class InvoiceCtrlList extends Base01CtrlList<Invoice> {
+public class InvoiceCtrlList extends UI_CtrlList<Invoice> {
+
+    public InvoiceCtrlList(Invoice table) {
+        super(table);
+    }
 
     @Override
     protected String[] getColumns() {
@@ -12,10 +16,5 @@ public class InvoiceCtrlList extends Base01CtrlList<Invoice> {
     @Override
     protected String getResourceRecordName() {
         return "/test01/data/invoice/record.fxml";
-    }
-
-    @Override
-    protected Invoice buildTable() {
-        return new Invoice();
     }
 }

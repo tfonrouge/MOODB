@@ -1,21 +1,23 @@
 package test01.data.invoiceItem;
 
-import test01.data.base01.Base01CtrlList;
+import javafx.scene.control.TableView;
+import tech.fonrouge.MOODB.ui.UI_CtrlList;
 
-public class InvoiceItemCtrlList extends Base01CtrlList<InvoiceItem> {
+public class InvoiceItemCtrlList extends UI_CtrlList<InvoiceItem> {
+
+    public TableView tableView_invoiceItem;
+
+    public InvoiceItemCtrlList(InvoiceItem table) {
+        super(table);
+    }
 
     @Override
     protected String[] getColumns() {
-        return new String[]{"rowNumber", "invoice.customer", "invItem.name", "qty", "unitPrice"};
+        return new String[]{"rowNumber", "invoice.docNumber", "invoice.customer", "invItem.name", "qty", "unitPrice"};
     }
 
     @Override
     protected String getResourceRecordName() {
         return "/test01/data/invoiceItem/record.fxml";
-    }
-
-    @Override
-    protected InvoiceItem buildTable() {
-        return new InvoiceItem();
     }
 }

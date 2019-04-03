@@ -3,9 +3,9 @@ package test01.data.invoiceItem;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import test01.data.base01.Base01CtrlRecord;
+import tech.fonrouge.MOODB.ui.UI_CtrlRecord;
 
-public class InvoiceItemCtrlRecord extends Base01CtrlRecord<InvoiceItem> {
+public class InvoiceItemCtrlRecord extends UI_CtrlRecord<InvoiceItem> {
 
     public TextField textField_price;
     @FXML

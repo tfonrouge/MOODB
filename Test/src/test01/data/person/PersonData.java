@@ -1,10 +1,8 @@
 package test01.data.person;
 
-import test01.data.base01.Base01Data;
-
 import java.util.Date;
 
-public abstract class PersonData<T extends Person> extends Base01Data<T> {
+public abstract class PersonData<T extends Person> extends tech.fonrouge.MOODB.MBaseData<T> {
 
     /* @@ begin field descriptor @@ */
     public PersonData(T person) {

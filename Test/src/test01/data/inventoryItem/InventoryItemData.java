@@ -1,11 +1,10 @@
 package test01.data.inventoryItem;
 
 import org.bson.types.Binary;
-import test01.data.base01.Base01Data;
 
 import java.util.Date;
 
-public class InventoryItemData<T extends InventoryItem> extends Base01Data<T> {
+public class InventoryItemData<T extends InventoryItem> extends tech.fonrouge.MOODB.MBaseData<T> {
 
     /* @@ begin field descriptor @@ */
     public InventoryItemData(T inventoryitem) {

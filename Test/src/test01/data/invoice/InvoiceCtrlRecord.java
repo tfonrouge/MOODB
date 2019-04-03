@@ -4,9 +4,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import test01.data.base01.Base01CtrlRecord;
+import tech.fonrouge.MOODB.ui.UI_CtrlRecord;
 
-public class InvoiceCtrlRecord extends Base01CtrlRecord<Invoice> {
+public class InvoiceCtrlRecord extends UI_CtrlRecord<Invoice> {
 
     public TextField textField_docNumber;
     public TextField textField_date;

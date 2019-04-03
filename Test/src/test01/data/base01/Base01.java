@@ -8,7 +8,6 @@ public abstract class Base01 extends MTable {
 
     /* @@ begin field descriptor @@ */
 
-
     @Override
     protected MDatabase newDatabase() {
         return new TestDatabase(this);

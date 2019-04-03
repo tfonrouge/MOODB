@@ -1,8 +1,6 @@
 package test01.data.entity;
 
-import test01.data.base01.Base01Data;
-
-public abstract class EntityData<T extends Entity> extends Base01Data<T> {
+public abstract class EntityData<T extends Entity> extends tech.fonrouge.MOODB.MBaseData<T> {
 
     /* @@ begin field descriptor @@ */
     public EntityData(T entity) {

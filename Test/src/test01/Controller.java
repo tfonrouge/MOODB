@@ -3,8 +3,8 @@ package test01;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import tech.fonrouge.MOODB.ui.UI_BaseController;
-import test01.data.invoice.InvoiceCtrlList;
-import test01.data.invoiceItem.InvoiceItemCtrlList;
+import test01.data.invoice.Invoice;
+import test01.data.invoiceItem.InvoiceItem;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -22,13 +22,13 @@ public class Controller extends UI_BaseController implements Initializable {
 
     public void onActionInvoices(ActionEvent actionEvent) {
 
-        showList(new InvoiceCtrlList());
+        showList(new Invoice());
 
     }
 
     public void onActionInvoiceItems(ActionEvent actionEvent) {
 
-        showList(new InvoiceItemCtrlList());
+        showList(new InvoiceItem());
 
     }
 }
