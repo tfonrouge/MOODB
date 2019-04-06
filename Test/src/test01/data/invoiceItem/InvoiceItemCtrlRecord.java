@@ -15,8 +15,8 @@ public class InvoiceItemCtrlRecord extends UI_CtrlRecord<InvoiceItem> {
 
     @Override
     protected void initData() {
-        bindControl(comboBox_invItem, table.field_invItem, "name");
-        bindControl(spinner_qty, table.field_qty);
-        bindControl(textField_price, table.field_unitPrice);
+
+        bindControls();
+
     }
 }

@@ -10,7 +10,7 @@ import java.util.concurrent.Callable;
 public abstract class MField<T> {
 
     public final int index;
-    final MTable.FIELD_TYPE fieldType = getFieldType();
+    public final MTable.FIELD_TYPE fieldType = getFieldType();
     final MTable table;
     protected boolean notNullable;
     protected boolean required;
@@ -271,6 +271,10 @@ public abstract class MField<T> {
         return calculated || autoInc;
     }
 
+    public void setFilterValue(T value) {
+        fieldState.filterValue = value;
+    }
+
     /**
      * setValue
      *
@@ -359,12 +363,14 @@ public abstract class MField<T> {
     }
 
     class FieldState {
+        T filterValue;
         T value;
         T defaultValue;
         T origValue;
 
         FieldState cloneThis() {
             FieldState fieldState = new FieldState();
+            fieldState.filterValue = this.filterValue;
             fieldState.value = this.value;
             fieldState.defaultValue = this.defaultValue;
             fieldState.origValue = this.origValue;

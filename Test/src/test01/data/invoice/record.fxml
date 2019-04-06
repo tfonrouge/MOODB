@@ -30,7 +30,7 @@
         <Label text="Date:" GridPane.rowIndex="1" />
         <TextField fx:id="textField_date" GridPane.columnIndex="1" GridPane.rowIndex="1" />
         <Label text="Customer:" GridPane.rowIndex="2" />
-        <ComboBox fx:id="comboBox_customer" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        <ComboBox fx:id="comboBox_customer_name" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
         <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
         </padding>
@@ -41,6 +41,6 @@
         <padding>
             <Insets top="10.0" />
         </padding>
-        <Button defaultButton="true" mnemonicParsing="false" onAction="#onActionButtonAceptar" text="Aceptar" />
+        <Button defaultButton="true" mnemonicParsing="false" onAction="#onActionButtonAccept" text="Aceptar" />
     </HBox>
 </VBox>

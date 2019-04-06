@@ -7,6 +7,7 @@ import test01.data.invoiceItem_xInvoice.InvoiceItem_xInvoice;
 
 public class Invoice extends Base01 {
 
+    //@formatter:off
     /* @@ begin field descriptor @@ */
 
     public final MFieldInteger field_docNumber = new MFieldInteger(this, "docNumber") {
@@ -17,6 +18,7 @@ public class Invoice extends Base01 {
             description = "Invoice number";
         }
     };
+
     public final MFieldTableField<Customer> field_customer = new MFieldTableField<Customer>(this, "customer") {
         @Override
         protected void initialize() {
@@ -28,6 +30,7 @@ public class Invoice extends Base01 {
             return new Customer();
         }
     };
+
     public final MFieldDate field_date = new MFieldDate(this, "date") {
         @Override
         protected void initialize() {
@@ -35,6 +38,7 @@ public class Invoice extends Base01 {
             mNewDate = true;
         }
     };
+
     public final MFieldLong field_itemsCount = new MFieldLong(this, "itemsCount") {
         @Override
         protected void initialize() {
@@ -49,10 +53,6 @@ public class Invoice extends Base01 {
         }
     };
 
-    public final InvoiceItem_xInvoice childTable_invoiceItem() {
-        return new InvoiceItem_xInvoice(this);
-    }
-
     @Override
     public final String getTableName() {
         return "invoice";
@@ -63,10 +63,21 @@ public class Invoice extends Base01 {
         return new InvoiceData<>(this);
     }
     /* @@ end field descriptor @@ */
+    //@formatter:on
+
+    private InvoiceItem_xInvoice invoiceItemXInvoice;
 
     /* @@ begin calcField_itemsCount @@ */
-    private Long calcField_itemsCount() {
-        return childTable_invoiceItem().count();
+    public Long calcField_itemsCount() {
+        return invoiceItemXInvoice().count();
     }
     /* @@ end calcField_itemsCount @@ */
+
+    public InvoiceItem_xInvoice invoiceItemXInvoice() {
+        if (invoiceItemXInvoice == null) {
+            invoiceItemXInvoice = new InvoiceItem_xInvoice(this);
+        }
+        return invoiceItemXInvoice;
+    }
+    // @formatter:on
 }

@@ -14,8 +14,6 @@
 
     </oons:Fields>
 
-    <oons:ChildTable name="invoiceItem" class="InvoiceItem_xInvoice"/>
-
     <oons:Index name="docNumber" keyField="docNumber" unique="true"/>
 
 </oons:Table>

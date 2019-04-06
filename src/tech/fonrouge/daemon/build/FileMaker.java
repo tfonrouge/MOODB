@@ -31,8 +31,8 @@ class FileMaker {
     private int numCalcFields = 0;
     private int numValidateFields = 0;
     private List<FieldModel> fieldModels;
-    private List<ChildTableModel> childTableModels;
     private List<IndexModel> indexModels;
+    private List<FieldFilterModel> fieldFilterModels;
     private List<String> calcFieldList = new ArrayList<>();
     private List<String> onValidateList = new ArrayList<>();
 
@@ -50,8 +50,8 @@ class FileMaker {
         this.pathModel = Paths.get(pathExtLess.toString() + "Data.java");
         this.className = className;
         fieldModels = new ArrayList<>();
-        childTableModels = new ArrayList<>();
         indexModels = new ArrayList<>();
+        fieldFilterModels = new ArrayList<>();
 
         NodeList nodeList = document.getElementsByTagNameNS("*", "Fields").item(0).getChildNodes();
 
@@ -71,17 +71,17 @@ class FileMaker {
             }
         }
 
-        for (int i = 0; i < document.getElementsByTagNameNS("*", "ChildTable").getLength(); i++) {
-            Node node = document.getElementsByTagNameNS("*", "ChildTable").item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                childTableModels.add(new ChildTableModel(node));
-            }
-        }
-
         for (int i = 0; i < document.getElementsByTagNameNS("*", "Index").getLength(); i++) {
             Node node = document.getElementsByTagNameNS("*", "Index").item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 indexModels.add(new IndexModel(node));
+            }
+        }
+
+        for (int i = 0; i < document.getElementsByTagNameNS("*", "FieldFilter").getLength(); ++i) {
+            Node node = document.getElementsByTagNameNS("*", "FieldFilter").item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                fieldFilterModels.add(new FieldFilterModel(node));
             }
         }
 
@@ -112,7 +112,7 @@ class FileMaker {
         if (fieldModels.size() > 0) {
             builder.append("\n");
             for (FieldModel fieldModel : fieldModels) {
-                String cast = "";
+                String cast;
                 if (fieldModel.type.contentEquals("TableField")) {
                     cast = "<" + fieldModel.className + ">";
                 } else {
@@ -206,6 +206,7 @@ class FileMaker {
             }
         }
 
+        /* Indexes */
         if (indexModels.size() > 0) {
             indexModels.forEach(indexModel -> {
                 builder.
@@ -230,9 +231,7 @@ class FileMaker {
                         builder.append("            partialFilter = Filters.").append(indexFieldItem.getLogicOperator()).append("(");
                         if (indexFieldItem.getPartialFilterItems().size() > 0) {
                             final String[] s = {""};
-                            indexFieldItem.getPartialFilterItems().forEach((value) -> {
-                                s[0] += s[0].isEmpty() ? value : (", " + value);
-                            });
+                            indexFieldItem.getPartialFilterItems().forEach((value) -> s[0] += s[0].isEmpty() ? value : (", " + value));
                             builder.append(s[0]);
                         }
                     });
@@ -240,30 +239,6 @@ class FileMaker {
                 }
                 builder.append("        }\n");
                 builder.append("    };\n");
-            });
-        }
-
-        if (!isAbstract) {
-            /*
-            buffer.
-                    append("    private ").
-                    append(className).
-                    append("Model m;\n");
-            */
-        }
-
-        if (childTableModels.size() > 0) {
-            childTableModels.forEach(childTableModel -> {
-                builder.
-                        append("    public final ").
-                        append(childTableModel.getClassName()).
-                        append(" childTable_").
-                        append(childTableModel.getName()).
-                        append("() {\n").
-                        append("        return new ").
-                        append(childTableModel.getClassName()).
-                        append("(this);\n").
-                        append("    }\n");
             });
         }
 
@@ -292,6 +267,16 @@ class FileMaker {
                     append("    }\n");
         }
 
+        /* FieldFilters */
+        if (fieldFilterModels.size() > 0) {
+            builder.append("\n");
+            builder.append("    public void setFieldFilters() {\n");
+            fieldFilterModels.forEach(fieldFilterModel -> {
+                builder.append("        field_").append(fieldFilterModel.fieldName).append(".setFilterValue(").append(fieldFilterModel.filterValue).append(");\n");
+            });
+            builder.append("    }\n");
+        }
+
         /* getTableName */
         if (tableName != null) {
             builder.
@@ -309,7 +294,7 @@ class FileMaker {
             builder.
                     append("\n").
                     append("    @Override\n").
-                    append("    public final String getGenre() {\n").
+                    append("    public String getGenre() {\n").
                     append("        return \"").
                     append(genre).
                     append("\";\n").
@@ -321,7 +306,7 @@ class FileMaker {
             builder.
                     append("\n").
                     append("    @Override\n").
-                    append("    public final String getGenres() {\n").
+                    append("    public String getGenres() {\n").
                     append("        return \"").
                     append(genres).
                     append("\";\n").
@@ -338,20 +323,6 @@ class FileMaker {
                     append(database).
                     append("(this);\n").
                     append("    }\n");
-        }
-
-        if (!isAbstract) {
-            /*
-            buffer.
-                    append("\n").
-                    append("    @Override\n").
-                    append("    protected void initializeModel() {\n").
-                    append("        m = new ").
-                    append(className).
-                    append("Model();\n").
-                    append("        m.setTable(this);\n").
-                    append("    }\n");
-                    */
         }
 
         if (!isAbstract) {

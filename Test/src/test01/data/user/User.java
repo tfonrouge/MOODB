@@ -19,6 +19,7 @@ public class User extends Person {
             description = "User Id";
         }
     };
+
     public final MFieldString field_userLevel = new MFieldString(this, "userLevel") {
         @Override
         protected void initialize() {
@@ -29,6 +30,7 @@ public class User extends Person {
             valueItems.put("0", "General User");
         }
     };
+
     public final MFieldString field_password = new MFieldString(this, "password") {
         @Override
         protected void initialize() {
@@ -36,12 +38,14 @@ public class User extends Person {
             description = "User password";
         }
     };
+
     public final MFieldDate field_lastLogin = new MFieldDate(this, "lastLogin") {
         @Override
         protected void initialize() {
             description = "Last date login";
         }
     };
+
     public final MFieldInteger field_logCounter = new MFieldInteger(this, "logCounter") {
         @Override
         protected void initialize() {
@@ -54,7 +58,6 @@ public class User extends Person {
         protected void initialize() {
         }
     };
-
 
     @Override
     public final String getTableName() {

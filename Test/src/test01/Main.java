@@ -36,24 +36,24 @@ public class Main extends Application {
 
     private static void findInvoices() {
         Invoice invoice = new Invoice();
+        InvoiceItem_xInvoice invoiceItemXInvoice = new InvoiceItem_xInvoice(invoice);
 
         if (invoice.find()) {
             while (!invoice.getEof()) {
                 System.out.println("Invoice #" + invoice.field_docNumber.value());
-                System.out.println("    Customer: " + invoice.field_customer.syncLinkedTable().field_name.value());
+                System.out.println("    Customer: " + invoice.field_customer.syncedTable().field_name.value());
                 System.out.println("        DATE: " + invoice.field_date.value());
-                InvoiceItem_xInvoice invoiceItem = invoice.childTable_invoiceItem();
-                if (invoiceItem.find()) {
+                if (invoiceItemXInvoice.find()) {
                     int row = 0;
-                    while (!invoiceItem.getEof()) {
+                    while (!invoiceItemXInvoice.getEof()) {
                         System.out.println("    * #" +
-                                invoiceItem.field_invoice.syncLinkedTable().field_docNumber.value() + " : " +
+                                invoiceItemXInvoice.field_invoice.syncedTable().field_docNumber.value() + " : " +
                                 ++row + " = " +
-                                invoiceItem.field_invItem.syncLinkedTable().field_name.value() + " \t" +
-                                invoiceItem.field_qty.value() + " \t" +
-                                invoiceItem.field_unitPrice.value() + " total $" +
-                                invoiceItem.field_total.value());
-                        invoiceItem.next();
+                                invoiceItemXInvoice.field_invItem.syncedTable().field_name.value() + " \t" +
+                                invoiceItemXInvoice.field_qty.value() + " \t" +
+                                invoiceItemXInvoice.field_unitPrice.value() + " total $" +
+                                invoiceItemXInvoice.field_total.value());
+                        invoiceItemXInvoice.next();
                     }
                 }
                 invoice.next();
@@ -240,12 +240,12 @@ public class Main extends Application {
         String[] strings = {"Mouse", "Keyboard", "Monitor", "Motherboard", "UTP Cable", "Intel CPU"};
 
         if (invoice.count() == 0) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 100; i++) {
                 Random random = new Random();
                 if (invoice.insert()) {
                     invoice.field_customer.setValue(idCustomerList.get(random.nextInt(idCustomerList.size())));
                     if (invoice.post()) {
-                        InvoiceItem_xInvoice invoiceItem = invoice.childTable_invoiceItem();
+                        InvoiceItem_xInvoice invoiceItem = new InvoiceItem_xInvoice(invoice);
                         for (int j = 0; j < 3; j++) {
                             if (invoiceItem.insert()) {
                                 inventoryItem.field_name.find(strings[random.nextInt(strings.length)]);
@@ -271,7 +271,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
         primaryStage.setTitle("Test 01");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(new Scene(root, -1, -1));
         primaryStage.show();
     }
 }

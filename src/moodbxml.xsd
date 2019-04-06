@@ -9,8 +9,8 @@
         <xs:sequence>
             <xs:element name="Fields" type="FieldsType"/>
             <xs:element name="MasterSource" type="MasterSourceType" minOccurs="0"/>
-            <xs:element name="ChildTable" type="ChildTableType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="Index" type="IndexType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="FieldFilter" type="FieldFilterType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="extends" type="xs:string"/>
         <xs:attribute name="abstract" type="xs:boolean"/>
@@ -101,9 +101,12 @@
         <xs:attribute name="unique" type="xs:boolean"/>
         <xs:attribute name="sparse" type="xs:boolean"/>
     </xs:complexType>
-    <xs:complexType name="ChildTableType">
-        <xs:attribute name="name" type="xs:string" use="required"/>
-        <xs:attribute name="class" type="xs:string" use="required"/>
+    <xs:complexType name="FieldFilterType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="field"/>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="MasterSourceType">
         <xs:attribute name="class" type="xs:string" use="required"/>
@@ -123,13 +126,13 @@
     </xs:complexType>
     <xs:complexType name="partialFilterType">
         <xs:sequence>
-            <xs:element name="field" type="partialFilterField" maxOccurs="unbounded"/>
+            <xs:element name="field" type="partialFieldFilter" maxOccurs="unbounded"/>
             <xs:element name="PartialFilter" type="partialFilterType" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="operator" type="logicOperatorType" use="required">
         </xs:attribute>
     </xs:complexType>
-    <xs:complexType name="partialFilterField">
+    <xs:complexType name="partialFieldFilter">
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute name="name" type="xs:string" use="required"/>

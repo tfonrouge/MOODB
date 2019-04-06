@@ -4,15 +4,19 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TableView;
+import tech.fonrouge.MOODB.MBaseData;
 import tech.fonrouge.MOODB.MField;
 import tech.fonrouge.MOODB.MTable;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding {
+public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
 
-    protected T table;
     private UI_CtrlList<T> ctrlList;
 
     <U extends UI_CtrlList<T>> void setCtrlList(U ctrlList) {
@@ -23,10 +27,15 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding {
 
     protected abstract void initData();
 
+    @SuppressWarnings("unused")
     @FXML
-    private void onActionButtonAceptar(ActionEvent actionEvent) {
+    private void onActionButtonAccept(ActionEvent actionEvent) {
         Node source = (Node) actionEvent.getSource();
-        if (table.getState() != MTable.STATE.NORMAL) {
+        MTable.STATE state = table.getState();
+        TableView<MBaseData> tableView = ctrlList.getTableView();
+        int focusedIndex = tableView.getSelectionModel().getFocusedIndex();
+        int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
+        if (state != MTable.STATE.NORMAL) {
             HashMap<String, String> list = table.getInvalidFieldList();
             if (list.size() > 0) {
                 Map.Entry<String, String> i = list.entrySet().iterator().next();
@@ -37,7 +46,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding {
                     }
                 });
                 new Alert(Alert.AlertType.WARNING, i.getValue() + ": '" + mField[0].getLabel() + "'").showAndWait();
-                Node node = nodeHashMap.get(i.getKey());
+                Node node = (Node) nodeHashMap.get(i.getKey());
                 if (node != null) {
                     node.requestFocus();
                 }
@@ -48,6 +57,8 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding {
                 table.cancel();
             }
             ctrlList.populateList();
+            tableView.getSelectionModel().focus(focusedIndex);
+            tableView.getSelectionModel().select(selectedIndex);
         }
         if (source != null) {
             source.getScene().getWindow().hide();

@@ -21,6 +21,11 @@ public class MFieldBoolean extends MField<Boolean> {
         return null;
     }
 
+    @Override
+    public boolean isEmpty() {
+        return value() == null;
+    }
+
     public boolean setValueAsString(String value) {
         return super.setValue(value.toUpperCase().contentEquals("TRUE"));
     }

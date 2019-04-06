@@ -18,6 +18,7 @@ public abstract class Base extends MTable {
             calcValue = () -> calcField_fechaRegistro();
         }
     };
+
     public final MFieldDate field_fecha = new MFieldDate(this, "fecha") {
         @Override
         protected void initialize() {

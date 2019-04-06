@@ -7,13 +7,11 @@ import test01.data.invoiceItem.InvoiceItem;
 public class InvoiceItem_xInvoice extends InvoiceItem {
 
     /* @@ begin field descriptor @@ */
-
     public final MIndex index_invoice_invItem = new MIndex(this, "invoice_invItem", "invoice", "invItem", true, false) {
         @Override
         protected void initialize() {
         }
     };
-
 
     public InvoiceItem_xInvoice(Invoice masterSource) {
         setMasterSource(masterSource, field_invoice);
@@ -29,10 +27,4 @@ public class InvoiceItem_xInvoice extends InvoiceItem {
         return new InvoiceItem_xInvoiceData<>(this);
     }
     /* @@ end field descriptor @@ */
-
-    /* @@ begin calcField_itemsCount @@ */
-    private Long calcField_itemsCount() {
-        return null;
-    }
-    /* @@ end calcField_itemsCount @@ */
 }

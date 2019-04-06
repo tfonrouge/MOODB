@@ -21,7 +21,6 @@ public class Customer extends Entity {
         }
     };
 
-
     @Override
     public final String getTableName() {
         return "customer";

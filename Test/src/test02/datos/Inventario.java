@@ -19,12 +19,14 @@ public class Inventario extends Base {
             description = "Nombre";
         }
     };
+
     public final MFieldString field_udem = new MFieldString(this, "udem") {
         @Override
         protected void initialize() {
             required = true;
         }
     };
+
     public final MFieldString field_tipo = new MFieldString(this, "tipo") {
         @Override
         protected void initialize() {
@@ -36,6 +38,7 @@ public class Inventario extends Base {
             valueItems.put("G", "Grupo");
         }
     };
+
     public final MFieldInteger field_level = new MFieldInteger(this, "level") {
         @Override
         protected void initialize() {
@@ -46,12 +49,14 @@ public class Inventario extends Base {
             valueItems.put(3, "three");
         }
     };
+
     public final MFieldDouble field_existencia = new MFieldDouble(this, "existencia") {
         @Override
         protected void initialize() {
             setCallableNewValue(() -> 0.0);
         }
     };
+
     public final MFieldString field_status = new MFieldString(this, "status") {
         @Override
         protected void initialize() {
@@ -66,13 +71,11 @@ public class Inventario extends Base {
             partialFilter = Filters.and(Filters.eq("tipo", "A"), Filters.gte("nombre", "CILINDRO"));
         }
     };
-
     public final MIndex index_nombre = new MIndex(this, "nombre", "", "nombre", false, false) {
         @Override
         protected void initialize() {
         }
     };
-
 
     @Override
     public final String getTableName() {

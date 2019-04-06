@@ -19,6 +19,7 @@ public abstract class Person extends Base01 {
             description = "Name";
         }
     };
+
     public final MFieldString field_firstName = new MFieldString(this, "firstName") {
         @Override
         protected void initialize() {
@@ -26,18 +27,21 @@ public abstract class Person extends Base01 {
             description = "First name";
         }
     };
+
     public final MFieldString field_lastName = new MFieldString(this, "lastName") {
         @Override
         protected void initialize() {
             description = "Last name";
         }
     };
+
     public final MFieldDate field_bday = new MFieldDate(this, "bday") {
         @Override
         protected void initialize() {
             description = "Birth day";
         }
     };
+
     public final MFieldString field_gender = new MFieldString(this, "gender") {
         @Override
         protected void initialize() {
@@ -49,11 +53,13 @@ public abstract class Person extends Base01 {
             valueItems.put("F", "Female");
         }
     };
+
     public final MFieldBoolean field_married = new MFieldBoolean(this, "married") {
         @Override
         protected void initialize() {
         }
     };
+
     public final MFieldString field_personId = new MFieldString(this, "personId") {
         @Override
         protected void initialize() {
@@ -66,6 +72,5 @@ public abstract class Person extends Base01 {
         protected void initialize() {
         }
     };
-
     /* @@ end field descriptor @@ */
 }

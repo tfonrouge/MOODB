@@ -55,11 +55,16 @@ class MEngine {
     /* private methods */
     /* *************** */
     private Document buildMasterSourceFilter() {
-        Document document = null;
+        Document document = new Document();
         if (table.tableState.masterSource != null) {
-            document = new Document().
-                    append(table.tableState.masterSourceField.name, table.tableState.masterSource._id());
+            document.append(table.tableState.masterSourceField.name, table.tableState.masterSource._id());
         }
+        table.setFieldFilters();
+        table.fieldList.forEach(mField -> {
+            if (!mField.isCalculated() && mField.fieldState.filterValue != null) {
+                document.append(mField.name, mField.fieldState.filterValue);
+            }
+        });
         return document;
     }
 
@@ -72,12 +77,13 @@ class MEngine {
             collections = new HashMap<>();
         }
 
+        MongoClientURI mongoClientURI = new MongoClientURI(clientURI);
+        MongoClient mongoClient = new MongoClient(mongoClientURI);
+        mongoDatabase = mongoClient.getDatabase(table.getDatabase().getDatabaseName());
+
         if (collections.containsKey(key)) {
             collection = collections.get(key);
         } else {
-            MongoClientURI mongoClientURI = new MongoClientURI(clientURI);
-            MongoClient mongoClient = new MongoClient(mongoClientURI);
-            mongoDatabase = mongoClient.getDatabase(table.getDatabase().getDatabaseName());
             collection = mongoDatabase.getCollection(tableName);
             collections.put(key, collection);
         }
@@ -120,7 +126,7 @@ class MEngine {
 
         if (mFieldTableField != null) {
             String lookupFieldName = mFieldTableField.name;
-            String lookupTableName = mFieldTableField.getLinkedTable().getTableName();
+            String lookupTableName = mFieldTableField.linkedTable().getTableName();
             documents.add(
                     new Document()
                             .append("$lookup", new Document()

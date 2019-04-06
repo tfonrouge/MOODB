@@ -32,6 +32,6 @@
         <padding>
             <Insets top="10.0"/>
         </padding>
-        <Button defaultButton="true" mnemonicParsing="false" onAction="#onActionButtonAceptar" text="Aceptar"/>
+        <Button defaultButton="true" mnemonicParsing="false" onAction="#onActionButtonAccept" text="Aceptar"/>
     </HBox>
 </VBox>

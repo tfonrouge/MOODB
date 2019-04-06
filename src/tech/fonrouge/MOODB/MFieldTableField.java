@@ -4,8 +4,8 @@ import org.bson.types.ObjectId;
 
 public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
 
-    private final T linkedTable = initializeTableField();
     boolean notSynced = false;
+    private T linkedTable;
 
     protected MFieldTableField(MTable owner, String name) {
         super(owner, name);
@@ -16,7 +16,10 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
         return MTable.FIELD_TYPE.TABLE_FIELD;
     }
 
-    public final T getLinkedTable() {
+    public final T linkedTable() {
+        if (linkedTable == null) {
+            linkedTable = initializeTableField();
+        }
         return linkedTable;
     }
 
@@ -38,14 +41,14 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
         return super.setValue(table._id());
     }
 
-    public final T syncLinkedTable() {
+    public final T syncedTable() {
 
-        Object objectId = linkedTable._id();
+        Object objectId = linkedTable()._id();
 
         if (objectId == null || !objectId.equals(table.tableState.getFieldValue(index))) {
-            linkedTable.goTo(table.tableState.getFieldValue(index));
+            linkedTable().goTo(table.tableState.getFieldValue(index));
         }
 
-        return linkedTable;
+        return linkedTable();
     }
 }

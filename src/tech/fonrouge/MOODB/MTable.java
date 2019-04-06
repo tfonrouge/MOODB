@@ -3,6 +3,7 @@ package tech.fonrouge.MOODB;
 import com.mongodb.client.MongoCursor;
 import org.bson.Document;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ abstract public class MTable {
     MEngine engine;
 
     TableState tableState;
+    Document filter;
+
     private MDatabase database;
     private int tableStateIndex = 0;
     private ArrayList<TableState> tableStateList = new ArrayList<>();
@@ -63,6 +66,11 @@ abstract public class MTable {
         engine = new MEngine(this);
 
         buildIndices();
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void setFieldFilters() {
+
     }
 
     void set_id(Object value) {
@@ -262,6 +270,14 @@ abstract public class MTable {
      */
     public Object _id() {
         return field__id.getTypedValue();
+    }
+
+    public MTable getChildTable(Class clazz) {
+        Method[] a = getClass().getDeclaredMethods();
+        for (Method method : a) {
+            System.out.println(a);
+        }
+        return null;
     }
 
     public abstract MBaseData getData();
@@ -534,8 +550,7 @@ abstract public class MTable {
         OBJECT,
         OBJECT_ID,
         STRING,
-        TABLE_FIELD,
-        TABLE
+        TABLE_FIELD
     }
 
     public enum STATE {

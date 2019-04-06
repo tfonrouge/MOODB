@@ -24,11 +24,15 @@ import tech.fonrouge.MOODB.MFieldTableField;
 import tech.fonrouge.MOODB.MTable;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.util.ArrayList;
 
-public abstract class UI_CtrlList<T extends MTable> {
+public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     private final ObservableList<MBaseData> observableList = FXCollections.observableArrayList();
-    private T table = getTable();
+
     @SuppressWarnings("unused")
     @FXML
     private MenuItem menuItem_cerrar;
@@ -45,18 +49,17 @@ public abstract class UI_CtrlList<T extends MTable> {
     @FXML
     private TableView<MBaseData> tableView;
 
+    public UI_CtrlList(T table) {
+        this.table = table;
+    }
+
+    public TableView<MBaseData> getTableView() {
+        return tableView;
+    }
+
     protected abstract String[] getColumns();
 
-    void buildUI(@NotNull Parent parent) {
-
-        menuItem_cerrar.setAccelerator(new KeyCodeCombination(KeyCode.ESCAPE));
-        menuItem_agregar.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
-        menuItem_modificar.setAccelerator(new KeyCodeCombination(KeyCode.F3));
-        menuItem_eliminar.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
-
-        table = getTable();
-
-        Stage stage = new Stage();
+    private void buildTableView() {
 
         tableView.getColumns().clear();
 
@@ -67,6 +70,19 @@ public abstract class UI_CtrlList<T extends MTable> {
         populateList();
 
         tableView.setItems(observableList);
+
+    }
+
+    void buildUI(@NotNull Parent parent) {
+
+        menuItem_cerrar.setAccelerator(new KeyCodeCombination(KeyCode.ESCAPE));
+        menuItem_agregar.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
+        menuItem_modificar.setAccelerator(new KeyCodeCombination(KeyCode.F3));
+        menuItem_eliminar.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
+
+        Stage stage = new Stage();
+
+        buildTableView();
 
         Scene scene = new Scene(parent);
 
@@ -115,7 +131,7 @@ public abstract class UI_CtrlList<T extends MTable> {
                         label = mFieldTableField.getLabel();
                         int i = 1;
                         do {
-                            mField = mFieldTableField.syncLinkedTable().fieldByName(fieldList[i]);
+                            mField = mFieldTableField.linkedTable().fieldByName(fieldList[i]);
                             if (mField != null) {
                                 if (mField instanceof MFieldTableField) {
                                     mFieldTableField = (MFieldTableField) mField;
@@ -173,80 +189,114 @@ public abstract class UI_CtrlList<T extends MTable> {
         }
     }
 
-    abstract protected T buildTable();
-
     public T getTable() {
-        if (table == null) {
-            table = buildTable();
-        }
         return table;
     }
 
     abstract protected String getResourceRecordName();
 
     private void doInsertEdit() {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(getResourceRecordName()));
+        String resourceRecordName = getResourceRecordName();
 
-        Parent parent = null;
+        if (resourceRecordName != null && !resourceRecordName.isEmpty()) {
+            URL resource = getClass().getResource(resourceRecordName);
+            FXMLLoader fxmlLoader = new FXMLLoader(resource);
 
-        try {
-            parent = fxmlLoader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            ArrayList<UI_CtrlList> ui_ctrlLists = new ArrayList<>();
 
-        if (parent != null) {
-            fxmlLoader.<UI_CtrlRecord>getController().setCtrlList(this);
+            fxmlLoader.setControllerFactory(param -> {
+                try {
+                    if (UI_CtrlList.class.isAssignableFrom(param)) {
+                        Class<?> tableClass = param.getConstructors()[0].getParameterTypes()[0];
+                        Constructor<?>[] constructors = tableClass.getConstructors();
+                        MTable childTable;
+                        if (constructors.length == 0 || constructors[0].getParameterTypes().length == 0) {
+                            childTable = (MTable) tableClass.newInstance();
+                        } else {
+                            Constructor<?> ctor = tableClass.getConstructor(table.getClass());
+                            childTable = (MTable) ctor.newInstance(table);
+                        }
+                        Constructor<?> constructor = param.getConstructor(tableClass);
+                        UI_CtrlList ui_ctrlList = (UI_CtrlList) constructor.newInstance(childTable);
+                        ui_ctrlLists.add(ui_ctrlList);
+                        return ui_ctrlList;
+                    }
+                    return param.newInstance();
+                } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                    e.printStackTrace();
+                    UI_Message.Warning("Warning", e.toString());
+                }
+                return null;
+            });
 
-            Stage stage = new Stage();
-            Scene scene = new Scene(parent);
+            Parent parent = null;
 
-            stage.setScene(scene);
-            stage.initModality(Modality.APPLICATION_MODAL);
-
-            String title;
-
-            switch (table.getState()) {
-                case NORMAL:
-                    title = "Mostrar Detalle";
-                    break;
-                case EDIT:
-                    title = "Modificar";
-                    break;
-                case INSERT:
-                    title = "Agregar";
-                    break;
-                default:
-                    title = "?";
+            try {
+                parent = fxmlLoader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+                UI_Message.Warning("Warning", e.toString());
             }
 
-            stage.setTitle(title + ": " + table.getGenre());
+            for (UI_CtrlList ui_ctrlList : ui_ctrlLists) {
+                ui_ctrlList.buildTableView();
+            }
 
-            stage.setOnHidden(event -> {
-                if (table.getState() != MTable.STATE.NORMAL) {
-                    table.cancel();
+            if (parent != null) {
+                fxmlLoader.<UI_CtrlRecord>getController().setCtrlList(this);
+
+                Stage stage = new Stage();
+                Scene scene = new Scene(parent);
+
+                stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+
+                String title;
+
+                switch (table.getState()) {
+                    case NORMAL:
+                        title = "Mostrar Detalle";
+                        break;
+                    case EDIT:
+                        title = "Modificar";
+                        break;
+                    case INSERT:
+                        title = "Agregar";
+                        break;
+                    default:
+                        title = "?";
                 }
-            });
 
-            scene.setOnKeyPressed(event -> {
-                if (event.getCode() == KeyCode.ESCAPE) {
-                    stage.close();
-                }
-            });
+                stage.setTitle(title + ": " + table.getGenre());
 
-            stage.show();
+                stage.setOnHidden(event -> {
+                    if (table.getState() != MTable.STATE.NORMAL) {
+                        table.cancel();
+                    }
+                });
+
+                scene.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ESCAPE) {
+                        stage.close();
+                    }
+                });
+
+                stage.show();
+            }
+        } else {
+            UI_Message.Warning("Warning", "No form Record XML descriptor found");
         }
     }
 
     @SuppressWarnings("unused")
-    public void onActionMenuAgregar() {
+    public void onActionInsertDocument() {
         if (table.insert()) {
             doInsertEdit();
         }
     }
 
     @SuppressWarnings("unused")
-    public void onActionMenuModificar() {
+    public void onActionEditDocument() {
 
         MBaseData item = tableView.getSelectionModel().getSelectedItem();
 
@@ -259,7 +309,7 @@ public abstract class UI_CtrlList<T extends MTable> {
     }
 
     @SuppressWarnings("unused")
-    public void onActionMenuEliminar() {
+    public void onActionDeleteDocument() {
 
         MBaseData item = tableView.getSelectionModel().getSelectedItem();
 
