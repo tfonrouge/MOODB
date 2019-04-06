@@ -18,15 +18,15 @@
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
     </rowConstraints>
     <Label text="Invoice #:"/>
-    <TextField fx:id="textField_invoiceNo" maxWidth="80.0" GridPane.columnIndex="1"/>
+    <TextField fx:id="textField_invoice_docNumber" maxWidth="80.0" GridPane.columnIndex="1"/>
     <Label text="Inv Item:" GridPane.rowIndex="1"/>
-    <ComboBox fx:id="comboBox_invItem" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+    <ComboBox fx:id="comboBox_invItem_name" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
     <Label text="Qty:" GridPane.rowIndex="2"/>
     <TextField fx:id="textField_qty" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
     <Label text="Price:" GridPane.rowIndex="3"/>
-    <TextField fx:id="textField_price" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+    <TextField fx:id="textField_unitPrice" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
     <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="5">
-        <Button mnemonicParsing="false" onAction="#onActionButtonAceptar" text="Accept"/>
+        <Button mnemonicParsing="false" onAction="#onActionButtonAccept" text="Accept"/>
     </HBox>
     <opaqueInsets>
         <Insets/>
