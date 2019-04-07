@@ -23,6 +23,9 @@ public class TableState {
         lookupDocument = new Document();
     }
 
+    /**
+     * @param tableState : copy constructor
+     */
     TableState(TableState tableState) {
         masterSource = tableState.masterSource;
         masterSourceField = tableState.masterSourceField;
