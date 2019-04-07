@@ -40,8 +40,13 @@ public class TableState {
         return lookupDocument;
     }
 
-    <T> void setFieldValue(int index, T value) {
-        fieldStateList.get(index).value = value;
+    <T> boolean setFieldValue(int index, T value) {
+        Object oldValue = fieldStateList.get(index).value;
+        if ((value != null && !value.equals(oldValue)) || (oldValue != null && !oldValue.equals(value))) {
+            fieldStateList.get(index).value = value;
+            return true;
+        }
+        return false;
     }
 
     public Object getFieldValue(int index) {
@@ -58,6 +63,12 @@ public class TableState {
         } else {
             o = fieldStateList.get(mField.index).value;
         }
-        return clazz.cast(o);
+        T result = null;
+        try {
+            result = clazz.cast(o);
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

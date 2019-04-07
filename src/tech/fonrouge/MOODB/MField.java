@@ -24,6 +24,7 @@ public abstract class MField<T> {
     FieldState fieldState = new FieldState();
     String name;
     Callable<T> callableNewValue;
+    Runnable runnableOnAfterChangeValue;
     private String invalidCause = null;
     private int fieldStateIndex = 0;
     private ArrayList<FieldState> fieldStateList = new ArrayList<>();
@@ -214,6 +215,10 @@ public abstract class MField<T> {
         callableNewValue = callable;
     }
 
+    final public void setRunnableOnAfterChangeValue(Runnable callable) {
+        runnableOnAfterChangeValue = callable;
+    }
+
     /**
      * @return
      */
@@ -303,7 +308,15 @@ public abstract class MField<T> {
 
         /* TODO: validate against notNullable value */
         //this.fieldState.value = value;
-        table.tableState.setFieldValue(index, value);
+        if (table.tableState.setFieldValue(index, value)) {
+            if (runnableOnAfterChangeValue !=null) {
+                try {
+                    runnableOnAfterChangeValue.run();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         return true;
     }

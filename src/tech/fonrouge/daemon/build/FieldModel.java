@@ -19,6 +19,7 @@ class FieldModel {
     HashMap<String, String> keyValueItems;
     String newValue;
     String defaultValue;
+    String onAfterChangeValue;
     boolean autoInc;
     private boolean valid = true;
 
@@ -100,6 +101,13 @@ class FieldModel {
                         NodeList nodeNewValue = node1.getChildNodes();
                         if (nodeNewValue.getLength() > 0) {
                             defaultValue = nodeNewValue.item(0).getNodeValue();
+                        }
+                    }
+                    /* onAfterChangeValue */
+                    if (node1.getNodeType() == Node.ELEMENT_NODE && node1.getLocalName().contentEquals("onAfterChangeValue")) {
+                        NodeList childNodes = node1.getChildNodes();
+                        if (childNodes.getLength() > 0) {
+                            onAfterChangeValue = childNodes.item(0).getNodeValue();
                         }
                     }
                 }

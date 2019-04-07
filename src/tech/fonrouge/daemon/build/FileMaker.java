@@ -173,6 +173,10 @@ class FileMaker {
                     initializeString += "            setDefaultValue(" + fieldModel.defaultValue + ");\n";
                 }
 
+                if (fieldModel.onAfterChangeValue != null) {
+                    initializeString += "            setRunnableOnAfterChangeValue(() -> " + fieldModel.onAfterChangeValue + ");\n";
+                }
+
                 if (fieldModel.keyValueItems.size() > 0) {
                     initializeString += "\n            valueItems = new HashMap<>();\n";
                     final String[] line = {""};
