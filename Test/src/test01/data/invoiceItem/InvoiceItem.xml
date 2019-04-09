@@ -9,8 +9,8 @@
 
         <oons:FieldTableField name="invoice" class="Invoice" description="Invoice" required="true"/>
         <oons:FieldTableField name="invItem" class="InventoryItem" required="true"/>
-        <oons:FieldDouble name="qty" description="Quantity" notNullable="true"/>
-        <oons:FieldDouble name="unitPrice" description="Unit Price" notNullable="true"/>
+        <oons:FieldDouble name="qty" description="Quantity" required="true"/>
+        <oons:FieldDouble name="unitPrice" description="Unit Price" required="true"/>
 
         <oons:FieldDouble name="total" calculated="true"/>
 

@@ -39,7 +39,6 @@ public class InvoiceItem extends Base01 {
     public final MFieldDouble field_qty = new MFieldDouble(this, "qty") {
         @Override
         protected void initialize() {
-            notNullable = true;
             description = "Quantity";
         }
     };
@@ -47,7 +46,6 @@ public class InvoiceItem extends Base01 {
     public final MFieldDouble field_unitPrice = new MFieldDouble(this, "unitPrice") {
         @Override
         protected void initialize() {
-            notNullable = true;
             description = "Unit Price";
         }
     };

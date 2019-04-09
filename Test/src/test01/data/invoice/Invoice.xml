@@ -9,7 +9,7 @@
 
         <oons:FieldInteger name="docNumber" description="Invoice number" required="true" autoInc="true"/>
         <oons:FieldTableField name="customer" class="Customer" required="true"/>
-        <oons:FieldDate name="date" required="true" newDate="true"/>
+        <oons:FieldDate name="date" required="true"/>
         <oons:FieldLong name="itemsCount" calculated="true"/>
 
     </oons:Fields>

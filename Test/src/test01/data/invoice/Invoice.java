@@ -35,7 +35,6 @@ public class Invoice extends Base01 {
         @Override
         protected void initialize() {
             required = true;
-            mNewDate = true;
         }
     };
 

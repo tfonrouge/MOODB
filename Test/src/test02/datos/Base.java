@@ -23,7 +23,6 @@ public abstract class Base extends MTable {
         @Override
         protected void initialize() {
             required = true;
-            mNewDate = true;
         }
     };
 

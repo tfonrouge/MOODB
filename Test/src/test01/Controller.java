@@ -22,7 +22,10 @@ public class Controller extends UI_BaseController implements Initializable {
 
     public void onActionInvoices(ActionEvent actionEvent) {
 
-        showList(new Invoice());
+        Invoice invoice = new Invoice();
+        invoice.addLookupField("customer.name");
+
+        showList(invoice);
 
     }
 
