@@ -1,8 +1,5 @@
 package tech.fonrouge.MOODB.ui;
 
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import tech.fonrouge.MOODB.*;
@@ -80,6 +77,13 @@ public class UI_Binding<T extends MTable> {
                 method.invoke(this, objects);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
+                String s;
+                if (objects.length > 1) {
+                    s = objects[1].toString();
+                } else {
+                    s = "no field info";
+                }
+                UI_Message.Warning("Bind error:", s + " : " + e.toString());
             }
         } else {
             UI_Message.Warning("No Binding Method", "Params: " + Arrays.toString(objects));
@@ -122,29 +126,19 @@ public class UI_Binding<T extends MTable> {
     /**
      * @param textField
      * @param fieldTableField
-     * @param fieldByName
+     * @param detailField
      * @param <U>
      */
     @SuppressWarnings("unused")
-    protected <U extends MTable> void bindControl(TextField textField, MFieldTableField<U> fieldTableField, String fieldByName) {
-        nodeHashMap.put(fieldTableField.getName(), textField);
-        final boolean[] ignore = {false};
-        MField mField = fieldTableField.linkedTable().fieldByName(fieldByName);
-        textField.setEditable(!mField.isReadOnly());
-        String value = fieldTableField.syncedTable().fieldByName(fieldByName).valueAsString();
-        textField.textProperty().setValue(value);
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignore[0]) {
-                if (!mField.find(newValue)) {
-                    ignore[0] = true;
-                    Platform.runLater(() -> {
-                        textField.textProperty().setValue(oldValue);
-                        ignore[0] = false;
-                    });
-                }
-            }
-        });
-        textField.setPromptText(fieldTableField.getDescription());
+    protected <U extends MTable> void bindControl(TextField textField, MFieldTableField<U> fieldTableField, String detailField) {
+        registerControl(fieldTableField, textField);
+        textField.textProperty().addListener(new UI_ChangeListenerTextFieldTFT(textField, fieldTableField, detailField));
+    }
+
+    protected void registerControl(MField mField, Node node) {
+        nodeHashMap.put(mField.getName(), node);
+        mField.getFieldState().node = node;
+        node.setDisable(mField.isReadOnly());
     }
 
     /**
@@ -155,46 +149,8 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected <U extends MTable> void bindControl(ComboBox<Object> comboBox, MFieldTableField<U> fieldTableField, String detailField) {
-        nodeHashMap.put(fieldTableField.getName(), comboBox);
-        final boolean[] ignore = {false};
-        MField mField = fieldTableField.linkedTable().fieldByName(detailField);
-        Object a = fieldTableField.syncedTable().fieldByName(detailField).value();
-        comboBox.valueProperty().setValue(a);
-        comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignore[0]) {
-                if (!mField.find(newValue)) {
-                    ignore[0] = true;
-                    Platform.runLater(() -> {
-                        comboBox.valueProperty().setValue(oldValue);
-                        ignore[0] = false;
-                    });
-                }
-            }
-        });
-        fillComboBoxList(comboBox, fieldTableField, detailField);
-        comboBox.setPromptText(fieldTableField.getDescription());
-    }
-
-    /**
-     * @param comboBox
-     * @param fieldTableField
-     * @param detailField
-     * @param <U>
-     */
-    private <U extends MTable> void fillComboBoxList(ComboBox<Object> comboBox, MFieldTableField<U> fieldTableField, String detailField) {
-        ObservableList<Object> o = FXCollections.observableArrayList();
-        U mTable = fieldTableField.linkedTable();
-        mTable.tableStatePush();
-        MField mField = mTable.fieldByName(detailField);
-        if (mField != null && mTable.find()) {
-            while (!mTable.getEof()) {
-                Object value = mField.value();
-                o.add(value);
-                mTable.next();
-            }
-        }
-        mTable.tableStatePull();
-        comboBox.setItems(o);
+        registerControl(fieldTableField, comboBox);
+        comboBox.valueProperty().addListener(new UI_ChangeListenerComboBoxTFT(comboBox, fieldTableField, detailField));
     }
 
     /**
@@ -203,26 +159,21 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(ComboBox<String> comboBox, MFieldString fieldString) {
-        nodeHashMap.put(fieldString.getName(), comboBox);
-        final boolean[] ignore = {false};
-        comboBox.valueProperty().setValue(fieldString.valueAsString());
-        comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignore[0]) {
-                if (!fieldString.setValue(newValue)) {
-                    ignore[0] = true;
-                    Platform.runLater(() -> {
-                        comboBox.valueProperty().setValue(oldValue);
-                        ignore[0] = false;
-                    });
-                }
-            }
-        });
-        comboBox.setItems(FXCollections.observableArrayList());
-        HashMap<String, String> keyValueItems = fieldString.getValueItems();
-        if (keyValueItems != null) {
-            keyValueItems.forEach((key, value) -> comboBox.getItems().add(key));
-        }
-        comboBox.setPromptText(fieldString.getDescription());
+        registerControl(fieldString, comboBox);
+        comboBox.valueProperty().addListener(new UI_ChangeListenerComboBoxString(comboBox, fieldString));
+    }
+
+    /**
+     * @param textField
+     * @param fieldString
+     */
+    @SuppressWarnings("unused")
+    final protected void bindControl(TextInputControl textField, MFieldString fieldString) {
+        registerControl(fieldString, textField);
+
+        textField.textProperty().set(fieldString.value());
+        textField.textProperty().addListener((observable, oldValue, newValue) -> fieldString.setValue(newValue));
+        textField.setPromptText(fieldString.getDescription());
     }
 
     /**
@@ -231,8 +182,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldInteger fieldInteger) {
-        nodeHashMap.put(fieldInteger.getName(), textField);
-        textField.setEditable(!fieldInteger.isReadOnly());
+        registerControl(fieldInteger, textField);
 
         textField.textProperty().set(String.valueOf(fieldInteger.value()));
         textField.textProperty().addListener((observable, oldValue, newValue) -> fieldInteger.setValue(Integer.valueOf(newValue)));
@@ -245,24 +195,11 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldDouble fieldDouble) {
-        nodeHashMap.put(fieldDouble.getName(), textField);
+        registerControl(fieldDouble, textField);
 
         textField.textProperty().set(String.valueOf(fieldDouble.value()));
         textField.textProperty().addListener((observable, oldValue, newValue) -> fieldDouble.setValue(Double.valueOf(newValue)));
         textField.setPromptText(fieldDouble.getDescription());
-    }
-
-    /**
-     * @param textField
-     * @param fieldString
-     */
-    @SuppressWarnings("unused")
-    final protected void bindControl(TextInputControl textField, MFieldString fieldString) {
-        nodeHashMap.put(fieldString.getName(), textField);
-
-        textField.textProperty().set(fieldString.value());
-        textField.textProperty().addListener((observable, oldValue, newValue) -> fieldString.setValue(newValue));
-        textField.setPromptText(fieldString.getDescription());
     }
 
     /**
@@ -271,7 +208,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(Spinner<Integer> integerSpinner, MFieldInteger fieldInteger) {
-        nodeHashMap.put(fieldInteger.getName(), integerSpinner);
+        registerControl(fieldInteger, integerSpinner);
 
         integerSpinner.getValueFactory().setValue(fieldInteger.value());
         integerSpinner.getValueFactory().valueProperty().addListener((observable, oldValue, newValue) -> fieldInteger.setValue(newValue));
@@ -283,7 +220,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(CheckBox checkBox, MFieldBoolean mFieldBoolean) {
-        nodeHashMap.put(mFieldBoolean.getName(), checkBox);
+        registerControl(mFieldBoolean, checkBox);
 
         checkBox.setSelected(mFieldBoolean.value());
         checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> mFieldBoolean.setValue(newValue));
@@ -295,7 +232,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldDate mFieldDate) {
-        nodeHashMap.put(mFieldDate.getName(), textField);
+        registerControl(mFieldDate, textField);
 
         textField.textProperty().set(mFieldDate.valueAsString());
         textField.textProperty().addListener((observable, oldValue, newValue) -> mFieldDate.setValueAsString(newValue));

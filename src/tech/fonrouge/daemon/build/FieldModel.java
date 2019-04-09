@@ -6,11 +6,10 @@ import org.w3c.dom.NodeList;
 import java.util.HashMap;
 
 class FieldModel {
-    boolean notNullable;
-    boolean newDate;
     String fieldName;
     String type;
     boolean calculated;
+    boolean newFinal;
     boolean validate;
     String description;
     String label;
@@ -34,17 +33,14 @@ class FieldModel {
             node1 = node.getAttributes().getNamedItem("calculated");
             calculated = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
+            node1 = node.getAttributes().getNamedItem("newFinal");
+            newFinal = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
+
             node1 = node.getAttributes().getNamedItem("validate");
             validate = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
             node1 = node.getAttributes().getNamedItem("required");
             required = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
-
-            node1 = node.getAttributes().getNamedItem("notNullable");
-            notNullable = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
-
-            node1 = node.getAttributes().getNamedItem("newDate");
-            newDate = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
             node1 = node.getAttributes().getNamedItem("autoInc");
             autoInc = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");

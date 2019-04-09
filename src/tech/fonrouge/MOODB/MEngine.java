@@ -61,8 +61,8 @@ class MEngine {
         }
         table.setFieldFilters();
         table.fieldList.forEach(mField -> {
-            if (!mField.isCalculated() && mField.fieldState.filterValue != null) {
-                document.append(mField.name, mField.fieldState.filterValue);
+            if (!mField.isCalculated() && mField.getFieldState().filterValue != null) {
+                document.append(mField.name, mField.getFieldState().filterValue);
             }
         });
         return document;
@@ -113,8 +113,13 @@ class MEngine {
      */
     @SuppressWarnings("WeakerAccess")
     public MongoCursor<Document> executeAggregate(List<Document> documentList) {
-        if (table.tableState.lookupDocument != null && table.tableState.lookupDocument.size() > 0) {
-            table.tableState.lookupDocument.forEach((fieldName, o) -> documentList.addAll(getLookupStage(fieldName.substring(1))));
+        for (int i = 0; i < table.fieldList.size(); i++) {
+            if (table.fieldList.get(i).fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
+                MFieldTableField mFieldTableField = (MFieldTableField) table.fieldList.get(i);
+                if (!mFieldTableField.calculated && mFieldTableField.isLookupDocument()) {
+                    documentList.addAll(getLookupStage(mFieldTableField.name));
+                }
+            }
         }
         return collection.aggregate(documentList).iterator();
     }
@@ -149,13 +154,13 @@ class MEngine {
                                                     .append("$limit", 1)
                                             )
                                     )
-                                    .append("as", "@" + lookupFieldName)
+                                    .append("as", "" + lookupFieldName)
                             ));
 
             documents.add(
                     new Document().
                             append("$unwind", new Document().
-                                    append("path", "$@" + lookupFieldName).
+                                    append("path", "$" + lookupFieldName).
                                     append("preserveNullAndEmptyArrays", true)
                             )
 

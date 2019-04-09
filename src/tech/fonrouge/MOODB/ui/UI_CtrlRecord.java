@@ -9,9 +9,6 @@ import tech.fonrouge.MOODB.MBaseData;
 import tech.fonrouge.MOODB.MField;
 import tech.fonrouge.MOODB.MTable;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,15 +43,16 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
                     }
                 });
                 new Alert(Alert.AlertType.WARNING, i.getValue() + ": '" + mField[0].getLabel() + "'").showAndWait();
-                Node node = (Node) nodeHashMap.get(i.getKey());
+                Node node = nodeHashMap.get(i.getKey());
                 if (node != null) {
                     node.requestFocus();
                 }
                 return;
             }
             if (!table.post()) {
-                System.out.println("Error: " + table.getException());
+                String errMsg = table.getException().toString();
                 table.cancel();
+                UI_Message.Warning("Post error:", errMsg);
             }
             ctrlList.populateList();
             tableView.getSelectionModel().focus(focusedIndex);

@@ -141,6 +141,10 @@ class FileMaker {
                     initializeString += "            calcValue = () -> calcField_" + fieldModel.fieldName + "();\n";
                 }
 
+                if (fieldModel.newFinal) {
+                    initializeString += "            newFinal = true;\n";
+                }
+
                 if (fieldModel.validate) {
                     initializeString += "            onValidate = () -> onValidate_" + fieldModel.fieldName + "();\n";
                 }
@@ -149,20 +153,12 @@ class FileMaker {
                     initializeString += "            required = true;\n";
                 }
 
-                if (fieldModel.notNullable) {
-                    initializeString += "            notNullable = true;\n";
-                }
-
                 if (fieldModel.description != null) {
                     initializeString += "            description = \"" + fieldModel.description + "\";\n";
                 }
 
                 if (fieldModel.label != null) {
                     initializeString += "            label = \"" + fieldModel.label + "\";\n";
-                }
-
-                if (fieldModel.newDate) {
-                    initializeString += "            mNewDate = true;\n";
                 }
 
                 if (fieldModel.newValue != null) {

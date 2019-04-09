@@ -19,10 +19,8 @@ abstract public class MTable {
     ArrayList<MField> fieldList;
     ArrayList<MIndex> indices = new ArrayList<>();
     MEngine engine;
-
     TableState tableState;
     Document filter;
-
     private MDatabase database;
     private int tableStateIndex = 0;
     private ArrayList<TableState> tableStateList = new ArrayList<>();
@@ -39,12 +37,20 @@ abstract public class MTable {
         initialize();
     }
 
+    public TableState getTableState() {
+        return tableState;
+    }
+
     @SuppressWarnings("unused")
     public void addLookupField(String fieldExpression) {
 
         String[] fields = fieldExpression.split("\\.");
-        if (fields.length > 1) {
-            tableState.lookupDocument.put("@" + fields[0], null);
+
+        for (String field : fields) {
+            MFieldTableField mFieldTableField = fieldTableFieldByName(field);
+            if (mFieldTableField != null) {
+                mFieldTableField.setLookupDocument(true);
+            }
         }
     }
 
@@ -86,7 +92,6 @@ abstract public class MTable {
         return null;
     }
 
-    @SuppressWarnings("WeakerAccess")
     public MFieldTableField fieldTableFieldByName(String name) {
         for (MField mField : fieldList) {
             if (mField.name.contentEquals(name) && mField instanceof MFieldTableField) {
@@ -172,20 +177,17 @@ abstract public class MTable {
         fieldList.forEach(mField -> {
             if (!mField.calculated) {
                 Object value = rawDocument == null ? null : rawDocument.getOrDefault(mField.name, null);
-                if (value == null && mField.notNullable) {
+                if (value == null && mField.required) {
                     value = mField.getEmptyValue();
+                }
+                if (value instanceof Document && mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
+                    Document document = (Document) value;
+                    tableState.fieldStateList.get(mField.index).document = document;
+                    value = document.get("_id");
                 }
                 tableState.setFieldValue(mField.index, value);
             }
         });
-
-        if (tableState.lookupDocument != null && tableState.lookupDocument.size() > 0) {
-            if (rawDocument == null) {
-                tableState.lookupDocument.forEach((fieldName, o) -> tableState.lookupDocument.put(fieldName, null));
-            } else {
-                tableState.lookupDocument.forEach((fieldName, o) -> tableState.lookupDocument.put(fieldName, rawDocument.get(fieldName)));
-            }
-        }
 
         if (tableState.linkedField != null && tableState.linkedField.table.tableState.state != STATE.NORMAL) {
             Object value = tableState.linkedField.getTypedValue();
@@ -205,6 +207,8 @@ abstract public class MTable {
         if (tableState.state == STATE.NORMAL) {
             throw new RuntimeException("Attempt to Cancel on Table at Normal State.");
         }
+
+        tableState.clearBindings();
 
         goTo(field__id.getTypedValue());
 
@@ -249,7 +253,7 @@ abstract public class MTable {
             if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
                 ((MFieldTableField) mField).notSynced = true;
             }
-            mField.fieldState.origValue = mField.getTypedValue();
+            mField.getFieldState().origValue = mField.getTypedValue();
         });
 
         tableState.state = STATE.EDIT;
@@ -424,16 +428,12 @@ abstract public class MTable {
                 if (tableState.masterSource != null && mField.equals(tableState.masterSourceField)) {
                     tableState.setFieldValue(mField.index, tableState.masterSource._id());
                 } else {
-                    if (mField.fieldType == FIELD_TYPE.DATE && ((MFieldDate) mField).mNewDate) {
-                        tableState.setFieldValue(mField.index, new Date());
-                    } else {
-                        Object value = mField.getNewValue();
-                        if (mField.notNullable && mField.valueItems != null && !mField.valueItems.containsKey(value)) {
-                            throw new RuntimeException("Invalid new value [" + value + "] on field '" + mField.name + "'.");
-                        }
-                        tableState.setFieldValue(mField.index, value);
+                    Object value = mField.getNewValue();
+                    if (mField.fieldType == FIELD_TYPE.DATE && value == null && ((MFieldDate) mField).required) {
+                        value = new Date();
                     }
-                    if (tableState.getFieldValue(mField.index) == null && (mField.notNullable || mField.autoInc)) {
+                    tableState.setFieldValue(mField.index, value);
+                    if (tableState.getFieldValue(mField) == null && (mField.required || mField.autoInc)) {
                         tableState.setFieldValue(mField.index, mField.getEmptyValue());
                     }
                 }
@@ -488,14 +488,14 @@ abstract public class MTable {
                             document.put(mField.getName(), mField.value());
                         }
                     });
-                    result = engine.update(document);
+                    result = document.size() == 0 || engine.update(document);
                     break;
                 case INSERT:
                     fieldList.forEach(mField -> {
                         if (!mField.calculated) {
                             if (mField.autoInc) {
                                 document.put(mField.name, mField.getNextSequence());
-                            } else if (!(mField instanceof MFieldObjectId && mField.getName().contentEquals("_id")) && !(tableState.getFieldValue(mField.index) == null)) {
+                            } else if (!(mField instanceof MFieldObjectId && mField.getName().contentEquals("_id")) && !(tableState.getFieldValue(mField) == null)) {
                                 document.put(mField.getName(), mField.value());
                             }
                         }
@@ -515,6 +515,8 @@ abstract public class MTable {
 
         tableState.state = STATE.NORMAL;
 
+        tableState.clearBindings();
+
         return true;
     }
 
@@ -523,7 +525,6 @@ abstract public class MTable {
         if (tableStateIndex == 0) {
             throw new RuntimeException("tableStateIndex out of bounds.");
         }
-        fieldList.forEach(MField::fieldStatePull);
         tableState = tableStateList.get(--tableStateIndex);
     }
 
@@ -537,7 +538,6 @@ abstract public class MTable {
         tableState = new TableState();
         tableState.fieldStateList = new ArrayList<>(currentTableState.fieldStateList);
         tableStateList.add(tableState);
-        fieldList.forEach(MField::fieldStatePush);
     }
 
     public enum FIELD_TYPE {

@@ -1,7 +1,9 @@
 package tech.fonrouge.MOODB;
 
 import com.mongodb.client.MongoCursor;
+import javafx.scene.Node;
 import org.bson.Document;
+import tech.fonrouge.MOODB.ui.UI_ChangeListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,22 +14,20 @@ public abstract class MField<T> {
     public final int index;
     public final MTable.FIELD_TYPE fieldType = getFieldType();
     final MTable table;
-    protected boolean notNullable;
     protected boolean required;
     protected boolean calculated;
+    protected boolean newFinal;
     protected String description;
     protected String label;
     protected HashMap<T, String> valueItems;
     protected Callable<T> calcValue = null;
     protected Callable<Boolean> onValidate = null;
     protected boolean autoInc;
-    FieldState fieldState = new FieldState();
+    protected boolean readOnly;
     String name;
     Callable<T> callableNewValue;
     Runnable runnableOnAfterChangeValue;
     private String invalidCause = null;
-    private int fieldStateIndex = 0;
-    private ArrayList<FieldState> fieldStateList = new ArrayList<>();
 
     MField(MTable owner, String name) {
 
@@ -43,8 +43,10 @@ public abstract class MField<T> {
 
         this.name = name;
         calculated = false;
+        newFinal = false;
+        autoInc = false;
+        readOnly = false;
         required = false;
-        notNullable = false;
         index = table.fieldList.size();
         table.fieldList.add(this);
         if (table.tableState == null) {
@@ -54,20 +56,11 @@ public abstract class MField<T> {
         initialize();
     }
 
-    void fieldStatePull() {
-        if (fieldStateIndex == 0) {
-            throw new RuntimeException("fieldStateIndex out of bounds.");
-        }
-        fieldState = fieldStateList.get(--fieldStateIndex);
-    }
+    /**
+     * initialize
+     */
+    protected void initialize() {
 
-    void fieldStatePush() {
-        if (fieldStateIndex == 0) {
-            fieldStateList.add(fieldState);
-        }
-        ++fieldStateIndex;
-        fieldState = new FieldState();
-        fieldStateList.add(fieldState);
     }
 
     public boolean find() {
@@ -86,7 +79,7 @@ public abstract class MField<T> {
      * @param keyValue
      * @return
      */
-    public boolean find(T keyValue) {
+    public boolean find(Object keyValue) {
         ArrayList<Document> pipeline = new ArrayList<>();
         pipeline.add(
                 new Document().
@@ -99,23 +92,6 @@ public abstract class MField<T> {
     }
 
     public abstract T getAsValue(Object anyValue);
-
-    /**
-     * getCalculatedValue
-     *
-     * @return
-     */
-    private T getCalculatedValue() {
-        T value = null;
-        if (calculated) {
-            try {
-                value = calcValue.call();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return value;
-    }
 
     /**
      * getDescription
@@ -134,11 +110,16 @@ public abstract class MField<T> {
     }
 
     /**
-     * getEmptyValue
+     * getLabel
      *
-     * @return empty value for the field type
+     * @return String label for field
      */
-    abstract public T getEmptyValue();
+    public String getLabel() {
+        if (label == null) {
+            return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
+        }
+        return label;
+    }
 
     protected abstract MTable.FIELD_TYPE getFieldType();
 
@@ -157,18 +138,6 @@ public abstract class MField<T> {
      */
     public HashMap<T, String> getValueItems() {
         return valueItems;
-    }
-
-    /**
-     * getLabel
-     *
-     * @return String label for field
-     */
-    public String getLabel() {
-        if (label == null) {
-            return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
-        }
-        return label;
     }
 
     public T getMaxValue() {
@@ -194,6 +163,13 @@ public abstract class MField<T> {
         }
         return value;
     }
+
+    /**
+     * getEmptyValue
+     *
+     * @return empty value for the field type
+     */
+    abstract public T getEmptyValue();
 
     /**
      * getNewValue
@@ -252,17 +228,6 @@ public abstract class MField<T> {
     }
 
     /**
-     * initialize
-     */
-    protected void initialize() {
-
-    }
-
-    public boolean isCalculated() {
-        return calculated;
-    }
-
-    /**
      * isEmpty
      *
      * @return
@@ -272,12 +237,57 @@ public abstract class MField<T> {
         return value == null || value.equals(getEmptyValue());
     }
 
+    /**
+     * value
+     *
+     * @return value of field
+     */
+    public final T value() {
+        if (calculated) {
+            return getCalculatedValue();
+        }
+        return getTypedValue();
+        //return fieldState.value;
+    }
+
+    /**
+     * getCalculatedValue
+     *
+     * @return
+     */
+    private T getCalculatedValue() {
+        T value = null;
+        if (calculated) {
+            try {
+                value = calcValue.call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return value;
+    }
+
+    protected abstract T getTypedValue();
+
+    public boolean isCalculated() {
+        return calculated;
+    }
+
     public boolean isReadOnly() {
-        return calculated || autoInc;
+        return calculated || autoInc || (newFinal && table.tableState.state == MTable.STATE.EDIT) || readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+        table.tableState.set_UI_state(this);
     }
 
     public void setFilterValue(T value) {
-        fieldState.filterValue = value;
+        getFieldState().filterValue = value;
+    }
+
+    public MField.FieldState getFieldState() {
+        return table.tableState.fieldStateList.get(index);
     }
 
     /**
@@ -296,6 +306,10 @@ public abstract class MField<T> {
             return false;
         }
 
+        if (newFinal && table.tableState.state == MTable.STATE.EDIT) {
+            return false;
+        }
+
         if (value != null && valueItems != null) {
             if (!valueItems.containsKey(value)) {
                 if (value.equals(getEmptyValue())) {
@@ -306,10 +320,9 @@ public abstract class MField<T> {
             }
         }
 
-        /* TODO: validate against notNullable value */
         //this.fieldState.value = value;
         if (table.tableState.setFieldValue(index, value)) {
-            if (runnableOnAfterChangeValue !=null) {
+            if (runnableOnAfterChangeValue != null) {
                 try {
                     runnableOnAfterChangeValue.run();
                 } catch (Exception e) {
@@ -322,21 +335,6 @@ public abstract class MField<T> {
     }
 
     abstract public boolean setValueAsString(String value);
-
-    /**
-     * value
-     *
-     * @return value of field
-     */
-    public final T value() {
-        if (calculated) {
-            return getCalculatedValue();
-        }
-        return getTypedValue();
-        //return fieldState.value;
-    }
-
-    protected abstract T getTypedValue();
 
     public final T value(T defaultValue) {
         T value = value();
@@ -354,32 +352,42 @@ public abstract class MField<T> {
      * @return boolean if value has changed
      */
     boolean valueChanged() {
-        return !(getTypedValue() == fieldState.
-                origValue);
+        return !(getTypedValue() == getFieldState().origValue);
     }
 
     @SuppressWarnings("WeakerAccess")
-    final public T getDefaultValue() {
-        if (fieldState.defaultValue == null) {
+    final public Object getDefaultValue() {
+        if (getFieldState().defaultValue == null) {
             try {
                 return callableNewValue.call();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        return fieldState.defaultValue;
+        return getFieldState().defaultValue;
     }
 
     @SuppressWarnings("unused")
     final public void setDefaultValue(T defaultValue) {
-        fieldState.defaultValue = defaultValue;
+        getFieldState().defaultValue = defaultValue;
     }
 
-    class FieldState {
-        T filterValue;
-        T value;
-        T defaultValue;
-        T origValue;
+    public String toString() {
+        Object value = value();
+        String s = table.getClass().getSimpleName() + "@" + getClass().getSuperclass().getSimpleName();
+        s += "[name=" + name + "]";
+        s += "'" + (value == null ? "null" : value.toString()) + "'";
+        return s;
+    }
+
+    public class FieldState<U> {
+        public Node node; /* TODO: move this to TableState.ui_changeListener */
+        U filterValue;
+        U value;
+        U defaultValue;
+        U origValue;
+        Document document;
+        UI_ChangeListener ui_changeListener;
 
         FieldState cloneThis() {
             FieldState fieldState = new FieldState();
@@ -387,7 +395,12 @@ public abstract class MField<T> {
             fieldState.value = this.value;
             fieldState.defaultValue = this.defaultValue;
             fieldState.origValue = this.origValue;
+            fieldState.document = this.document;
             return fieldState;
+        }
+
+        public void setChangeListener(UI_ChangeListener ui_changeListener) {
+            this.ui_changeListener = ui_changeListener;
         }
     }
 }

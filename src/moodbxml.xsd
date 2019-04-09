@@ -42,8 +42,8 @@
         <xs:attribute name="label" type="xs:string"/>
         <xs:attribute name="calculated" type="xs:boolean"/>
         <xs:attribute name="required" type="xs:boolean"/>
-        <xs:attribute name="notNullable" type="xs:boolean"/>
         <xs:attribute name="validate" type="xs:boolean"/>
+        <xs:attribute name="newFinal" type="xs:boolean"/>
     </xs:complexType>
     <xs:complexType name="FieldBooleanType">
         <xs:complexContent>
@@ -54,7 +54,6 @@
     <xs:complexType name="FieldDateType">
         <xs:complexContent>
             <xs:extension base="FieldBaseType">
-                <xs:attribute name="newDate" type="xs:boolean"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

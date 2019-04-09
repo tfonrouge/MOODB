@@ -57,22 +57,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         return tableView;
     }
 
-    protected abstract String[] getColumns();
-
-    private void buildTableView() {
-
-        tableView.getColumns().clear();
-
-        tableView.setMaxHeight(Control.USE_COMPUTED_SIZE);
-
-        buildColumns();
-
-        populateList();
-
-        tableView.setItems(observableList);
-
-    }
-
     void buildUI(@NotNull Parent parent) {
 
         menuItem_cerrar.setAccelerator(new KeyCodeCombination(KeyCode.ESCAPE));
@@ -100,6 +84,20 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         stage.show();
     }
 
+    private void buildTableView() {
+
+        tableView.getColumns().clear();
+
+        tableView.setMaxHeight(Control.USE_COMPUTED_SIZE);
+
+        buildColumns();
+
+        populateList();
+
+        tableView.setItems(observableList);
+
+    }
+
     private void buildColumns() {
 
         for (String fieldExpression : getColumns()) {
@@ -109,65 +107,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             tableView.getColumns().add(column);
 
         }
-    }
-
-    private TableColumn<MBaseData, ?> getColumn(String fieldExpression) {
-
-        if (fieldExpression.indexOf('.') > 0) {
-            String[] fieldList = fieldExpression.split("\\.");
-            if (fieldList.length > 1) {
-                TableColumn<MBaseData, String> column;
-                column = new TableColumn<>();
-                column.setCellValueFactory(param -> {
-
-                    String label;
-                    String value;
-                    Document document = param.getValue().getTableState().getLookupDocument().get("@" + fieldList[0], Document.class);
-
-                    MField mField;
-                    MFieldTableField mFieldTableField = param.getValue().getTable().fieldTableFieldByName(fieldList[0]);
-
-                    if (document != null && mFieldTableField != null) {
-                        label = mFieldTableField.getLabel();
-                        int i = 1;
-                        do {
-                            mField = mFieldTableField.linkedTable().fieldByName(fieldList[i]);
-                            if (mField != null) {
-                                if (mField instanceof MFieldTableField) {
-                                    mFieldTableField = (MFieldTableField) mField;
-                                } else {
-                                    mFieldTableField = null;
-                                }
-                                label += " " + mField.getLabel();
-                                value = document.get(mField.getName()).toString();
-                            } else {
-                                label = "!" + fieldExpression + "!";
-                                value = "!error!";
-                                break;
-                            }
-                            document = document.get("@" + mField.getName(), Document.class);
-                        } while (mFieldTableField != null && document != null && ++i < fieldList.length);
-                    } else {
-                        label = "!" + fieldExpression + "!";
-                        value = "!error!";
-                    }
-
-                    column.setText(label);
-                    return new ReadOnlyObjectWrapper<>(value);
-                });
-                return column;
-            }
-        } else {
-            MField mField = table.fieldByName(fieldExpression);
-            if (mField != null) {
-                TableColumn<MBaseData, ?> column;
-                column = new TableColumn<>(mField.getLabel());
-                column.setCellValueFactory(new PropertyValueFactory<>(mField.getName()));
-                return column;
-            }
-        }
-
-        return new TableColumn<>(fieldExpression);
     }
 
     void populateList() {
@@ -189,11 +128,79 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
+    protected abstract String[] getColumns();
+
+    private TableColumn<MBaseData, ?> getColumn(String fieldExpression) {
+
+        if (fieldExpression.indexOf('.') > 0) {
+            String[] fieldList = fieldExpression.split("\\.");
+            if (fieldList.length > 1) {
+                TableColumn<MBaseData, String> column;
+                column = new TableColumn<>();
+                column.setCellValueFactory(param -> {
+
+                    String label = "";
+                    String value = "";
+
+                    MFieldTableField mFieldTableField = param.getValue().getTable().fieldTableFieldByName(fieldList[0]);
+
+                    if (mFieldTableField != null) {
+                        Document document = param.getValue().getTableState().getFieldStateDocument(mFieldTableField.index);
+                        if (document != null) {
+                            label = mFieldTableField.getLabel();
+                            int i = 1;
+                            do {
+                                MField mField = mFieldTableField.linkedTable().fieldByName(fieldList[i]);
+                                if (mField != null) {
+                                    if (mField instanceof MFieldTableField) {
+                                        mFieldTableField = (MFieldTableField) mField;
+                                    } else {
+                                        mFieldTableField = null;
+                                    }
+                                    label += " " + mField.getLabel();
+                                    if (mField.isCalculated()) {
+                                        value = mField.valueAsString();
+                                    } else {
+                                        value = document.get(mField.getName()).toString();
+                                    }
+                                } else {
+                                    //label = "!" + fieldExpression + "!";
+                                    //value = "!error!";
+                                    break;
+                                }
+                                document = document.get("@" + mField.getName(), Document.class);
+                            } while (mFieldTableField != null && document != null && ++i < fieldList.length);
+                        }
+                    }
+
+                    column.setText(label);
+                    return new ReadOnlyObjectWrapper<>(value);
+                });
+                return column;
+            }
+        } else {
+            MField mField = table.fieldByName(fieldExpression);
+            if (mField != null) {
+                TableColumn<MBaseData, ?> column;
+                column = new TableColumn<>(mField.getLabel());
+                column.setCellValueFactory(new PropertyValueFactory<>(mField.getName()));
+                return column;
+            }
+        }
+
+        return new TableColumn<>(fieldExpression);
+    }
+
     public T getTable() {
         return table;
     }
 
-    abstract protected String getResourceRecordName();
+    @SuppressWarnings("unused")
+    public void onActionInsertDocument() {
+        if (table.insert()) {
+            doInsertEdit();
+        }
+    }
 
     private void doInsertEdit() {
         String resourceRecordName = getResourceRecordName();
@@ -288,12 +295,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
-    @SuppressWarnings("unused")
-    public void onActionInsertDocument() {
-        if (table.insert()) {
-            doInsertEdit();
-        }
-    }
+    abstract protected String getResourceRecordName();
 
     @SuppressWarnings("unused")
     public void onActionEditDocument() {
