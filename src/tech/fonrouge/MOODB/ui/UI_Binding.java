@@ -203,6 +203,19 @@ public class UI_Binding<T extends MTable> {
     }
 
     /**
+     * @param textField
+     * @param mFieldDate
+     */
+    @SuppressWarnings("unused")
+    final protected void bindControl(TextField textField, MFieldDate mFieldDate) {
+        registerControl(mFieldDate, textField);
+
+        textField.textProperty().set(mFieldDate.valueAsString());
+        textField.textProperty().addListener((observable, oldValue, newValue) -> mFieldDate.setValueAsString(newValue));
+        textField.setPromptText(mFieldDate.getDescription());
+    }
+
+    /**
      * @param integerSpinner
      * @param fieldInteger
      */
@@ -224,18 +237,5 @@ public class UI_Binding<T extends MTable> {
 
         checkBox.setSelected(mFieldBoolean.value());
         checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> mFieldBoolean.setValue(newValue));
-    }
-
-    /**
-     * @param textField
-     * @param mFieldDate
-     */
-    @SuppressWarnings("unused")
-    final protected void bindControl(TextField textField, MFieldDate mFieldDate) {
-        registerControl(mFieldDate, textField);
-
-        textField.textProperty().set(mFieldDate.valueAsString());
-        textField.textProperty().addListener((observable, oldValue, newValue) -> mFieldDate.setValueAsString(newValue));
-        textField.setPromptText(mFieldDate.getDescription());
     }
 }
