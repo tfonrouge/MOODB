@@ -381,13 +381,12 @@ public abstract class MField<T> {
     }
 
     public class FieldState<U> {
-        public Node node; /* TODO: move this to TableState.ui_changeListener */
         U filterValue;
         U value;
         U defaultValue;
         U origValue;
         Document document;
-        UI_ChangeListener ui_changeListener;
+        public UI_ChangeListener ui_changeListener;
 
         FieldState cloneThis() {
             FieldState fieldState = new FieldState();
@@ -397,10 +396,6 @@ public abstract class MField<T> {
             fieldState.origValue = this.origValue;
             fieldState.document = this.document;
             return fieldState;
-        }
-
-        public void setChangeListener(UI_ChangeListener ui_changeListener) {
-            this.ui_changeListener = ui_changeListener;
         }
     }
 }

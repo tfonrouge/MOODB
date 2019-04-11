@@ -83,6 +83,10 @@ abstract public class MTable {
         field__id.table.tableState.setFieldValue(field__id.index, value);
     }
 
+    /**
+     * @param fieldName name of looked field
+     * @return MField
+     */
     public MField fieldByName(String fieldName) {
         for (MField mField : fieldList) {
             if (mField.name.contentEquals(fieldName)) {
@@ -536,7 +540,9 @@ abstract public class MTable {
         }
         ++tableStateIndex;
         tableState = new TableState();
-        tableState.fieldStateList = new ArrayList<>(currentTableState.fieldStateList);
+        for (MField.FieldState fieldState : currentTableState.fieldStateList) {
+            tableState.fieldStateList.add(fieldState.cloneThis());
+        }
         tableStateList.add(tableState);
     }
 

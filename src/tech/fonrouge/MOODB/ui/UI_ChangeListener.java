@@ -3,14 +3,28 @@ package tech.fonrouge.MOODB.ui;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.Node;
 import tech.fonrouge.MOODB.MField;
 import tech.fonrouge.MOODB.MFieldTableField;
 
-public abstract class UI_ChangeListener<T, U> implements ChangeListener<T> {
-    U property;
+public abstract class UI_ChangeListener<T> implements ChangeListener<T> {
+    public Node node;
     MFieldTableField mFieldTableField = null;
     MField<T> mField;
     private boolean ignore = false;
+
+    UI_ChangeListener(Node node, MField<T> mField) {
+        this.node = node;
+        this.mField = mField;
+        this.mField.getFieldState().ui_changeListener = this;
+    }
+
+    UI_ChangeListener(Node node, MFieldTableField mFieldTableField, String detailField) {
+        this.node = node;
+        this.mFieldTableField = mFieldTableField;
+        this.mField = mFieldTableField.syncedTable().fieldByName(detailField);
+        this.mFieldTableField.getFieldState().ui_changeListener = this;
+    }
 
     abstract T propertyGetValue();
 
@@ -18,8 +32,8 @@ public abstract class UI_ChangeListener<T, U> implements ChangeListener<T> {
 
     @Override
     final public void changed(ObservableValue<? extends T> observable, T oldValue, T newValue) {
-        if (mFieldTableField == null) {
-            if (!ignore) {
+        if (!ignore) {
+            if (mFieldTableField == null) {
                 if (!mField.setValue(newValue)) {
                     ignore = true;
                     Platform.runLater(() -> {
@@ -27,9 +41,7 @@ public abstract class UI_ChangeListener<T, U> implements ChangeListener<T> {
                         ignore = false;
                     });
                 }
-            }
-        } else {
-            if (!ignore) {
+            } else {
                 if (!mField.find(newValue)) {
                     ignore = true;
                     Platform.runLater(() -> {

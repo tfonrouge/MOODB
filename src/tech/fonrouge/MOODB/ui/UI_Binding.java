@@ -123,6 +123,11 @@ public class UI_Binding<T extends MTable> {
         }
     }
 
+    private void registerControl(MField mField, Node node) {
+        nodeHashMap.put(mField.getName(), node);
+        node.setDisable(mField.isReadOnly());
+    }
+
     /**
      * @param textField
      * @param fieldTableField
@@ -132,13 +137,7 @@ public class UI_Binding<T extends MTable> {
     @SuppressWarnings("unused")
     protected <U extends MTable> void bindControl(TextField textField, MFieldTableField<U> fieldTableField, String detailField) {
         registerControl(fieldTableField, textField);
-        textField.textProperty().addListener(new UI_ChangeListenerTextFieldTFT(textField, fieldTableField, detailField));
-    }
-
-    protected void registerControl(MField mField, Node node) {
-        nodeHashMap.put(mField.getName(), node);
-        mField.getFieldState().node = node;
-        node.setDisable(mField.isReadOnly());
+        textField.textProperty().addListener(new UI_ChangeListenerTextField(textField, fieldTableField, detailField));
     }
 
     /**
@@ -150,7 +149,7 @@ public class UI_Binding<T extends MTable> {
     @SuppressWarnings("unused")
     final protected <U extends MTable> void bindControl(ComboBox<Object> comboBox, MFieldTableField<U> fieldTableField, String detailField) {
         registerControl(fieldTableField, comboBox);
-        comboBox.valueProperty().addListener(new UI_ChangeListenerComboBoxTFT(comboBox, fieldTableField, detailField));
+        comboBox.valueProperty().addListener(new UI_ChangeListenerComboBox<>(comboBox, fieldTableField, detailField));
     }
 
     /**
@@ -160,20 +159,17 @@ public class UI_Binding<T extends MTable> {
     @SuppressWarnings("unused")
     final protected void bindControl(ComboBox<String> comboBox, MFieldString fieldString) {
         registerControl(fieldString, comboBox);
-        comboBox.valueProperty().addListener(new UI_ChangeListenerComboBoxString(comboBox, fieldString));
+        comboBox.valueProperty().addListener(new UI_ChangeListenerComboBox<>(comboBox, fieldString));
     }
 
     /**
-     * @param textField
-     * @param fieldString
+     * @param textInputControl
+     * @param mFieldString
      */
     @SuppressWarnings("unused")
-    final protected void bindControl(TextInputControl textField, MFieldString fieldString) {
-        registerControl(fieldString, textField);
-
-        textField.textProperty().set(fieldString.value());
-        textField.textProperty().addListener((observable, oldValue, newValue) -> fieldString.setValue(newValue));
-        textField.setPromptText(fieldString.getDescription());
+    final protected void bindControl(TextInputControl textInputControl, MFieldString mFieldString) {
+        registerControl(mFieldString, textInputControl);
+        textInputControl.textProperty().addListener(new UI_ChangeListenerTextField(textInputControl, mFieldString));
     }
 
     /**
@@ -183,6 +179,7 @@ public class UI_Binding<T extends MTable> {
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldInteger fieldInteger) {
         registerControl(fieldInteger, textField);
+        //textField.textProperty().addListener(new UI_ChangeListenerTextField(textField, fieldInteger));
 
         textField.textProperty().set(String.valueOf(fieldInteger.value()));
         textField.textProperty().addListener((observable, oldValue, newValue) -> fieldInteger.setValue(Integer.valueOf(newValue)));

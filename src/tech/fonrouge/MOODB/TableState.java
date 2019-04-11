@@ -42,9 +42,6 @@ public class TableState {
             if (fieldState.ui_changeListener != null) {
                 fieldState.ui_changeListener = null;
             }
-            if (fieldState.node != null) {
-                fieldState.node = null;
-            }
         }
     }
 
@@ -91,8 +88,8 @@ public class TableState {
 
     void set_UI_state(MField mField) {
         MField.FieldState fieldState = fieldStateList.get(mField.index);
-        if (fieldState.node != null) {
-            fieldState.node.setDisable(mField.isReadOnly());
+        if (fieldState.ui_changeListener != null) {
+            fieldState.ui_changeListener.node.setDisable(mField.isReadOnly());
         }
     }
 
