@@ -12,14 +12,14 @@ class UI_ChangeListenerTextField extends UI_ChangeListener<String> {
 
     UI_ChangeListenerTextField(TextField textField, MFieldTableField mFieldTableField, String detailField) {
         super(textField, mFieldTableField, detailField);
-        intialize(textField);
+        initialize(textField);
     }
 
     public UI_ChangeListenerTextField(TextInputControl textInputControl, MFieldString mFieldString) {
         super(textInputControl, mFieldString);
     }
 
-    private void intialize(TextField textField) {
+    private void initialize(TextField textField) {
         textField.setPromptText(mField.getDescription());
         property = textField.textProperty();
         property.setValue(mField.value());
