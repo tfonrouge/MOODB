@@ -20,7 +20,6 @@ abstract public class MTable {
     ArrayList<MIndex> indices = new ArrayList<>();
     MEngine engine;
     TableState tableState;
-    Document filter;
     private MDatabase database;
     private int tableStateIndex = 0;
     private ArrayList<TableState> tableStateList = new ArrayList<>();
@@ -357,6 +356,7 @@ abstract public class MTable {
     /**
      * @return linkedField
      */
+    @SuppressWarnings("unused")
     public MFieldTableField<? extends MTable> getLinkedField() {
         return tableState.linkedField;
     }
@@ -395,6 +395,7 @@ abstract public class MTable {
      *
      * @param objectId : _id of rawDocument to go
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean goTo(Object objectId) {
         return engine.goTo(objectId);
     }
@@ -402,6 +403,7 @@ abstract public class MTable {
     /**
      * @return true if current cursor is valid and his hasNext() is true
      */
+    @SuppressWarnings("unused")
     public boolean hasNext() {
         return tableState.mongoCursor != null && tableState.mongoCursor.hasNext();
     }
