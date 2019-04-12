@@ -179,11 +179,7 @@ public class UI_Binding<T extends MTable> {
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldInteger fieldInteger) {
         registerControl(fieldInteger, textField);
-        //textField.textProperty().addListener(new UI_ChangeListenerTextField(textField, fieldInteger));
-
-        textField.textProperty().set(String.valueOf(fieldInteger.value()));
-        textField.textProperty().addListener((observable, oldValue, newValue) -> fieldInteger.setValue(Integer.valueOf(newValue)));
-        textField.setPromptText(fieldInteger.getDescription());
+        textField.textProperty().addListener(new UI_ChangeListenerStringProperty<>(textField, fieldInteger));
     }
 
     /**
@@ -193,10 +189,7 @@ public class UI_Binding<T extends MTable> {
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldDouble fieldDouble) {
         registerControl(fieldDouble, textField);
-
-        textField.textProperty().set(String.valueOf(fieldDouble.value()));
-        textField.textProperty().addListener((observable, oldValue, newValue) -> fieldDouble.setValue(Double.valueOf(newValue)));
-        textField.setPromptText(fieldDouble.getDescription());
+        textField.textProperty().addListener(new UI_ChangeListenerStringProperty<>(textField, fieldDouble));
     }
 
     /**
@@ -206,10 +199,7 @@ public class UI_Binding<T extends MTable> {
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldDate mFieldDate) {
         registerControl(mFieldDate, textField);
-
-        textField.textProperty().set(mFieldDate.valueAsString());
-        textField.textProperty().addListener((observable, oldValue, newValue) -> mFieldDate.setValueAsString(newValue));
-        textField.setPromptText(mFieldDate.getDescription());
+        textField.textProperty().addListener(new UI_ChangeListenerStringProperty<>(textField, mFieldDate));
     }
 
     /**
@@ -217,11 +207,9 @@ public class UI_Binding<T extends MTable> {
      * @param fieldInteger
      */
     @SuppressWarnings("unused")
-    final protected void bindControl(Spinner<Integer> integerSpinner, MFieldInteger fieldInteger) {
+    public void bindControl(Spinner<Integer> integerSpinner, MFieldInteger fieldInteger) {
         registerControl(fieldInteger, integerSpinner);
-
-        integerSpinner.getValueFactory().setValue(fieldInteger.value());
-        integerSpinner.getValueFactory().valueProperty().addListener((observable, oldValue, newValue) -> fieldInteger.setValue(newValue));
+        integerSpinner.getValueFactory().valueProperty().addListener(new UI_ChangeListenerSpinnerInteger(integerSpinner, fieldInteger));
     }
 
     /**
