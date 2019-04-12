@@ -6,20 +6,20 @@ import javafx.scene.control.TextInputControl;
 import tech.fonrouge.MOODB.MFieldString;
 import tech.fonrouge.MOODB.MFieldTableField;
 
-class UI_ChangeListenerTextField extends UI_ChangeListener<String> {
+class UI_ChangeListenerTextField extends UI_ChangeListener<String, TextInputControl> {
 
     private StringProperty property;
 
     UI_ChangeListenerTextField(TextField textField, MFieldTableField mFieldTableField, String detailField) {
         super(textField, mFieldTableField, detailField);
-        initialize(textField);
     }
 
-    public UI_ChangeListenerTextField(TextInputControl textInputControl, MFieldString mFieldString) {
+    UI_ChangeListenerTextField(TextInputControl textInputControl, MFieldString mFieldString) {
         super(textInputControl, mFieldString);
     }
 
-    private void initialize(TextField textField) {
+    @Override
+    void initialize(TextInputControl textField) {
         textField.setPromptText(mField.getDescription());
         property = textField.textProperty();
         property.setValue(mField.value());

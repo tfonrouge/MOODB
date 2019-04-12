@@ -10,21 +10,19 @@ import tech.fonrouge.MOODB.MTable;
 
 import java.util.HashMap;
 
-class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T> {
+class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T, ComboBox<T>> {
 
     private ObjectProperty<T> property;
 
     UI_ChangeListenerComboBox(ComboBox<T> comboBox, MField<T> mField) {
         super(comboBox, mField);
-        initialize(comboBox);
     }
 
     UI_ChangeListenerComboBox(ComboBox<T> comboBox, MFieldTableField fieldTableField, String detailField) {
         super(comboBox, fieldTableField, detailField);
-        initialize(comboBox);
     }
 
-    private void initialize(ComboBox<T> comboBox) {
+    void initialize(ComboBox<T> comboBox) {
         comboBox.setPromptText(mField.getDescription());
         comboBox.setItems(getObservableArrayList());
         property = comboBox.valueProperty();
