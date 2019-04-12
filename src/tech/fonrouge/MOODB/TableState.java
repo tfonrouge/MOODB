@@ -45,7 +45,7 @@ public class TableState {
         }
     }
 
-    public MField.FieldState getFieldStateList(int index) {
+    MField.FieldState getFieldState(int index) {
         return fieldStateList.get(index);
     }
 
