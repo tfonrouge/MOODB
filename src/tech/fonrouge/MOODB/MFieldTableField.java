@@ -5,8 +5,6 @@ import org.bson.types.ObjectId;
 
 public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
 
-    boolean notSynced = false;
-
     /**
      * true if document has to be included in aggregated lookup field
      */
