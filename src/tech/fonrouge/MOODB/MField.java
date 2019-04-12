@@ -1,9 +1,8 @@
 package tech.fonrouge.MOODB;
 
 import com.mongodb.client.MongoCursor;
-import javafx.scene.Node;
 import org.bson.Document;
-import tech.fonrouge.MOODB.ui.UI_ChangeListener;
+import tech.fonrouge.MOODB.ui.UI_ChangeListener0;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -380,13 +379,13 @@ public abstract class MField<T> {
         return s;
     }
 
-    public class FieldState<U> {
-        U filterValue;
-        U value;
-        U defaultValue;
-        U origValue;
+    public class FieldState {
+        public UI_ChangeListener0 ui_changeListener;
+        T filterValue;
+        T value;
+        T defaultValue;
+        T origValue;
         Document document;
-        public UI_ChangeListener ui_changeListener;
 
         FieldState cloneThis() {
             FieldState fieldState = new FieldState();
