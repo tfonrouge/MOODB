@@ -86,10 +86,10 @@ abstract public class MTable {
      * @param fieldName name of looked field
      * @return MField
      */
-    public MField fieldByName(String fieldName) {
+    public <T> MField<T> fieldByName(String fieldName) {
         for (MField mField : fieldList) {
             if (mField.name.contentEquals(fieldName)) {
-                return mField;
+                return (MField<T>) mField; /* TODO: fix this */
             }
         }
         return null;
@@ -253,9 +253,6 @@ abstract public class MTable {
 
         /* fill field values */
         fieldList.forEach(mField -> {
-            if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
-                ((MFieldTableField) mField).notSynced = true;
-            }
             mField.getFieldState().origValue = mField.getTypedValue();
         });
 
@@ -422,9 +419,6 @@ abstract public class MTable {
         }
 
         fieldList.forEach(mField -> {
-            if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
-                ((MFieldTableField) mField).notSynced = true;
-            }
             tableState.setFieldValue(mField.index, null);
         });
 
