@@ -24,6 +24,10 @@ public class InvoiceData<T extends Invoice> extends Base01Data<T> {
         return tableState.getFieldValue(table.field_date, Date.class);
     }
 
+    public Integer getDaysOfCredit() {
+        return tableState.getFieldValue(table.field_daysOfCredit, Integer.class);
+    }
+
     public Long getItemsCount() {
         return tableState.getFieldValue(table.field_itemsCount, Long.class);
     }

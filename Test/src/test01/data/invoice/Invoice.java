@@ -38,6 +38,13 @@ public class Invoice extends Base01 {
         }
     };
 
+    public final MFieldInteger field_daysOfCredit = new MFieldInteger(this, "daysOfCredit") {
+        @Override
+        protected void initialize() {
+            required = true;
+        }
+    };
+
     public final MFieldLong field_itemsCount = new MFieldLong(this, "itemsCount") {
         @Override
         protected void initialize() {
