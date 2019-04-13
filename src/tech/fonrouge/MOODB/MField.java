@@ -2,7 +2,6 @@ package tech.fonrouge.MOODB;
 
 import com.mongodb.client.MongoCursor;
 import org.bson.Document;
-import tech.fonrouge.MOODB.ui.UI_ChangeListener0;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +26,6 @@ public abstract class MField<T> {
     Callable<T> callableNewValue;
     Runnable runnableOnAfterChangeValue;
     private String invalidCause = null;
-
     MField(MTable owner, String name) {
 
         table = owner;
@@ -53,6 +51,10 @@ public abstract class MField<T> {
         }
         table.tableState.fieldStateList.add(new FieldState());
         initialize();
+    }
+
+    public MTable getTable() {
+        return table;
     }
 
     /**
@@ -375,7 +377,7 @@ public abstract class MField<T> {
         Object value = value();
         String s = table.getClass().getSimpleName() + "@" + getClass().getSuperclass().getSimpleName();
         s += "[name=" + name + "]";
-        s += "'" + (value == null ? "null" : value.toString()) + "'";
+        s += "=" + (value == null ? "null" : value.toString());
         return s;
     }
 }

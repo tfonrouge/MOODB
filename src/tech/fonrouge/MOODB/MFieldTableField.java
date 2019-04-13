@@ -9,7 +9,6 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
      * true if document has to be included in aggregated lookup field
      */
     private boolean lookupDocument = false;
-    private T linkedTable;
 
     protected MFieldTableField(MTable owner, String name) {
         super(owner, name);
@@ -31,10 +30,10 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
     }
 
     public final T linkedTable() {
-        if (linkedTable == null) {
-            linkedTable = initializeTableField();
+        if (getFieldState().linkedTable == null) {
+            getFieldState().linkedTable = initializeTableField();
         }
-        return linkedTable;
+        return (T) getFieldState().linkedTable;
     }
 
     private T initializeTableField() {
