@@ -71,10 +71,11 @@ public class UI_Binding<T extends MTable> {
         return null;
     }
 
-    private void invokeMethod(Method method, Object... objects) {
+    private boolean invokeMethod(Method method, Object... objects) {
         if (method != null) {
             try {
                 method.invoke(this, objects);
+                return true;
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 String s;
@@ -88,6 +89,7 @@ public class UI_Binding<T extends MTable> {
         } else {
             UI_Message.Warning("No Binding Method", "Params: " + Arrays.toString(objects));
         }
+        return false;
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -102,17 +104,21 @@ public class UI_Binding<T extends MTable> {
                 if (node != null) {
 
                     Method method;
+                    Boolean invoquedOk = null;
 
                     if (mField.fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
                         String name = declaredField.getName();
                         String subFieldName = name.substring(name.indexOf(mField.getName()) + mField.getName().length());
                         if (!subFieldName.isEmpty()) {
                             method = getBindControlMethod(getClass(), node.getClass(), mField.getClass().getSuperclass(), String.class);
-                            invokeMethod(method, node, mField, subFieldName.substring(1));
+                            invoquedOk = invokeMethod(method, node, mField, subFieldName.substring(1));
                         }
                     } else {
                         method = getBindControlMethod(getClass(), node.getClass(), mField.getClass().getSuperclass());
-                        invokeMethod(method, node, mField);
+                        invoquedOk = invokeMethod(method, node, mField);
+                    }
+                    if (invoquedOk!=null && invoquedOk) {
+                        registerControl(node, mField);
                     }
                 } else {
                     UI_Message.Warning("Control not valid", "Control: " + declaredField.toString());
@@ -123,7 +129,7 @@ public class UI_Binding<T extends MTable> {
         }
     }
 
-    private void registerControl(MField mField, Node node) {
+    private void registerControl(Node node, MField mField) {
         nodeHashMap.put(mField.getName(), node);
         node.setDisable(mField.isReadOnly());
     }
@@ -136,7 +142,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     protected <U extends MTable> void bindControl(TextField textField, MFieldTableField<U> fieldTableField, String detailField) {
-        registerControl(fieldTableField, textField);
+        registerControl(textField, fieldTableField);
         textField.textProperty().addListener(new UI_ChangeListenerTextField(textField, fieldTableField, detailField));
     }
 
@@ -148,7 +154,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected <U extends MTable> void bindControl(ComboBox<Object> comboBox, MFieldTableField<U> fieldTableField, String detailField) {
-        registerControl(fieldTableField, comboBox);
+        registerControl(comboBox, fieldTableField);
         comboBox.valueProperty().addListener(new UI_ChangeListenerComboBox<>(comboBox, fieldTableField, detailField));
     }
 
@@ -158,7 +164,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(ComboBox<String> comboBox, MFieldString fieldString) {
-        registerControl(fieldString, comboBox);
+        registerControl(comboBox, fieldString);
         comboBox.valueProperty().addListener(new UI_ChangeListenerComboBox<>(comboBox, fieldString));
     }
 
@@ -168,7 +174,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(TextInputControl textInputControl, MFieldString mFieldString) {
-        registerControl(mFieldString, textInputControl);
+        registerControl(textInputControl, mFieldString);
         textInputControl.textProperty().addListener(new UI_ChangeListenerTextField(textInputControl, mFieldString));
     }
 
@@ -178,7 +184,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldInteger fieldInteger) {
-        registerControl(fieldInteger, textField);
+        registerControl(textField, fieldInteger);
         textField.textProperty().addListener(new UI_ChangeListenerStringProperty<>(textField, fieldInteger));
     }
 
@@ -188,7 +194,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldDouble fieldDouble) {
-        registerControl(fieldDouble, textField);
+        registerControl(textField, fieldDouble);
         textField.textProperty().addListener(new UI_ChangeListenerStringProperty<>(textField, fieldDouble));
     }
 
@@ -198,7 +204,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldDate mFieldDate) {
-        registerControl(mFieldDate, textField);
+        registerControl(textField, mFieldDate);
         textField.textProperty().addListener(new UI_ChangeListenerStringProperty<>(textField, mFieldDate));
     }
 
@@ -208,7 +214,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     public void bindControl(Spinner<Integer> integerSpinner, MFieldInteger fieldInteger) {
-        registerControl(fieldInteger, integerSpinner);
+        registerControl(integerSpinner, fieldInteger);
         integerSpinner.getValueFactory().valueProperty().addListener(new UI_ChangeListenerSpinnerInteger(integerSpinner, fieldInteger));
     }
 
@@ -218,7 +224,7 @@ public class UI_Binding<T extends MTable> {
      */
     @SuppressWarnings("unused")
     final protected void bindControl(CheckBox checkBox, MFieldBoolean mFieldBoolean) {
-        registerControl(mFieldBoolean, checkBox);
+        registerControl(checkBox, mFieldBoolean);
 
         checkBox.setSelected(mFieldBoolean.value());
         checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> mFieldBoolean.setValue(newValue));
