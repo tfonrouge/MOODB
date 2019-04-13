@@ -378,23 +378,4 @@ public abstract class MField<T> {
         s += "'" + (value == null ? "null" : value.toString()) + "'";
         return s;
     }
-
-    public class FieldState {
-        public UI_ChangeListener0 ui_changeListener;
-        T filterValue;
-        T value;
-        T defaultValue;
-        T origValue;
-        Document document;
-
-        FieldState cloneThis() {
-            FieldState fieldState = new FieldState();
-            fieldState.filterValue = this.filterValue;
-            fieldState.value = this.value;
-            fieldState.defaultValue = this.defaultValue;
-            fieldState.origValue = this.origValue;
-            fieldState.document = this.document;
-            return fieldState;
-        }
-    }
 }
