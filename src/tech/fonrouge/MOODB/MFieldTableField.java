@@ -33,7 +33,7 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
         if (getFieldState().linkedTable == null) {
             getFieldState().linkedTable = initializeTableField();
         }
-        return (T) getFieldState().linkedTable;
+        return (T) getFieldState().linkedTable; // TODO: solve this unchecked cast
     }
 
     private T initializeTableField() {
