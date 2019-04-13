@@ -16,7 +16,7 @@ public class TableState {
     Exception exception;
     MFieldTableField<? extends MTable> linkedField;
 
-    List<MField.FieldState> fieldStateList;
+    List<FieldState> fieldStateList;
 
     TableState() {
         fieldStateList = new ArrayList<>();
@@ -38,14 +38,14 @@ public class TableState {
     }
 
     void clearBindings() {
-        for (MField.FieldState fieldState : fieldStateList) {
+        for (FieldState fieldState : fieldStateList) {
             if (fieldState.ui_changeListener != null) {
                 fieldState.ui_changeListener = null;
             }
         }
     }
 
-    MField.FieldState getFieldState(int index) {
+    FieldState getFieldState(int index) {
         return fieldStateList.get(index);
     }
 
@@ -73,7 +73,7 @@ public class TableState {
     }
 
     <T> boolean setFieldValue(int index, T value) {
-        MField.FieldState fieldState = fieldStateList.get(index);
+        FieldState fieldState = fieldStateList.get(index);
         Object oldValue = fieldState.value;
         if ((value != null && !value.equals(oldValue)) || (oldValue != null && !oldValue.equals(value))) {
             fieldState.value = value;
@@ -87,7 +87,7 @@ public class TableState {
     }
 
     void set_UI_state(MField mField) {
-        MField.FieldState fieldState = fieldStateList.get(mField.index);
+        FieldState fieldState = fieldStateList.get(mField.index);
         if (fieldState.ui_changeListener != null) {
             fieldState.ui_changeListener.node.setDisable(mField.isReadOnly());
         }

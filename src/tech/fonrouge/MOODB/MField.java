@@ -285,7 +285,7 @@ public abstract class MField<T> {
         getFieldState().filterValue = value;
     }
 
-    public MField.FieldState getFieldState() {
+    public FieldState getFieldState() {
         return table.tableState.fieldStateList.get(index);
     }
 

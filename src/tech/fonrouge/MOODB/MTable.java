@@ -536,7 +536,7 @@ abstract public class MTable {
         }
         ++tableStateIndex;
         tableState = new TableState();
-        for (MField.FieldState fieldState : currentTableState.fieldStateList) {
+        for (FieldState fieldState : currentTableState.fieldStateList) {
             tableState.fieldStateList.add(fieldState.cloneThis());
         }
         tableStateList.add(tableState);
