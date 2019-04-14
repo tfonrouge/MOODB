@@ -31,6 +31,10 @@ public class InvoiceData<T extends Invoice> extends Base01Data<T> {
     public Long getItemsCount() {
         return tableState.getFieldValue(table.field_itemsCount, Long.class);
     }
+
+    public Boolean getReqShipment() {
+        return tableState.getFieldValue(table.field_reqShipment, Boolean.class);
+    }
     /* @@ end field descriptor @@ */
 }
 

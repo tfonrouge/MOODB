@@ -12,6 +12,7 @@
         <oons:FieldDate name="date" required="true"/>
         <oons:FieldInteger name="daysOfCredit" required="true"/>
         <oons:FieldLong name="itemsCount" calculated="true"/>
+        <oons:FieldBoolean name="reqShipment" required="true"/>
 
     </oons:Fields>
 

@@ -16,9 +16,11 @@
         <oons:FieldBinary name="image"/>
         <oons:FieldString name="type">
             <oons:validValues>
-                <oons:value label="ANA"/>
+                <oons:value label="Item">"ITEM"</oons:value>
+                <oons:value label="Service">"SERVICE"</oons:value>
             </oons:validValues>
         </oons:FieldString>
+        <oons:FieldBoolean name="taxable" required="true"/>
 
     </oons:Fields>
 

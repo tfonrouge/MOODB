@@ -43,6 +43,10 @@ public class InventoryItemData<T extends InventoryItem> extends Base01Data<T> {
     public String getType() {
         return tableState.getFieldValue(table.field_type, String.class);
     }
+
+    public Boolean getTaxable() {
+        return tableState.getFieldValue(table.field_taxable, Boolean.class);
+    }
     /* @@ end field descriptor @@ */
 }
 

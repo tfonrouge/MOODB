@@ -68,7 +68,15 @@ public class InventoryItem extends Base01 {
         protected void initialize() {
 
             valueItems = new HashMap<>();
-            valueItems.put("ANA", "ANA");
+            valueItems.put("ITEM", "Item");
+            valueItems.put("SERVICE", "Service");
+        }
+    };
+
+    public final MFieldBoolean field_taxable = new MFieldBoolean(this, "taxable") {
+        @Override
+        protected void initialize() {
+            required = true;
         }
     };
 

@@ -44,7 +44,18 @@ public class Invoice extends Base01 {
             required = true;
         }
     };
-
+    public final MFieldBoolean field_reqShipment = new MFieldBoolean(this, "reqShipment") {
+        @Override
+        protected void initialize() {
+            required = true;
+        }
+    };
+    public final MIndex index_docNumber = new MIndex(this, "docNumber", "", "docNumber", true, false) {
+        @Override
+        protected void initialize() {
+        }
+    };
+    private InvoiceItem_xInvoice invoiceItemXInvoice;
     public final MFieldLong field_itemsCount = new MFieldLong(this, "itemsCount") {
         @Override
         protected void initialize() {
@@ -53,25 +64,17 @@ public class Invoice extends Base01 {
         }
     };
 
-    public final MIndex index_docNumber = new MIndex(this, "docNumber", "", "docNumber", true, false) {
-        @Override
-        protected void initialize() {
-        }
-    };
-
     @Override
     public final String getTableName() {
         return "invoice";
     }
+    /* @@ end field descriptor @@ */
+    //@formatter:on
 
     @Override
     public InvoiceData getData() {
         return new InvoiceData<>(this);
     }
-    /* @@ end field descriptor @@ */
-    //@formatter:on
-
-    private InvoiceItem_xInvoice invoiceItemXInvoice;
 
     /* @@ begin calcField_itemsCount @@ */
     public Long calcField_itemsCount() {
