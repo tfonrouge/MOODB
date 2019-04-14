@@ -35,7 +35,11 @@ public class MFieldBinary extends MField<Binary> {
 
     @Override
     public String valueAsString() {
-        Binary value = value();
+        return valueAsString(value());
+    }
+
+    @Override
+    public String valueAsString(Binary value) {
         if (value == null) {
             return "";
         }

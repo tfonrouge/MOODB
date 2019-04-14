@@ -37,7 +37,11 @@ public class MFieldBoolean extends MField<Boolean> {
 
     @Override
     public String valueAsString() {
-        Boolean value = value();
+        return valueAsString(value());
+    }
+
+    @Override
+    public String valueAsString(Boolean value) {
         if (value == null) {
             return "";
         }

@@ -70,7 +70,11 @@ public class MFieldInteger extends MField<Integer> {
 
     @Override
     public String valueAsString() {
-        Integer value = value();
+        return valueAsString(value());
+    }
+
+    @Override
+    public String valueAsString(Integer value) {
         if (value == null) {
             return "";
         }

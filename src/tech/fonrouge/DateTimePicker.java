@@ -19,7 +19,7 @@ public class DateTimePicker extends DatePicker {
     public static final String DefaultFormat = "yyyy-MM-dd HH:mm";
 
     private DateTimeFormatter formatter;
-    
+
     private ObjectProperty<LocalDateTime> dateTimeValue = new SimpleObjectProperty<>(LocalDateTime.now());
     private ObjectProperty<String> format = new SimpleObjectProperty<String>() {
         public void set(String newValue) {

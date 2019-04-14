@@ -35,7 +35,11 @@ public class MFieldObjectId extends MField<ObjectId> {
 
     @Override
     public String valueAsString() {
-        ObjectId value = value();
+        return valueAsString(value());
+    }
+
+    @Override
+    public String valueAsString(ObjectId value) {
         if (value == null) {
             return "";
         }

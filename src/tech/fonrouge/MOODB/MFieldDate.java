@@ -38,7 +38,11 @@ public class MFieldDate extends MField<Date> {
 
     @Override
     public String valueAsString() {
-        Date value = value();
+        return valueAsString(value());
+    }
+
+    @Override
+    public String valueAsString(Date value) {
         if (value == null) {
             return "";
         }

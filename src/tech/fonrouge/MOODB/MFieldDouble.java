@@ -39,7 +39,11 @@ public class MFieldDouble extends MField<Double> {
 
     @Override
     public String valueAsString() {
-        Double value = value();
+        return valueAsString(value());
+    }
+
+    @Override
+    public String valueAsString(Double value) {
         if (value == null) {
             return "";
         }

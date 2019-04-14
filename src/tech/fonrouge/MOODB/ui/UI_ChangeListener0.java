@@ -13,13 +13,33 @@ public abstract class UI_ChangeListener0<T, N extends Node, U> implements Change
         this.node = node;
         this.mField = mField;
         initialize(this.node);
+        addChangeListener(mField);
     }
 
     abstract void initialize(N node);
 
-    abstract public void update(U value);
+    abstract public void update(T value);
 
-    void setChangeListener(MField mField) {
-        mField.getFieldState().ui_changeListener = this;
+    public abstract void removePropertyListener();
+
+    boolean setmFieldValue(T value) {
+        mField.getFieldState().setCurrentChangeListener(this);
+        boolean result = mField.setValue(value);
+        mField.getFieldState().clearCurrentChangeListener();
+        return result;
+    }
+
+    void setmFieldValueAsString(String value) {
+        mField.getFieldState().setCurrentChangeListener(this);
+        boolean result = mField.setValueAsString(value);
+        mField.getFieldState().clearCurrentChangeListener();
+    }
+
+    private void addChangeListener(MField mField) {
+        mField.getFieldState().addListener(this);
+    }
+
+    public void refreshNode() {
+        update(mField.value());
     }
 }

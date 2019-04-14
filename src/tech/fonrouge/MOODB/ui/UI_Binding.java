@@ -117,7 +117,7 @@ public class UI_Binding<T extends MTable> {
                         method = getBindControlMethod(getClass(), node.getClass(), mField.getClass().getSuperclass());
                         invoquedOk = invokeMethod(method, node, mField);
                     }
-                    if (invoquedOk!=null && invoquedOk) {
+                    if (invoquedOk != null && invoquedOk) {
                         registerControl(node, mField);
                     }
                 } else {
@@ -134,99 +134,48 @@ public class UI_Binding<T extends MTable> {
         node.setDisable(mField.isReadOnly());
     }
 
-    /**
-     * @param textField
-     * @param fieldTableField
-     * @param detailField
-     * @param <U>
-     */
     @SuppressWarnings("unused")
     protected <U extends MTable> void bindControl(TextField textField, MFieldTableField<U> fieldTableField, String detailField) {
-        registerControl(textField, fieldTableField);
-        textField.textProperty().addListener(new UI_ChangeListenerTextField(textField, fieldTableField, detailField));
+        new UI_ChangeListenerTextInputControl<>(textField, fieldTableField.syncedTable().fieldByName(detailField));
     }
 
-    /**
-     * @param comboBox
-     * @param fieldTableField
-     * @param detailField
-     * @param <U>
-     */
     @SuppressWarnings("unused")
     final protected <U extends MTable> void bindControl(ComboBox<Object> comboBox, MFieldTableField<U> fieldTableField, String detailField) {
-        registerControl(comboBox, fieldTableField);
-        comboBox.valueProperty().addListener(new UI_ChangeListenerComboBox<>(comboBox, fieldTableField, detailField));
+        new UI_ChangeListenerComboBox<>(comboBox, fieldTableField.syncedTable().fieldByName(detailField));
     }
 
-    /**
-     * @param comboBox
-     * @param fieldString
-     */
     @SuppressWarnings("unused")
     final protected void bindControl(ComboBox<String> comboBox, MFieldString fieldString) {
-        registerControl(comboBox, fieldString);
-        comboBox.valueProperty().addListener(new UI_ChangeListenerComboBox<>(comboBox, fieldString));
+        new UI_ChangeListenerComboBox<>(comboBox, fieldString);
     }
 
-    /**
-     * @param textInputControl
-     * @param mFieldString
-     */
     @SuppressWarnings("unused")
     final protected void bindControl(TextInputControl textInputControl, MFieldString mFieldString) {
-        registerControl(textInputControl, mFieldString);
-        textInputControl.textProperty().addListener(new UI_ChangeListenerTextField(textInputControl, mFieldString));
+        new UI_ChangeListenerTextInputControl<>(textInputControl, mFieldString);
     }
 
-    /**
-     * @param textField
-     * @param fieldInteger
-     */
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldInteger fieldInteger) {
-        registerControl(textField, fieldInteger);
-        textField.textProperty().addListener(new UI_ChangeListenerStringProperty<>(textField, fieldInteger));
+        new UI_ChangeListenerTextInputControl<>(textField, fieldInteger);
     }
 
-    /**
-     * @param textField
-     * @param fieldDouble
-     */
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldDouble fieldDouble) {
-        registerControl(textField, fieldDouble);
-        textField.textProperty().addListener(new UI_ChangeListenerStringProperty<>(textField, fieldDouble));
+        new UI_ChangeListenerTextInputControl<>(textField, fieldDouble);
     }
 
-    /**
-     * @param textField
-     * @param mFieldDate
-     */
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldDate mFieldDate) {
-        registerControl(textField, mFieldDate);
-        textField.textProperty().addListener(new UI_ChangeListenerStringProperty<>(textField, mFieldDate));
+        new UI_ChangeListenerTextInputControl<>(textField, mFieldDate);
     }
 
-    /**
-     * @param integerSpinner
-     * @param fieldInteger
-     */
     @SuppressWarnings("unused")
     public void bindControl(Spinner<Integer> integerSpinner, MFieldInteger fieldInteger) {
-        registerControl(integerSpinner, fieldInteger);
-        integerSpinner.getValueFactory().valueProperty().addListener(new UI_ChangeListenerSpinnerInteger(integerSpinner, fieldInteger));
+        new UI_ChangeListenerSpinnerInteger(integerSpinner, fieldInteger);
     }
 
-    /**
-     * @param checkBox
-     * @param mFieldBoolean
-     */
     @SuppressWarnings("unused")
     final protected void bindControl(CheckBox checkBox, MFieldBoolean mFieldBoolean) {
-        registerControl(checkBox, mFieldBoolean);
-
-        checkBox.setSelected(mFieldBoolean.value());
-        checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> mFieldBoolean.setValue(newValue));
+        new UI_ChangeListenerCheckBox(checkBox, mFieldBoolean);
     }
 }

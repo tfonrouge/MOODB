@@ -11,7 +11,7 @@ class FieldFilterModel {
     FieldFilterModel(Node node) {
         fieldName = node.getAttributes().getNamedItem("field").getNodeValue();
         NodeList childNodes = node.getChildNodes();
-        if (childNodes != null && childNodes.getLength()>0) {
+        if (childNodes != null && childNodes.getLength() > 0) {
             filterValue = childNodes.item(0).getTextContent();
         }
     }

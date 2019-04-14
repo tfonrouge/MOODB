@@ -26,6 +26,7 @@ public abstract class MField<T> {
     Callable<T> callableNewValue;
     Runnable runnableOnAfterChangeValue;
     private String invalidCause = null;
+
     MField(MTable owner, String name) {
 
         table = owner;
@@ -332,6 +333,10 @@ public abstract class MField<T> {
             }
         }
 
+        getFieldState().updateUI();
+
+        System.out.println("setValue(): " + this);
+
         return true;
     }
 
@@ -346,6 +351,8 @@ public abstract class MField<T> {
     }
 
     public abstract String valueAsString();
+
+    public abstract String valueAsString(T value);
 
     /**
      * valueChanged

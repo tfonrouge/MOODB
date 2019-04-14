@@ -16,19 +16,19 @@ class UI_ChangeListenerSpinnerInteger extends UI_ChangeListener0<Integer, Spinne
 
     @Override
     public void changed(ObservableValue<? extends Integer> observable, Integer oldValue, Integer newValue) {
-        mField.setValue(newValue);
+        setmFieldValue(newValue);
     }
 
     @Override
     void initialize(Spinner<Integer> spinner) {
         SpinnerValueFactory<Integer> valueFactory = spinner.getValueFactory();
         if (valueFactory == null) {
-            valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(Integer.MIN_VALUE, Integer.MAX_VALUE, 0, mField.value());
+            valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(Integer.MIN_VALUE, Integer.MAX_VALUE);
             spinner.setValueFactory(valueFactory);
-        } else {
-            spinner.getValueFactory().setValue(mField.value());
         }
         property = spinner.getValueFactory().valueProperty();
+        property.setValue(mField.value());
+        property.addListener(this);
     }
 
     @Override
@@ -36,5 +36,10 @@ class UI_ChangeListenerSpinnerInteger extends UI_ChangeListener0<Integer, Spinne
         if (!mField.value().equals(property.getValue())) {
             property.setValue(value);
         }
+    }
+
+    @Override
+    public void removePropertyListener() {
+        property.removeListener(this);
     }
 }

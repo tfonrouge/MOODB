@@ -5,7 +5,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import tech.fonrouge.MOODB.MField;
-import tech.fonrouge.MOODB.MFieldTableField;
 import tech.fonrouge.MOODB.MTable;
 
 import java.util.HashMap;
@@ -18,26 +17,28 @@ class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T, ComboBox<T>> {
         super(comboBox, mField);
     }
 
-    UI_ChangeListenerComboBox(ComboBox<T> comboBox, MFieldTableField fieldTableField, String detailField) {
-        super(comboBox, fieldTableField, detailField);
-    }
-
     void initialize(ComboBox<T> comboBox) {
         comboBox.setPromptText(mField.getDescription());
         comboBox.setItems(getObservableArrayList());
         property = comboBox.valueProperty();
         property.setValue(mField.value());
+        property.addListener(this);
+    }
+
+    @Override
+    public void removePropertyListener() {
+        property.removeListener(this);
     }
 
     private ObservableList<T> getObservableArrayList() {
         ObservableList<T> observableList = FXCollections.observableArrayList();
-        if (mFieldTableField == null) {
+        if (mField.getTable().getLinkedField() == null) {
             HashMap<T, String> keyValueItems = mField.getValueItems();
             if (keyValueItems != null) {
                 keyValueItems.forEach((key, value) -> observableList.add(key));
             }
         } else {
-            MTable mTable = mFieldTableField.linkedTable();
+            MTable mTable = mField.getTable().getLinkedField().linkedTable();
             mTable.tableStatePush();
 
             if (mField != null && mTable.find()) {

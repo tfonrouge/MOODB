@@ -39,9 +39,7 @@ public class TableState {
 
     void clearBindings() {
         for (FieldState fieldState : fieldStateList) {
-            if (fieldState.ui_changeListener != null) {
-                fieldState.ui_changeListener = null;
-            }
+            fieldState.removeListener();
         }
     }
 
@@ -77,10 +75,6 @@ public class TableState {
         Object oldValue = fieldState.value;
         if ((value != null && !value.equals(oldValue)) || (oldValue != null && !oldValue.equals(value))) {
             fieldState.value = value;
-            if (fieldState.ui_changeListener != null) {
-                System.out.println("::: + " + fieldState.ui_changeListener);
-                fieldState.ui_changeListener.update(value);
-            }
             return true;
         }
         return false;
@@ -88,9 +82,7 @@ public class TableState {
 
     void set_UI_state(MField mField) {
         FieldState fieldState = fieldStateList.get(mField.index);
-        if (fieldState.ui_changeListener != null) {
-            fieldState.ui_changeListener.node.setDisable(mField.isReadOnly());
-        }
+        fieldState.nodeSetDisable(mField.isReadOnly());
     }
 
     public Document getFieldStateDocument(int index) {

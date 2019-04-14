@@ -40,7 +40,11 @@ public class MFieldLong extends MField<Long> {
 
     @Override
     public String valueAsString() {
-        Long value = value();
+        return valueAsString(value());
+    }
+
+    @Override
+    public String valueAsString(Long value) {
         if (value == null) {
             return "";
         }

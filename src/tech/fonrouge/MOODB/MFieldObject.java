@@ -33,7 +33,11 @@ public class MFieldObject extends MField<Object> {
 
     @Override
     public String valueAsString() {
-        Object value = value();
+        return valueAsString(value());
+    }
+
+    @Override
+    public String valueAsString(Object value) {
         if (value == null) {
             return "";
         }
