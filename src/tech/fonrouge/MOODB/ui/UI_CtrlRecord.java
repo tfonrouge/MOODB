@@ -3,6 +3,7 @@ package tech.fonrouge.MOODB.ui;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TableView;
 import tech.fonrouge.MOODB.MBaseData;
@@ -15,10 +16,12 @@ import java.util.Map;
 public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
 
     private UI_CtrlList<T> ctrlList;
+    protected Parent parent;
 
     <U extends UI_CtrlList<T>> void setCtrlList(U ctrlList) {
         this.ctrlList = ctrlList;
         this.table = ctrlList.getTable();
+        this.parent = ctrlList.getParent();
         initData();
     }
 

@@ -48,9 +48,14 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     @SuppressWarnings("unused")
     @FXML
     private TableView<MBaseData> tableView;
+    private Parent parent;
 
     public UI_CtrlList(T table) {
         this.table = table;
+    }
+
+    public Parent getParent() {
+        return parent;
     }
 
     public TableView<MBaseData> getTableView() {
@@ -235,8 +240,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 }
                 return null;
             });
-
-            Parent parent = null;
 
             try {
                 parent = fxmlLoader.load();
