@@ -34,7 +34,7 @@ public abstract class UI_ChangeListener0<T, N extends Node, U> implements Change
 
     void setmFieldValueAsString(String value) {
         mField.getFieldState().setCurrentChangeListener(this);
-        boolean result = mField.setValueAsString(value);
+        mField.setValueAsString(value);
         mField.getFieldState().clearCurrentChangeListener();
     }
 

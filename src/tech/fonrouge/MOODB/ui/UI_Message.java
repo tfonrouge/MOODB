@@ -5,8 +5,10 @@ import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
 
+@SuppressWarnings("WeakerAccess")
 public class UI_Message {
 
+    @SuppressWarnings("WeakerAccess")
     public static MESSAGE_VALUE ConfirmYesNo(String confirm, String headerText) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(confirm);
@@ -19,6 +21,7 @@ public class UI_Message {
         return MESSAGE_VALUE.CANCEL;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static void Warning(String warning, String headerText) {
 
         Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -28,6 +31,7 @@ public class UI_Message {
         alert.showAndWait();
     }
 
+    @SuppressWarnings("unused")
     public enum MESSAGE_VALUE {
         OK,
         NO,
@@ -36,6 +40,7 @@ public class UI_Message {
 
     public static class Wordwrap {
 
+        @SuppressWarnings("WeakerAccess")
         public static String wordwrap(final String input, final int length) {
             if (input == null || length < 1) {
                 throw new IllegalArgumentException("Invalid input args");

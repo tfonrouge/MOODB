@@ -19,6 +19,7 @@ import java.util.Map;
 
 public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
 
+    @SuppressWarnings("WeakerAccess")
     protected Parent parent;
     private UI_CtrlList<T> ctrlList;
 
@@ -76,6 +77,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
+    @SuppressWarnings("WeakerAccess")
     public  @interface NoAutoBinding {
 
     }

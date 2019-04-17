@@ -54,11 +54,11 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         this.table = table;
     }
 
-    public Parent getParent() {
+    Parent getParent() {
         return parent;
     }
 
-    public TableView<MBaseData> getTableView() {
+    TableView<MBaseData> getTableView() {
         return tableView;
     }
 
@@ -201,13 +201,14 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     }
 
     @SuppressWarnings("unused")
-    public void onActionInsertDocument() {
+    protected void onActionInsertDocument() {
         if (table.insert()) {
             doInsertEdit();
         }
     }
 
-    private void doInsertEdit() {
+    @SuppressWarnings("WeakerAccess")
+    protected void doInsertEdit() {
         String resourceRecordName = getResourceRecordName();
 
         if (resourceRecordName != null && !resourceRecordName.isEmpty()) {
@@ -301,7 +302,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     abstract protected String getResourceRecordName();
 
     @SuppressWarnings("unused")
-    public void onActionEditDocument() {
+    protected void onActionEditDocument() {
 
         MBaseData item = tableView.getSelectionModel().getSelectedItem();
 
@@ -314,7 +315,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     }
 
     @SuppressWarnings("unused")
-    public void onActionDeleteDocument() {
+    protected void onActionDeleteDocument() {
 
         MBaseData item = tableView.getSelectionModel().getSelectedItem();
 

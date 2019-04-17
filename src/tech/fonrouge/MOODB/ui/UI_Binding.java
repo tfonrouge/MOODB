@@ -23,7 +23,7 @@ public class UI_Binding<T extends MTable> {
     private Node findNodeByField(Field field) {
         if (Node.class.isAssignableFrom(field.getType())) {
             try {
-                Node node = null;
+                Node node;
                 if (!field.isAccessible()) {
                     field.setAccessible(true);
                     node = (Node) field.get(this);
@@ -242,6 +242,7 @@ public class UI_Binding<T extends MTable> {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
+    @SuppressWarnings("WeakerAccess")
     public @interface NoBindNode {
 
     }
