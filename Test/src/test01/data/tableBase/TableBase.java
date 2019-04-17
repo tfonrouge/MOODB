@@ -1,10 +1,10 @@
-package test01.data.base01;
+package test01.data.tableBase;
 
 import tech.fonrouge.MOODB.MDatabase;
 import tech.fonrouge.MOODB.MTable;
 import test01.data.TestDatabase;
 
-public abstract class Base01 extends MTable {
+public abstract class TableBase extends MTable {
 
     /* @@ begin field descriptor @@ */
 

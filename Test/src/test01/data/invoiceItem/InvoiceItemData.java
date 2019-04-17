@@ -1,9 +1,9 @@
 package test01.data.invoiceItem;
 
 import org.bson.types.ObjectId;
-import test01.data.base01.Base01Data;
+import test01.data.tableBase.TableBaseData;
 
-public class InvoiceItemData<T extends InvoiceItem> extends Base01Data<T> {
+public class InvoiceItemData<T extends InvoiceItem> extends TableBaseData<T> {
 
     /* @@ begin field descriptor @@ */
     public InvoiceItemData(T invoiceitem) {

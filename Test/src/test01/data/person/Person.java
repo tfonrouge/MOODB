@@ -4,11 +4,11 @@ import tech.fonrouge.MOODB.MFieldBoolean;
 import tech.fonrouge.MOODB.MFieldDate;
 import tech.fonrouge.MOODB.MFieldString;
 import tech.fonrouge.MOODB.MIndex;
-import test01.data.base01.Base01;
+import test01.data.tableBase.TableBase;
 
 import java.util.HashMap;
 
-public abstract class Person extends Base01 {
+public abstract class Person extends TableBase {
 
     /* @@ begin field descriptor @@ */
 

@@ -1,8 +1,8 @@
 package test01.data.entity;
 
-import test01.data.base01.Base01Data;
+import test01.data.tableBase.TableBaseData;
 
-public abstract class EntityData<T extends Entity> extends Base01Data<T> {
+public abstract class EntityData<T extends Entity> extends TableBaseData<T> {
 
     /* @@ begin field descriptor @@ */
     public EntityData(T entity) {

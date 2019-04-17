@@ -3,11 +3,11 @@ package test01.data.invoiceItem;
 import tech.fonrouge.MOODB.MFieldDouble;
 import tech.fonrouge.MOODB.MFieldTableField;
 import tech.fonrouge.MOODB.MIndex;
-import test01.data.base01.Base01;
+import test01.data.tableBase.TableBase;
 import test01.data.inventoryItem.InventoryItem;
 import test01.data.invoice.Invoice;
 
-public class InvoiceItem extends Base01 {
+public class InvoiceItem extends TableBase {
 
     /* @@ begin field descriptor @@ */
 
@@ -39,6 +39,7 @@ public class InvoiceItem extends Base01 {
     public final MFieldDouble field_qty = new MFieldDouble(this, "qty") {
         @Override
         protected void initialize() {
+            required = true;
             description = "Quantity";
         }
     };
@@ -46,6 +47,7 @@ public class InvoiceItem extends Base01 {
     public final MFieldDouble field_unitPrice = new MFieldDouble(this, "unitPrice") {
         @Override
         protected void initialize() {
+            required = true;
             description = "Unit Price";
         }
     };

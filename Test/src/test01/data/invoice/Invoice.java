@@ -1,12 +1,13 @@
 package test01.data.invoice;
 
 import tech.fonrouge.MOODB.*;
-import test01.data.base01.Base01;
+import test01.data.tableBase.TableBase;
 import test01.data.customer.Customer;
 import test01.data.invoiceItem_xInvoice.InvoiceItem_xInvoice;
 
-public class Invoice extends Base01 {
+public class Invoice extends TableBase {
 
+    private InvoiceItem_xInvoice invoiceItemXInvoice;
     //@formatter:off
     /* @@ begin field descriptor @@ */
 
@@ -44,18 +45,7 @@ public class Invoice extends Base01 {
             required = true;
         }
     };
-    public final MFieldBoolean field_reqShipment = new MFieldBoolean(this, "reqShipment") {
-        @Override
-        protected void initialize() {
-            required = true;
-        }
-    };
-    public final MIndex index_docNumber = new MIndex(this, "docNumber", "", "docNumber", true, false) {
-        @Override
-        protected void initialize() {
-        }
-    };
-    private InvoiceItem_xInvoice invoiceItemXInvoice;
+
     public final MFieldLong field_itemsCount = new MFieldLong(this, "itemsCount") {
         @Override
         protected void initialize() {
@@ -64,17 +54,30 @@ public class Invoice extends Base01 {
         }
     };
 
+    public final MFieldBoolean field_reqShipment = new MFieldBoolean(this, "reqShipment") {
+        @Override
+        protected void initialize() {
+            required = true;
+        }
+    };
+
+    public final MIndex index_docNumber = new MIndex(this, "docNumber", "", "docNumber", true, false) {
+        @Override
+        protected void initialize() {
+        }
+    };
+
     @Override
     public final String getTableName() {
         return "invoice";
     }
-    /* @@ end field descriptor @@ */
-    //@formatter:on
 
     @Override
     public InvoiceData getData() {
         return new InvoiceData<>(this);
     }
+    /* @@ end field descriptor @@ */
+    //@formatter:on
 
     /* @@ begin calcField_itemsCount @@ */
     public Long calcField_itemsCount() {

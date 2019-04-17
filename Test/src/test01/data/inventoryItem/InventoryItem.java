@@ -1,12 +1,12 @@
 package test01.data.inventoryItem;
 
 import tech.fonrouge.MOODB.*;
-import test01.data.base01.Base01;
+import test01.data.tableBase.TableBase;
 
 import java.util.Date;
 import java.util.HashMap;
 
-public class InventoryItem extends Base01 {
+public class InventoryItem extends TableBase {
 
     /* @@ begin field descriptor @@ */
 

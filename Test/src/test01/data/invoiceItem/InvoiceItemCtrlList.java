@@ -1,9 +1,9 @@
 package test01.data.invoiceItem;
 
 import javafx.scene.control.TableView;
-import tech.fonrouge.MOODB.ui.UI_CtrlList;
+import test01.data.tableBase.TableBaseCtrlList;
 
-public class InvoiceItemCtrlList extends UI_CtrlList<InvoiceItem> {
+public class InvoiceItemCtrlList extends TableBaseCtrlList<InvoiceItem> {
 
     public TableView tableView_invoiceItem;
 

@@ -1,8 +1,8 @@
 package test01.data.invoice;
 
-import tech.fonrouge.MOODB.ui.UI_CtrlList;
+import test01.data.tableBase.TableBaseCtrlList;
 
-public class InvoiceCtrlList extends UI_CtrlList<Invoice> {
+public class InvoiceCtrlList extends TableBaseCtrlList<Invoice> {
 
     public InvoiceCtrlList(Invoice table) {
         super(table);

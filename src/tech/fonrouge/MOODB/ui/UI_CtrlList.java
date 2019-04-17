@@ -8,16 +8,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Control;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.bson.Document;
-import org.jetbrains.annotations.NotNull;
 import tech.fonrouge.MOODB.MBaseData;
 import tech.fonrouge.MOODB.MField;
 import tech.fonrouge.MOODB.MFieldTableField;
@@ -35,44 +32,23 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     @SuppressWarnings("unused")
     @FXML
-    private MenuItem menuItem_close;
-    @SuppressWarnings("unused")
-    @FXML
-    private MenuItem menuItem_insert;
-    @SuppressWarnings("unused")
-    @FXML
-    private MenuItem menuItem_edit;
-    @SuppressWarnings("unused")
-    @FXML
-    private MenuItem menuItem_delete;
-    @FXML
-    private MenuItem menuItem_view;
-    @SuppressWarnings("unused")
-    @FXML
-    private TableView<MBaseData> tableView;
-    private Parent parent;
+    protected TableView<MBaseData> tableView;
+    protected Stage stage;
+    protected Parent parent;
 
     public UI_CtrlList(T table) {
         this.table = table;
-    }
-
-    Parent getParent() {
-        return parent;
     }
 
     TableView<MBaseData> getTableView() {
         return tableView;
     }
 
-    void buildUI(@NotNull Parent parent) {
+    void showWindow(Parent parent) {
 
-        menuItem_close.setAccelerator(new KeyCodeCombination(KeyCode.ESCAPE));
-        menuItem_insert.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
-        menuItem_edit.setAccelerator(new KeyCodeCombination(KeyCode.F3));
-        menuItem_delete.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
-        menuItem_view.setAccelerator(new KeyCodeCombination(KeyCode.F5));
+        initController(parent);
 
-        Stage stage = new Stage();
+        stage = new Stage();
 
         buildTableView();
 
@@ -84,12 +60,14 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             }
         });
 
-        menuItem_close.setOnAction(event -> stage.hide());
-
         stage.setScene(scene);
         stage.setTitle(table.getGenres());
 
         stage.show();
+    }
+
+    protected void initController(Parent parent) {
+
     }
 
     private void buildTableView() {
@@ -150,10 +128,10 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                     String label = "";
                     String value = "";
 
-                    MFieldTableField mFieldTableField = param.getValue().getTable().fieldTableFieldByName(fieldList[0]);
+                    MFieldTableField mFieldTableField = param.getValue()._getTable().fieldTableFieldByName(fieldList[0]);
 
                     if (mFieldTableField != null) {
-                        Document document = param.getValue().getTableState().getFieldStateDocument(mFieldTableField.index);
+                        Document document = param.getValue()._getTableState().getFieldStateDocument(mFieldTableField.index);
                         if (document != null) {
                             label = mFieldTableField.getLabel();
                             int i = 1;
@@ -197,17 +175,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
 
         return new TableColumn<>(fieldExpression);
-    }
-
-    public T getTable() {
-        return table;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void onActionInsertDocument() {
-        if (table.insert()) {
-            doInsertEdit();
-        }
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -305,6 +272,19 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     abstract protected String getResourceRecordName();
 
     @SuppressWarnings("WeakerAccess")
+    public void onActionDeleteDocument() {
+
+        MBaseData item = tableView.getSelectionModel().getSelectedItem();
+
+        if (item != null) {
+            if (table.field__id.find(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
+                table.delete();
+                populateList();
+            }
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
     public void onActionEditDocument() {
 
         MBaseData item = tableView.getSelectionModel().getSelectedItem();
@@ -318,15 +298,9 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public void onActionDeleteDocument() {
-
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
-
-        if (item != null) {
-            if (table.field__id.find(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
-                table.delete();
-                populateList();
-            }
+    public void onActionInsertDocument() {
+        if (table.insert()) {
+            doInsertEdit();
         }
     }
 

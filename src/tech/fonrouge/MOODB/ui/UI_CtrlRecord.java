@@ -25,8 +25,8 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
 
     <U extends UI_CtrlList<T>> void setCtrlList(U ctrlList) {
         this.ctrlList = ctrlList;
-        this.table = ctrlList.getTable();
-        this.parent = ctrlList.getParent();
+        this.table = ctrlList.table;
+        this.parent = ctrlList.parent;
         NoAutoBinding noAutoBinding = getClass().getAnnotation(NoAutoBinding.class);
         if (noAutoBinding == null) {
             bindControls();

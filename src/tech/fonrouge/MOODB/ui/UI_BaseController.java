@@ -56,7 +56,7 @@ public abstract class UI_BaseController {
                 UI_Message.Warning("Warning", e.toString());
             }
             if (parent != null) {
-                ui_ctrlList.buildUI(parent);
+                ui_ctrlList.showWindow(parent);
             }
         }
     }

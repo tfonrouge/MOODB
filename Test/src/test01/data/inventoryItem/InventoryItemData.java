@@ -1,11 +1,11 @@
 package test01.data.inventoryItem;
 
 import org.bson.types.Binary;
-import test01.data.base01.Base01Data;
+import test01.data.tableBase.TableBaseData;
 
 import java.util.Date;
 
-public class InventoryItemData<T extends InventoryItem> extends Base01Data<T> {
+public class InventoryItemData<T extends InventoryItem> extends TableBaseData<T> {
 
     /* @@ begin field descriptor @@ */
     public InventoryItemData(T inventoryitem) {
