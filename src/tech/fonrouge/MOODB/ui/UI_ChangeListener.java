@@ -19,8 +19,8 @@ public abstract class UI_ChangeListener<T, N extends Node> extends UI_ChangeList
     @Override
     final public void changed(ObservableValue<? extends T> observable, T oldValue, T newValue) {
         if (!ignore) {
-            ignore = true;
             if (mField.getTable().getLinkedField() == null) {
+                ignore = true;
                 if (!setmFieldValue(newValue)) {
                     Platform.runLater(() -> {
                         propertySetValue(oldValue);
@@ -29,6 +29,7 @@ public abstract class UI_ChangeListener<T, N extends Node> extends UI_ChangeList
                 }
             } else {
                 if (!mField.find(newValue)) {
+                    ignore = true;
                     Platform.runLater(() -> {
                         System.out.println("reverting value to " + oldValue);
                         propertySetValue(oldValue);
