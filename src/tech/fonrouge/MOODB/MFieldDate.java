@@ -2,6 +2,7 @@ package tech.fonrouge.MOODB;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 public class MFieldDate extends MField<Date> {
@@ -17,7 +18,12 @@ public class MFieldDate extends MField<Date> {
 
     @Override
     public boolean setValueAsString(String value) {
-        Date date = Date.from(LocalDateTime.parse(value).atZone(ZoneId.systemDefault()).toInstant());
+        Date date = null;
+        try {
+            date = Date.from(LocalDateTime.parse(value).atZone(ZoneId.systemDefault()).toInstant());
+        } catch (DateTimeParseException e) {
+            e.printStackTrace();
+        }
         return super.setValue(date);
     }
 
