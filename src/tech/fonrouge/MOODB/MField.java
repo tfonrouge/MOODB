@@ -335,8 +335,6 @@ public abstract class MField<T> {
 
         getFieldState().updateUI();
 
-        System.out.println("setValue(): " + this);
-
         return true;
     }
 
