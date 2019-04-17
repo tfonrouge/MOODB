@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="800.0" prefWidth="1200.0"
-            xmlns="http://javafx.com/javafx/8.0.121">
+            xmlns="http://javafx.com/javafx/8.0.172-ea">
     <center>
         <TableView fx:id="tableView" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
             <columns>
@@ -14,15 +14,19 @@
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Archivo">
-                <MenuItem fx:id="menuItem_cerrar" mnemonicParsing="false" text="Cerrar"/>
+                <MenuItem fx:id="menuItem_close" mnemonicParsing="false" text="Close"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Editar">
-                <MenuItem fx:id="menuItem_agregar" mnemonicParsing="false" onAction="#onActionInsertDocument"
+                <MenuItem fx:id="menuItem_insert" mnemonicParsing="false" onAction="#onActionInsertDocument"
                           text="Agregar"/>
-                <MenuItem fx:id="menuItem_modificar" mnemonicParsing="false" onAction="#onActionEditDocument"
+                <MenuItem fx:id="menuItem_edit" mnemonicParsing="false" onAction="#onActionEditDocument"
                           text="Modificar"/>
-                <MenuItem fx:id="menuItem_eliminar" mnemonicParsing="false" onAction="#onActionDeleteDocument"
+                <MenuItem fx:id="menuItem_delete" mnemonicParsing="false" onAction="#onActionDeleteDocument"
                           text="Eliminar"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="View">
+                <MenuItem fx:id="menuItem_view" mnemonicParsing="false" onAction="#onActionViewDocument"
+                          text="View Document"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Ayuda">
                 <MenuItem mnemonicParsing="false" text="About"/>
