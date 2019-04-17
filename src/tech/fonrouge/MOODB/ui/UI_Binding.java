@@ -192,7 +192,6 @@ public class UI_Binding<T extends MTable> {
 
     private void registerControl(Node node, MField mField) {
         nodeHashMap.put(mField.getName(), node);
-        node.setDisable(mField.isReadOnly());
     }
 
     @SuppressWarnings("unused")

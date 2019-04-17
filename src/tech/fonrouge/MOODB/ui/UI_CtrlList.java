@@ -35,16 +35,18 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     @SuppressWarnings("unused")
     @FXML
-    private MenuItem menuItem_cerrar;
+    private MenuItem menuItem_close;
     @SuppressWarnings("unused")
     @FXML
-    private MenuItem menuItem_agregar;
+    private MenuItem menuItem_insert;
     @SuppressWarnings("unused")
     @FXML
-    private MenuItem menuItem_modificar;
+    private MenuItem menuItem_edit;
     @SuppressWarnings("unused")
     @FXML
-    private MenuItem menuItem_eliminar;
+    private MenuItem menuItem_delete;
+    @FXML
+    private MenuItem menuItem_view;
     @SuppressWarnings("unused")
     @FXML
     private TableView<MBaseData> tableView;
@@ -64,10 +66,11 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     void buildUI(@NotNull Parent parent) {
 
-        menuItem_cerrar.setAccelerator(new KeyCodeCombination(KeyCode.ESCAPE));
-        menuItem_agregar.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
-        menuItem_modificar.setAccelerator(new KeyCodeCombination(KeyCode.F3));
-        menuItem_eliminar.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
+        menuItem_close.setAccelerator(new KeyCodeCombination(KeyCode.ESCAPE));
+        menuItem_insert.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
+        menuItem_edit.setAccelerator(new KeyCodeCombination(KeyCode.F3));
+        menuItem_delete.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
+        menuItem_view.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
         Stage stage = new Stage();
 
@@ -81,7 +84,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             }
         });
 
-        menuItem_cerrar.setOnAction(event -> stage.hide());
+        menuItem_close.setOnAction(event -> stage.hide());
 
         stage.setScene(scene);
         stage.setTitle(table.getGenres());
@@ -200,8 +203,8 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         return table;
     }
 
-    @SuppressWarnings("unused")
-    protected void onActionInsertDocument() {
+    @SuppressWarnings("WeakerAccess")
+    public void onActionInsertDocument() {
         if (table.insert()) {
             doInsertEdit();
         }
@@ -301,8 +304,8 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     abstract protected String getResourceRecordName();
 
-    @SuppressWarnings("unused")
-    protected void onActionEditDocument() {
+    @SuppressWarnings("WeakerAccess")
+    public void onActionEditDocument() {
 
         MBaseData item = tableView.getSelectionModel().getSelectedItem();
 
@@ -314,17 +317,24 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
-    @SuppressWarnings("unused")
-    protected void onActionDeleteDocument() {
+    @SuppressWarnings("WeakerAccess")
+    public void onActionDeleteDocument() {
 
         MBaseData item = tableView.getSelectionModel().getSelectedItem();
 
         if (item != null) {
-            Object id = item.get_id();
-            if (table.field__id.find(id) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
+            if (table.field__id.find(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
                 table.delete();
                 populateList();
             }
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void onActionViewDocument() {
+        MBaseData item = tableView.getSelectionModel().getSelectedItem();
+        if (item != null && table.field__id.find(item.get_id())) {
+            doInsertEdit();
         }
     }
 }

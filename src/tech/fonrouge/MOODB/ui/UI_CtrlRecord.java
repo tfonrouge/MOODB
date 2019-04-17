@@ -28,7 +28,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
         this.table = ctrlList.getTable();
         this.parent = ctrlList.getParent();
         NoAutoBinding noAutoBinding = getClass().getAnnotation(NoAutoBinding.class);
-        if (noAutoBinding==null) {
+        if (noAutoBinding == null) {
             bindControls();
         }
         initData();
@@ -78,7 +78,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
     @SuppressWarnings("WeakerAccess")
-    public  @interface NoAutoBinding {
+    public @interface NoAutoBinding {
 
     }
 }

@@ -4,6 +4,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBox;
 import tech.fonrouge.MOODB.MField;
+import tech.fonrouge.MOODB.MTable;
 
 class UI_ChangeListenerCheckBox extends UI_ChangeListener0<Boolean, CheckBox, Boolean> {
 
@@ -35,5 +36,13 @@ class UI_ChangeListenerCheckBox extends UI_ChangeListener0<Boolean, CheckBox, Bo
     @Override
     public void removePropertyListener() {
         property.removeListener(this);
+    }
+
+    @Override
+    void set_UI_state(CheckBox checkBox) {
+        if (getTable().getState() == MTable.STATE.NORMAL || getWorkField().isReadOnly()) {
+            checkBox.setDisable(true);
+            checkBox.setFocusTraversable(false);
+        }
     }
 }

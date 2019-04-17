@@ -4,6 +4,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextInputControl;
 import tech.fonrouge.MOODB.MField;
+import tech.fonrouge.MOODB.MTable;
 
 class UI_ChangeListenerTextInputControl<T> extends UI_ChangeListener0<T, TextInputControl, String> {
 
@@ -36,5 +37,13 @@ class UI_ChangeListenerTextInputControl<T> extends UI_ChangeListener0<T, TextInp
     @Override
     public void removePropertyListener() {
         property.removeListener(this);
+    }
+
+    @Override
+    void set_UI_state(TextInputControl textInputControl) {
+        if (getTable().getState() == MTable.STATE.NORMAL || getWorkField().isReadOnly()) {
+            textInputControl.editableProperty().setValue(false);
+            textInputControl.setFocusTraversable(false);
+        }
     }
 }

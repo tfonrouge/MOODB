@@ -5,6 +5,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import tech.fonrouge.MOODB.MField;
+import tech.fonrouge.MOODB.MTable;
 
 class UI_ChangeListenerSpinnerInteger extends UI_ChangeListener0<Integer, Spinner<Integer>, Integer> {
 
@@ -41,5 +42,14 @@ class UI_ChangeListenerSpinnerInteger extends UI_ChangeListener0<Integer, Spinne
     @Override
     public void removePropertyListener() {
         property.removeListener(this);
+    }
+
+    @Override
+    void set_UI_state(Spinner<Integer> spinner) {
+        if (getTable().getState() == MTable.STATE.NORMAL || getWorkField().isReadOnly()) {
+            spinner.editableProperty().setValue(false);
+            spinner.setDisable(true);
+            spinner.setFocusTraversable(false);
+        }
     }
 }

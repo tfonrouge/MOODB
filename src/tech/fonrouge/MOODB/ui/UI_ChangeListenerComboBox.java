@@ -30,6 +30,15 @@ class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T, ComboBox<T>> {
         property.removeListener(this);
     }
 
+    @Override
+    void set_UI_state(ComboBox<T> comboBox) {
+        if (getTable().getState() == MTable.STATE.NORMAL || getWorkField().isReadOnly()) {
+            comboBox.setItems(null);
+            comboBox.getEditor().editableProperty().setValue(false);
+            comboBox.setFocusTraversable(false);
+        }
+    }
+
     private ObservableList<T> getObservableArrayList() {
         ObservableList<T> observableList = FXCollections.observableArrayList();
         if (mField.getTable().getLinkedField() == null) {
