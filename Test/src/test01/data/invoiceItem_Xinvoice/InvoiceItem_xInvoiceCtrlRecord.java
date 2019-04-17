@@ -14,7 +14,5 @@ public class InvoiceItem_xInvoiceCtrlRecord extends UI_CtrlRecord<InvoiceItem_xI
     @Override
     protected void initData() {
 
-        bindControls();
-
     }
 }

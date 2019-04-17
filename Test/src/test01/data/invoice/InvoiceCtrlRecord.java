@@ -14,11 +14,10 @@ public class InvoiceCtrlRecord extends UI_CtrlRecord<Invoice> {
     public TextField textField_daysOfCredit;
     public Spinner<Integer> spinner_daysOfCredit;
     public CheckBox checkBox_reqShipment;
+    public TextField textField_customer_address;
 
     @Override
     protected void initData() {
-
-        bindControls();
 
     }
 }
