@@ -14,6 +14,9 @@ public abstract class UI_ChangeListener0<T, N extends Node, U> implements Change
         this.mField = mField;
         initialize(this.node);
         addChangeListener(mField);
+        if (mField.getTable().getLinkedField() != null) {
+            mField.getTable().getLinkedField().getFieldState().addListener(this);
+        }
     }
 
     abstract void initialize(N node);
