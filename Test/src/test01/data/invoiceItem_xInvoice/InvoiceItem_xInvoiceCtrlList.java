@@ -38,6 +38,9 @@ public class InvoiceItem_xInvoiceCtrlList extends UI_CtrlList<InvoiceItem_xInvoi
             case "Delete":
                 onActionDeleteDocument();
                 break;
+            case "View":
+                onActionViewDocument();
+                break;
         }
     }
 }
