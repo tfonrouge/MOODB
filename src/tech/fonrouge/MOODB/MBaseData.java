@@ -10,11 +10,11 @@ public abstract class MBaseData<T extends MTable> {
         tableState = new TableState(table.tableState);
     }
 
-    public MTable getTable() {
+    public MTable _getTable() {
         return table;
     }
 
-    public TableState getTableState() {
+    public TableState _getTableState() {
         return tableState;
     }
 
