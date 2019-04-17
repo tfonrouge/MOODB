@@ -4,6 +4,10 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import tech.fonrouge.MOODB.*;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -16,10 +20,18 @@ public class UI_Binding<T extends MTable> {
     protected final HashMap<String, Node> nodeHashMap = new HashMap<>();
     protected T table;
 
-    private Node findControl(Field field) {
+    private Node findNodeByField(Field field) {
         if (Node.class.isAssignableFrom(field.getType())) {
             try {
-                return (Node) field.get(this);
+                Node node = null;
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                    node = (Node) field.get(this);
+                    field.setAccessible(false);
+                } else {
+                    node = (Node) field.get(this);
+                }
+                return node;
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -92,16 +104,67 @@ public class UI_Binding<T extends MTable> {
         return false;
     }
 
+    private void assignFieldWith(Field declaredField, AssignWith assignWith) {
+        Field parentField = null;
+        try {
+            parentField = getClass().getDeclaredField(assignWith.parentNode());
+
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        Node parentNode = null;
+        if (parentField != null) {
+            try {
+                if (!parentField.isAccessible()) {
+                    parentField.setAccessible(true);
+                    parentNode = (Node) parentField.get(this);
+                    parentField.setAccessible(false);
+                } else {
+                    parentNode = (Node) parentField.get(this);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        String selectorId = assignWith.selectorId();
+        Node node = null;
+        if (parentNode != null) {
+            node = parentNode.lookup("#" + selectorId);
+        }
+        if (node != null) {
+            try {
+                if (!declaredField.isAccessible()) {
+                    declaredField.setAccessible(true);
+                    declaredField.set(this, node);
+                    declaredField.setAccessible(false);
+                } else {
+                    declaredField.set(this, node);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @SuppressWarnings("WeakerAccess")
-    public void bindControls() {
+    protected void bindControls() {
         Field[] declaredFields = getClass().getDeclaredFields();
         for (Field declaredField : declaredFields) {
 
-            Node node = findControl(declaredField);
-            MField mField = getTableField(declaredField);
+            AssignWith assignWith = declaredField.getAnnotation(AssignWith.class);
 
-            if (mField != null) {
-                if (node != null) {
+            if (assignWith != null) {
+                assignFieldWith(declaredField, assignWith);
+            }
+
+            NoBindNode annotation = declaredField.getAnnotation(NoBindNode.class);
+
+            Node node = findNodeByField(declaredField);
+
+            if (node != null && annotation == null) {
+                MField mField = getTableField(declaredField);
+
+                if (mField != null) {
 
                     Method method;
                     Boolean invoquedOk = null;
@@ -121,10 +184,8 @@ public class UI_Binding<T extends MTable> {
                         registerControl(node, mField);
                     }
                 } else {
-                    UI_Message.Warning("Control not valid", "Control: " + declaredField.toString());
+                    UI_Message.Warning("Table field not found", "Control: " + declaredField.toString());
                 }
-            } else {
-                UI_Message.Warning("Table field not found", "Control: " + declaredField.toString());
             }
         }
     }
@@ -177,5 +238,19 @@ public class UI_Binding<T extends MTable> {
     @SuppressWarnings("unused")
     final protected void bindControl(CheckBox checkBox, MFieldBoolean mFieldBoolean) {
         new UI_ChangeListenerCheckBox(checkBox, mFieldBoolean);
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface NoBindNode {
+
+    }
+
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface AssignWith {
+        String parentNode();
+
+        String selectorId();
     }
 }

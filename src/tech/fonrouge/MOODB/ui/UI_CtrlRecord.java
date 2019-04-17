@@ -10,18 +10,26 @@ import tech.fonrouge.MOODB.MBaseData;
 import tech.fonrouge.MOODB.MField;
 import tech.fonrouge.MOODB.MTable;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
 
-    private UI_CtrlList<T> ctrlList;
     protected Parent parent;
+    private UI_CtrlList<T> ctrlList;
 
     <U extends UI_CtrlList<T>> void setCtrlList(U ctrlList) {
         this.ctrlList = ctrlList;
         this.table = ctrlList.getTable();
         this.parent = ctrlList.getParent();
+        NoAutoBinding noAutoBinding = getClass().getAnnotation(NoAutoBinding.class);
+        if (noAutoBinding==null) {
+            bindControls();
+        }
         initData();
     }
 
@@ -64,5 +72,11 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
         if (source != null) {
             source.getScene().getWindow().hide();
         }
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    public  @interface NoAutoBinding {
+
     }
 }
