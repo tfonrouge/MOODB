@@ -4,9 +4,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
-import tech.fonrouge.MOODB.ui.UI_CtrlList;
+import test01.data.tableBase.TableBaseCtrlList;
 
-public class InvoiceItem_xInvoiceCtrlList extends UI_CtrlList<InvoiceItem_xInvoice> {
+public class InvoiceItem_xInvoiceCtrlList extends TableBaseCtrlList<InvoiceItem_xInvoice> {
 
     public TableView<InvoiceItem_xInvoiceData> tableView_invoiceItem_xInvoice;
 
