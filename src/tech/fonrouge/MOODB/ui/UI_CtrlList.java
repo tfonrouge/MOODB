@@ -34,6 +34,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     @FXML
     protected TableView<MBaseData> tableView;
     protected Stage stage;
+    @SuppressWarnings("WeakerAccess")
     protected Parent parent;
 
     public UI_CtrlList(T table) {
