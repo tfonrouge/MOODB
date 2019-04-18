@@ -378,6 +378,15 @@ public abstract class MField<T> {
         getFieldState().defaultValue = defaultValue;
     }
 
+    @SuppressWarnings("unused")
+    public boolean valueEquals(T value) {
+        T thisValue = value();
+        if (value == null) {
+            return thisValue == null;
+        }
+        return value.equals(thisValue);
+    }
+
     public String toString() {
         Object value = value();
         String s = table.getClass().getSimpleName() + "@" + getClass().getSuperclass().getSimpleName();

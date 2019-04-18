@@ -7,7 +7,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import tech.fonrouge.MOODB.ui.UI_CtrlList;
 
-public class TableBaseCtrlList<T extends TableBase> extends UI_CtrlList<T> {
+public abstract class TableBaseCtrlList<T extends TableBase> extends UI_CtrlList<T> {
 
     @SuppressWarnings("unused")
     @FXML
@@ -30,16 +30,6 @@ public class TableBaseCtrlList<T extends TableBase> extends UI_CtrlList<T> {
     }
 
     @Override
-    protected String[] getColumns() {
-        return new String[0];
-    }
-
-    @Override
-    protected String getResourceRecordName() {
-        return null;
-    }
-
-    @Override
     protected void initController(Parent parent) {
         super.initController(parent);
 
@@ -50,6 +40,5 @@ public class TableBaseCtrlList<T extends TableBase> extends UI_CtrlList<T> {
         menuItem_view.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
         menuItem_close.setOnAction(event -> stage.hide());
-
     }
 }

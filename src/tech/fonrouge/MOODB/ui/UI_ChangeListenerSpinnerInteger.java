@@ -34,7 +34,7 @@ class UI_ChangeListenerSpinnerInteger extends UI_ChangeListener0<Integer, Spinne
 
     @Override
     public void update(Integer value) {
-        if (!mField.value().equals(property.getValue())) {
+        if (!mField.valueEquals(property.getValue())) {
             property.setValue(value);
         }
     }

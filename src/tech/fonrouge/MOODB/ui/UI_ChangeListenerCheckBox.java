@@ -28,7 +28,7 @@ class UI_ChangeListenerCheckBox extends UI_ChangeListener0<Boolean, CheckBox, Bo
 
     @Override
     public void update(Boolean value) {
-        if (!mField.value().equals(property.getValue())) {
+        if (!mField.valueEquals(property.getValue())) {
             property.setValue(value);
         }
     }

@@ -18,7 +18,7 @@ public abstract class UI_ChangeListener<T, N extends Node> extends UI_ChangeList
 
     @Override
     final public void changed(ObservableValue<? extends T> observable, T oldValue, T newValue) {
-        if (!ignore && !mField.value().equals(newValue)) {
+        if (!ignore && !mField.valueEquals(newValue)) {
             if (mField.getTable().getLinkedField() == null) {
                 ignore = true;
                 if (!setmFieldValue(newValue)) {
@@ -44,7 +44,7 @@ public abstract class UI_ChangeListener<T, N extends Node> extends UI_ChangeList
         if (mField.getTable().getLinkedField() != null && !value.equals(mField.getTable().getLinkedField().linkedTable()._id())) {
             mField.getTable().getLinkedField().syncedTable();
         }
-        if (!mField.value().equals(propertyGetValue())) {
+        if (!mField.valueEquals(propertyGetValue())) {
             propertySetValue(mField.value());
         }
     }
