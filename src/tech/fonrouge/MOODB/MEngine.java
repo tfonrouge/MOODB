@@ -132,12 +132,13 @@ class MEngine {
         if (mFieldTableField != null) {
             String lookupFieldName = mFieldTableField.name;
             String lookupTableName = mFieldTableField.linkedTable().getTableName();
+            String varName = lookupFieldName.substring(0, 1).toLowerCase() + lookupFieldName.substring(1) + "_id";
             documents.add(
                     new Document()
                             .append("$lookup", new Document()
                                     .append("from", lookupTableName)
                                     .append("let", new Document()
-                                            .append(lookupFieldName + "_id", "$" + lookupFieldName)
+                                            .append(varName, "$" + lookupFieldName)
                                     )
                                     .append("pipeline", Arrays.asList(
                                             new Document()
@@ -145,7 +146,7 @@ class MEngine {
                                                             .append("$expr", new Document()
                                                                     .append("$eq", Arrays.asList(
                                                                             "$_id",
-                                                                            "$$" + lookupFieldName + "_id"
+                                                                            "$$" + varName
                                                                             )
                                                                     )
                                                             )
