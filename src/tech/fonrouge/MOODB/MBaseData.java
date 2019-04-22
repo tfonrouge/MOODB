@@ -21,4 +21,16 @@ public abstract class MBaseData<T extends MTable> {
     public Object get_id() {
         return tableState.getFieldValue(table.field__id, Object.class);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder toString = new StringBuilder();
+        for (FieldState fieldState : tableState.fieldStateList) {
+            if (toString.length() > 0) {
+                toString.append(", ");
+            }
+            toString.append(fieldState.value);
+        }
+        return super.toString() + ": " + toString.toString();
+    }
 }
