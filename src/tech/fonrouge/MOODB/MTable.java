@@ -183,10 +183,13 @@ abstract public class MTable {
                 if (value == null && mField.required) {
                     value = mField.getEmptyValue();
                 }
-                if (value instanceof Document && mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
-                    Document document = (Document) value;
-                    tableState.fieldStateList.get(mField.index).document = document;
-                    value = document.get("_id");
+                if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
+                    tableState.fieldStateList.get(mField.index).document = null;
+                    if (value instanceof Document) {
+                        Document document = (Document) value;
+                        tableState.fieldStateList.get(mField.index).document = document;
+                        value = document.get("_id");
+                    }
                 }
                 tableState.setFieldValue(mField.index, value);
             }
