@@ -39,10 +39,10 @@ public class MFieldInteger extends MField<Integer> {
 
     @Override
     public Integer getAsValue(Object anyValue) {
-        switch (anyValue.getClass().getName()) {
-            case "java.lang.Integer":
+        switch (anyValue.getClass().getSimpleName()) {
+            case "Integer":
                 return (Integer) anyValue;
-            case "java.lang.String":
+            case "String":
                 return Integer.valueOf((String) anyValue);
         }
         return null;
