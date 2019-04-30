@@ -24,9 +24,6 @@ abstract public class MTable {
     private int tableStateIndex = 0;
     private ArrayList<TableState> tableStateList = new ArrayList<>();
 
-    /* ******************* */
-    /* constructor methods */
-    /* ******************* */
     public MTable() {
         initialize();
     }
@@ -36,12 +33,11 @@ abstract public class MTable {
         initialize();
     }
 
-    public TableState getTableState() {
-        return tableState;
-    }
-
-    public void setTableState(TableState tableState) {
-        this.tableState = tableState;
+    /**
+     * @return OBJECT_ID for current rawDocument in table
+     */
+    public Object _id() {
+        return field__id.getTypedValue();
     }
 
     @SuppressWarnings("unused")
@@ -57,171 +53,11 @@ abstract public class MTable {
         }
     }
 
-    /* *************** */
-    /* private methods */
-    /* *************** */
-
     /**
      * buildIndices
      */
     protected void buildIndices() {
         indices.forEach(MIndex::buildIndex);
-    }
-
-    protected void initialize() {
-        indices = new ArrayList<>();
-
-        database = newDatabase();
-        engine = new MEngine(this);
-
-        buildIndices();
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void setFieldFilters() {
-
-    }
-
-    void set_id(Object value) {
-        field__id.table.tableState.setFieldValue(field__id.index, value);
-    }
-
-    /**
-     * @param fieldName name of looked field
-     * @return MField
-     */
-    public <T> MField<T> fieldByName(String fieldName) {
-        for (MField mField : fieldList) {
-            if (mField.name.contentEquals(fieldName)) {
-                return (MField<T>) mField; /* TODO: fix this */
-            }
-        }
-        return null;
-    }
-
-    public MFieldTableField fieldTableFieldByName(String name) {
-        for (MField mField : fieldList) {
-            if (mField.name.contentEquals(name) && mField instanceof MFieldTableField) {
-                return (MFieldTableField) mField;
-            }
-        }
-        return null;
-    }
-
-    /* *********************** */
-    /* package private methods */
-    /* *********************** */
-
-    /**
-     * getDatabase
-     *
-     * @return
-     */
-    protected MDatabase getDatabase() {
-        return database;
-    }
-
-    /**
-     * newDatabase
-     *
-     * @return
-     */
-    abstract protected MDatabase newDatabase();
-
-    protected void onAfterDelete() {
-
-    }
-
-    protected void onAfterPost() {
-    }
-
-    protected void onAfterPostEdit() {
-
-    }
-
-    protected void onAfterPostInsert() {
-
-    }
-
-    /**
-     * onBeforeEdit
-     *
-     * @return true if edit is allowed
-     */
-    protected boolean onBeforeEdit() {
-        return true;
-    }
-
-    /* ***************** */
-    /* protected methods */
-    /* ***************** */
-
-    /**
-     * onBeforeInsert
-     *
-     * @return true if insert is allowed
-     */
-    protected boolean onBeforeInsert() {
-        return true;
-    }
-
-    /**
-     * onBeforePost
-     *
-     * @return
-     */
-    protected boolean onBeforePost() {
-        return true;
-    }
-
-    /**
-     * setMasterSource
-     *
-     * @param masterSourceTable : the master source table
-     * @param masterSourceField : the field on the master source table
-     */
-    protected void setMasterSource(MTable masterSourceTable, MFieldTableField masterSourceField) {
-        tableState.masterSource = masterSourceTable;
-        tableState.masterSourceField = masterSourceField;
-    }
-
-    /**
-     * setTableDocument
-     */
-    boolean setTableDocument(MongoCursor<Document> mongoCursor) {
-
-        tableState.mongoCursor = mongoCursor;
-
-        Document rawDocument = (mongoCursor == null || !mongoCursor.hasNext()) ? null : mongoCursor.next();
-
-        tableState.eof = rawDocument == null;
-
-        fieldList.forEach(mField -> {
-            if (!mField.calculated) {
-                Object value = rawDocument == null ? null : rawDocument.getOrDefault(mField.name, null);
-                if (value == null && mField.required) {
-                    value = mField.getEmptyValue();
-                }
-                if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
-                    tableState.fieldStateList.get(mField.index).document = null;
-                    if (value instanceof Document) {
-                        Document document = (Document) value;
-                        tableState.fieldStateList.get(mField.index).document = document;
-                        value = document.get("_id");
-                    }
-                }
-                tableState.setFieldValue(mField.index, value);
-            }
-        });
-
-        if (tableState.linkedField != null && tableState.linkedField.table.tableState.state != STATE.NORMAL) {
-            Object value = tableState.linkedField.getTypedValue();
-            if ((value == null && _id() != null) || _id() != null && !_id().equals(value)) {
-                tableState.linkedField.setValue(_id());
-            }
-        }
-
-        return !tableState.eof;
     }
 
     /**
@@ -283,19 +119,30 @@ abstract public class MTable {
         return true;
     }
 
-    /* ************** */
-    /* public methods */
-    /* ************** */
+    /**
+     * @param fieldName name of looked field
+     * @return MField
+     */
+    public <T> MField<T> fieldByName(String fieldName) {
+        for (MField mField : fieldList) {
+            if (mField.name.contentEquals(fieldName)) {
+                return (MField<T>) mField; /* TODO: fix this */
+            }
+        }
+        return null;
+    }
+
+    public MFieldTableField fieldTableFieldByName(String name) {
+        for (MField mField : fieldList) {
+            if (mField.name.contentEquals(name) && mField instanceof MFieldTableField) {
+                return (MFieldTableField) mField;
+            }
+        }
+        return null;
+    }
 
     public boolean find() {
         return engine.find();
-    }
-
-    /**
-     * @return OBJECT_ID for current rawDocument in table
-     */
-    public Object _id() {
-        return field__id.getTypedValue();
     }
 
     public MTable getChildTable(Class clazz) {
@@ -307,6 +154,15 @@ abstract public class MTable {
     }
 
     public abstract MBaseData getData();
+
+    /**
+     * getDatabase
+     *
+     * @return
+     */
+    protected MDatabase getDatabase() {
+        return database;
+    }
 
     /**
      * getEof
@@ -409,6 +265,14 @@ abstract public class MTable {
      */
     abstract public String getTableName();
 
+    public TableState getTableState() {
+        return tableState;
+    }
+
+    public void setTableState(TableState tableState) {
+        this.tableState = tableState;
+    }
+
     /**
      * goTo
      *
@@ -425,6 +289,15 @@ abstract public class MTable {
     @SuppressWarnings("unused")
     public boolean hasNext() {
         return tableState.mongoCursor != null && tableState.mongoCursor.hasNext();
+    }
+
+    protected void initialize() {
+        indices = new ArrayList<>();
+
+        database = newDatabase();
+        engine = new MEngine(this);
+
+        buildIndices();
     }
 
     /**
@@ -468,6 +341,55 @@ abstract public class MTable {
 
     public boolean next() {
         return engine.next();
+    }
+
+    /**
+     * newDatabase
+     *
+     * @return
+     */
+    abstract protected MDatabase newDatabase();
+
+    protected void onAfterDelete() {
+
+    }
+
+    protected void onAfterPost() {
+    }
+
+    protected void onAfterPostEdit() {
+
+    }
+
+    protected void onAfterPostInsert() {
+
+    }
+
+    /**
+     * onBeforeEdit
+     *
+     * @return true if edit is allowed
+     */
+    protected boolean onBeforeEdit() {
+        return true;
+    }
+
+    /**
+     * onBeforeInsert
+     *
+     * @return true if insert is allowed
+     */
+    protected boolean onBeforeInsert() {
+        return true;
+    }
+
+    /**
+     * onBeforePost
+     *
+     * @return
+     */
+    protected boolean onBeforePost() {
+        return true;
     }
 
     /**
@@ -553,6 +475,65 @@ abstract public class MTable {
         tableState.clearBindings();
 
         return true;
+    }
+
+    void set_id(Object value) {
+        field__id.table.tableState.setFieldValue(field__id.index, value);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void setFieldFilters() {
+
+    }
+
+    /**
+     * setMasterSource
+     *
+     * @param masterSourceTable : the master source table
+     * @param masterSourceField : the field on the master source table
+     */
+    protected void setMasterSource(MTable masterSourceTable, MFieldTableField masterSourceField) {
+        tableState.masterSource = masterSourceTable;
+        tableState.masterSourceField = masterSourceField;
+    }
+
+    /**
+     * setTableDocument
+     */
+    boolean setTableDocument(MongoCursor<Document> mongoCursor) {
+
+        tableState.mongoCursor = mongoCursor;
+
+        Document rawDocument = (mongoCursor == null || !mongoCursor.hasNext()) ? null : mongoCursor.next();
+
+        tableState.eof = rawDocument == null;
+
+        fieldList.forEach(mField -> {
+            if (!mField.calculated) {
+                Object value = rawDocument == null ? null : rawDocument.getOrDefault(mField.name, null);
+                if (value == null && mField.required) {
+                    value = mField.getEmptyValue();
+                }
+                if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
+                    tableState.fieldStateList.get(mField.index).document = null;
+                    if (value instanceof Document) {
+                        Document document = (Document) value;
+                        tableState.fieldStateList.get(mField.index).document = document;
+                        value = document.get("_id");
+                    }
+                }
+                tableState.setFieldValue(mField.index, value);
+            }
+        });
+
+        if (tableState.linkedField != null && tableState.linkedField.table.tableState.state != STATE.NORMAL) {
+            Object value = tableState.linkedField.getTypedValue();
+            if ((value == null && _id() != null) || _id() != null && !_id().equals(value)) {
+                tableState.linkedField.setValue(_id());
+            }
+        }
+
+        return !tableState.eof;
     }
 
     @SuppressWarnings("unused")
