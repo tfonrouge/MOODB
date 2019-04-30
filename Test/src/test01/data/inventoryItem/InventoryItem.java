@@ -67,7 +67,7 @@ public class InventoryItem extends TableBase {
         @Override
         protected void initialize() {
 
-            valueItems = new HashMap<>();
+            valueItems = new ValueItems<>();
             valueItems.put("ITEM", "Item");
             valueItems.put("SERVICE", "Service");
         }

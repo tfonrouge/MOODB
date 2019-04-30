@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <oons:Table xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oons="http://fonrouge.tech/MOODB"
-            extends="Base01"
+            extends="TableBase"
             tableName="inventoryItem"
             xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
 

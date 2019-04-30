@@ -1,9 +1,6 @@
 package test01.data.user;
 
-import tech.fonrouge.MOODB.MFieldDate;
-import tech.fonrouge.MOODB.MFieldInteger;
-import tech.fonrouge.MOODB.MFieldString;
-import tech.fonrouge.MOODB.MIndex;
+import tech.fonrouge.MOODB.*;
 import test01.data.person.Person;
 
 import java.util.HashMap;
@@ -25,7 +22,7 @@ public class User extends Person {
         protected void initialize() {
             description = "User level";
 
-            valueItems = new HashMap<>();
+            valueItems = new ValueItems<>();
             valueItems.put("1", "Admin User");
             valueItems.put("0", "General User");
         }

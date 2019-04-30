@@ -1,9 +1,6 @@
 package test01.data.person;
 
-import tech.fonrouge.MOODB.MFieldBoolean;
-import tech.fonrouge.MOODB.MFieldDate;
-import tech.fonrouge.MOODB.MFieldString;
-import tech.fonrouge.MOODB.MIndex;
+import tech.fonrouge.MOODB.*;
 import test01.data.tableBase.TableBase;
 
 import java.util.HashMap;
@@ -47,7 +44,7 @@ public abstract class Person extends TableBase {
         protected void initialize() {
             required = true;
 
-            valueItems = new HashMap<>();
+            valueItems = new ValueItems<>();
             valueItems.put("?", "Undetermined");
             valueItems.put("M", "Male");
             valueItems.put("F", "Female");

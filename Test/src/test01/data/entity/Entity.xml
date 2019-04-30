@@ -2,7 +2,7 @@
 
 <oons:Table xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oons="http://fonrouge.tech/MOODB"
             abstract="true"
-            extends="Base01"
+            extends="TableBase"
             xsi:noNamespaceSchemaLocation="/moodbxml.xsd">
 
     <oons:Fields>

@@ -1,10 +1,7 @@
 package test02.datos;
 
 import com.mongodb.client.model.Filters;
-import tech.fonrouge.MOODB.MFieldDouble;
-import tech.fonrouge.MOODB.MFieldInteger;
-import tech.fonrouge.MOODB.MFieldString;
-import tech.fonrouge.MOODB.MIndex;
+import tech.fonrouge.MOODB.*;
 
 import java.util.HashMap;
 
@@ -32,7 +29,7 @@ public class Inventario extends Base {
         protected void initialize() {
             required = true;
 
-            valueItems = new HashMap<>();
+            valueItems = new ValueItems<>();
             valueItems.put("S", "Servicio");
             valueItems.put("A", "Articulo");
             valueItems.put("G", "Grupo");
@@ -43,7 +40,7 @@ public class Inventario extends Base {
         @Override
         protected void initialize() {
 
-            valueItems = new HashMap<>();
+            valueItems = new ValueItems<>();
             valueItems.put(1, "one");
             valueItems.put(2, "two");
             valueItems.put(3, "three");

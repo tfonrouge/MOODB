@@ -174,7 +174,7 @@ class FileMaker {
                 }
 
                 if (fieldModel.keyValueItems.size() > 0) {
-                    initializeString += "\n            valueItems = new HashMap<>();\n";
+                    initializeString += "\n            valueItems = new ValueItems<>();\n";
                     final String[] line = {""};
                     fieldModel.keyValueItems.forEach((key, value) -> line[0] += "            valueItems.put(" + key + ", \"" + value + "\");\n");
                     initializeString += line[0];
