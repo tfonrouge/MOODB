@@ -87,9 +87,13 @@ abstract public class MTable {
      * delete
      */
     public boolean delete() {
-        boolean result = engine.delete();
-        onAfterDelete();
-        return result;
+        if (onBeforeDelete()) {
+            if (engine.delete()) {
+                onAfterDelete();
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -365,6 +369,10 @@ abstract public class MTable {
 
     protected void onAfterPostInsert() {
 
+    }
+
+    protected boolean onBeforeDelete() {
+        return true;
     }
 
     /**
