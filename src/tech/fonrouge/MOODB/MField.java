@@ -4,7 +4,6 @@ import com.mongodb.client.MongoCursor;
 import org.bson.Document;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.Callable;
 
 public abstract class MField<T> {
@@ -17,7 +16,7 @@ public abstract class MField<T> {
     protected boolean newFinal;
     protected String description;
     protected String label;
-    protected HashMap<T, String> valueItems;
+    protected ValueItems<T> valueItems = null;
     protected Callable<T> calcValue = null;
     protected Callable<Boolean> onValidate = null;
     protected boolean autoInc;
@@ -133,12 +132,19 @@ public abstract class MField<T> {
         return null;
     }
 
+    public String getLabelOfValue() {
+        if (valueItems != null) {
+            return valueItems.get(value());
+        }
+        return null;
+    }
+
     /**
      * getValueItems
      *
      * @return valueItems
      */
-    public HashMap<T, String> getValueItems() {
+    public ValueItems<T> getValueItems() {
         return valueItems;
     }
 
@@ -357,7 +363,7 @@ public abstract class MField<T> {
      *
      * @return boolean if value has changed
      */
-    boolean valueChanged() {
+    public boolean valueChanged() {
         return !(getTypedValue() == getFieldState().origValue);
     }
 
@@ -371,6 +377,10 @@ public abstract class MField<T> {
             }
         }
         return getFieldState().defaultValue;
+    }
+
+    final public T getOrigValue() {
+        return (T) getFieldState().origValue;
     }
 
     @SuppressWarnings("unused")

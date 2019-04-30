@@ -29,6 +29,7 @@
             <xs:element name="FieldTableField" type="FieldTableFieldType"/>
             <xs:element name="FieldString" type="FieldStringType"/>
             <xs:element name="FieldBinary" type="FieldBaseType"/>
+            <xs:element name="FieldObject" type="FieldBaseType"/>
         </xs:choice>
     </xs:complexType>
     <xs:complexType name="FieldBaseType">

@@ -15,10 +15,7 @@ import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.bson.Document;
-import tech.fonrouge.MOODB.MBaseData;
-import tech.fonrouge.MOODB.MField;
-import tech.fonrouge.MOODB.MFieldTableField;
-import tech.fonrouge.MOODB.MTable;
+import tech.fonrouge.MOODB.*;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -96,7 +93,8 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
-    void populateList() {
+    @SuppressWarnings("WeakerAccess")
+    protected void populateList() {
 
         observableList.clear();
 
@@ -106,7 +104,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             }
         }
 
-        table.find();
+        tableFind();
 
         while (!table.getEof()) {
             MBaseData e = table.getData();
@@ -129,35 +127,53 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                     String label = "";
                     String value = "";
 
-                    MFieldTableField mFieldTableField = param.getValue()._getTable().fieldTableFieldByName(fieldList[0]);
+                    MField mField = param.getValue()._getTable().fieldByName(fieldList[0]);
 
-                    if (mFieldTableField != null) {
-                        Document document = param.getValue()._getTableState().getFieldStateDocument(mFieldTableField.index);
-                        if (document != null) {
-                            label = mFieldTableField.getLabel();
-                            int i = 1;
-                            do {
-                                MField mField = mFieldTableField.linkedTable().fieldByName(fieldList[i]);
-                                if (mField != null) {
-                                    if (mField instanceof MFieldTableField) {
-                                        mFieldTableField = (MFieldTableField) mField;
+                    if (mField != null) {
+
+                        MTable table = mField.getTable();
+
+                        TableState tableState = table.getTableState();
+                        table.setTableState(param.getValue()._getTableState());
+
+                        MFieldTableField mFieldTableField = table.fieldTableFieldByName(fieldList[0]);
+
+                        if (mFieldTableField != null) {
+                            Document document = param.getValue()._getTableState().getFieldStateDocument(mFieldTableField.index);
+                            if (document != null) {
+                                label = mFieldTableField.getLabel();
+                                int i = 1;
+                                do {
+                                    mField = mFieldTableField.linkedTable().fieldByName(fieldList[i]);
+                                    if (mField != null) {
+                                        if (mField instanceof MFieldTableField) {
+                                            mFieldTableField = (MFieldTableField) mField;
+                                        } else {
+                                            mFieldTableField = null;
+                                        }
+                                        label += " " + mField.getLabel();
+                                        if (mField.isCalculated()) {
+                                            value = mField.valueAsString();
+                                        } else {
+                                            value = document.get(mField.getName()).toString();
+                                        }
                                     } else {
-                                        mFieldTableField = null;
+                                        //label = "!" + fieldExpression + "!";
+                                        //value = "!error!";
+                                        break;
                                     }
-                                    label += " " + mField.getLabel();
-                                    if (mField.isCalculated()) {
-                                        value = mField.valueAsString();
-                                    } else {
-                                        value = document.get(mField.getName()).toString();
-                                    }
-                                } else {
-                                    //label = "!" + fieldExpression + "!";
-                                    //value = "!error!";
-                                    break;
+                                    document = document.get("@" + mField.getName(), Document.class);
+                                } while (mFieldTableField != null && document != null && ++i < fieldList.length);
+                            }
+                        } else {
+                            if (mField.getValueItems() != null) {
+                                if (fieldList[1].equalsIgnoreCase("value")) {
+                                    label = mField.getLabel();
+                                    value = mField.getLabelOfValue();
                                 }
-                                document = document.get("@" + mField.getName(), Document.class);
-                            } while (mFieldTableField != null && document != null && ++i < fieldList.length);
+                            }
                         }
+                        table.setTableState(tableState);
                     }
 
                     column.setText(label);
@@ -176,6 +192,37 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
 
         return new TableColumn<>(fieldExpression);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    protected void tableFind() {
+        table.find();
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void onActionDeleteDocument() {
+
+        MBaseData item = tableView.getSelectionModel().getSelectedItem();
+
+        if (item != null) {
+            if (table.field__id.find(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
+                table.delete();
+                populateList();
+            }
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void onActionEditDocument() {
+
+        MBaseData item = tableView.getSelectionModel().getSelectedItem();
+
+        if (item != null) {
+            Object id = item.get_id();
+            if (table.field__id.find(id) && table.edit()) {
+                doInsertEdit();
+            }
+        }
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -271,32 +318,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     }
 
     abstract protected String getResourceRecordName();
-
-    @SuppressWarnings("WeakerAccess")
-    public void onActionDeleteDocument() {
-
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
-
-        if (item != null) {
-            if (table.field__id.find(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
-                table.delete();
-                populateList();
-            }
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void onActionEditDocument() {
-
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
-
-        if (item != null) {
-            Object id = item.get_id();
-            if (table.field__id.find(id) && table.edit()) {
-                doInsertEdit();
-            }
-        }
-    }
 
     @SuppressWarnings("WeakerAccess")
     public void onActionInsertDocument() {

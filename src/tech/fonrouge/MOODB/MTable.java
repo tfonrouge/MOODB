@@ -40,6 +40,10 @@ abstract public class MTable {
         return tableState;
     }
 
+    public void setTableState(TableState tableState) {
+        this.tableState = tableState;
+    }
+
     @SuppressWarnings("unused")
     public void addLookupField(String fieldExpression) {
 
@@ -53,16 +57,16 @@ abstract public class MTable {
         }
     }
 
+    /* *************** */
+    /* private methods */
+    /* *************** */
+
     /**
      * buildIndices
      */
     protected void buildIndices() {
         indices.forEach(MIndex::buildIndex);
     }
-
-    /* *************** */
-    /* private methods */
-    /* *************** */
 
     protected void initialize() {
         indices = new ArrayList<>();
@@ -104,6 +108,10 @@ abstract public class MTable {
         return null;
     }
 
+    /* *********************** */
+    /* package private methods */
+    /* *********************** */
+
     /**
      * getDatabase
      *
@@ -113,16 +121,27 @@ abstract public class MTable {
         return database;
     }
 
-    /* *********************** */
-    /* package private methods */
-    /* *********************** */
-
     /**
      * newDatabase
      *
      * @return
      */
     abstract protected MDatabase newDatabase();
+
+    protected void onAfterDelete() {
+
+    }
+
+    protected void onAfterPost() {
+    }
+
+    protected void onAfterPostEdit() {
+
+    }
+
+    protected void onAfterPostInsert() {
+
+    }
 
     /**
      * onBeforeEdit
@@ -133,6 +152,10 @@ abstract public class MTable {
         return true;
     }
 
+    /* ***************** */
+    /* protected methods */
+    /* ***************** */
+
     /**
      * onBeforeInsert
      *
@@ -141,10 +164,6 @@ abstract public class MTable {
     protected boolean onBeforeInsert() {
         return true;
     }
-
-    /* ***************** */
-    /* protected methods */
-    /* ***************** */
 
     /**
      * onBeforePost
@@ -264,13 +283,13 @@ abstract public class MTable {
         return true;
     }
 
-    public boolean find() {
-        return engine.find();
-    }
-
     /* ************** */
     /* public methods */
     /* ************** */
+
+    public boolean find() {
+        return engine.find();
+    }
 
     /**
      * @return OBJECT_ID for current rawDocument in table
@@ -516,7 +535,20 @@ abstract public class MTable {
 
         tableState.eof = false;
 
+        STATE prevState = tableState.state;
+
         tableState.state = STATE.NORMAL;
+
+        onAfterPost();
+
+        switch (prevState) {
+            case EDIT:
+                onAfterPostEdit();
+                break;
+            case INSERT:
+                onAfterPostInsert();
+                break;
+        }
 
         tableState.clearBindings();
 
