@@ -21,6 +21,10 @@ public abstract class UI_ChangeListener0<T, N extends Node, U> implements Change
         }
     }
 
+    private void addChangeListener(MField mField) {
+        mField.getFieldState().addListener(this);
+    }
+
     MTable getTable() {
         return getWorkField().getTable();
     }
@@ -34,7 +38,9 @@ public abstract class UI_ChangeListener0<T, N extends Node, U> implements Change
 
     abstract void initialize(N node);
 
-    abstract public void update(T value);
+    public void refreshNode() {
+        update(mField.value());
+    }
 
     public abstract void removePropertyListener();
 
@@ -53,11 +59,5 @@ public abstract class UI_ChangeListener0<T, N extends Node, U> implements Change
         mField.getFieldState().clearCurrentChangeListener();
     }
 
-    private void addChangeListener(MField mField) {
-        mField.getFieldState().addListener(this);
-    }
-
-    public void refreshNode() {
-        update(mField.value());
-    }
+    abstract public void update(T value);
 }

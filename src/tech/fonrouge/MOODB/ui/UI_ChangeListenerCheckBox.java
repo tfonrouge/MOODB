@@ -27,15 +27,15 @@ class UI_ChangeListenerCheckBox extends UI_ChangeListener0<Boolean, CheckBox, Bo
     }
 
     @Override
+    public void removePropertyListener() {
+        property.removeListener(this);
+    }
+
+    @Override
     public void update(Boolean value) {
         if (!mField.valueEquals(property.getValue())) {
             property.setValue(value);
         }
-    }
-
-    @Override
-    public void removePropertyListener() {
-        property.removeListener(this);
     }
 
     @Override

@@ -17,28 +17,6 @@ class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T, ComboBox<T>> {
         super(comboBox, mField);
     }
 
-    void initialize(ComboBox<T> comboBox) {
-        comboBox.setPromptText(mField.getDescription());
-        comboBox.setItems(getObservableArrayList());
-        property = comboBox.valueProperty();
-        property.setValue(mField.value());
-        property.addListener(this);
-    }
-
-    @Override
-    public void removePropertyListener() {
-        property.removeListener(this);
-    }
-
-    @Override
-    void set_UI_state(ComboBox<T> comboBox) {
-        if (getTable().getState() == MTable.STATE.NORMAL || getWorkField().isReadOnly()) {
-            comboBox.setItems(null);
-            comboBox.getEditor().editableProperty().setValue(false);
-            comboBox.setFocusTraversable(false);
-        }
-    }
-
     private ObservableList<T> getObservableArrayList() {
         ObservableList<T> observableList = FXCollections.observableArrayList();
         if (mField.getTable().getLinkedField() == null) {
@@ -62,13 +40,35 @@ class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T, ComboBox<T>> {
         return observableList;
     }
 
+    void initialize(ComboBox<T> comboBox) {
+        comboBox.setPromptText(mField.getDescription());
+        comboBox.setItems(getObservableArrayList());
+        property = comboBox.valueProperty();
+        property.setValue(mField.value());
+        property.addListener(this);
+    }
+
     @Override
     T propertyGetValue() {
         return property.getValue();
     }
-
+    
     @Override
     void propertySetValue(T oldValue) {
         property.setValue(oldValue);
+    }
+
+    @Override
+    public void removePropertyListener() {
+        property.removeListener(this);
+    }
+
+    @Override
+    void set_UI_state(ComboBox<T> comboBox) {
+        if (getTable().getState() == MTable.STATE.NORMAL || getWorkField().isReadOnly()) {
+            comboBox.setItems(null);
+            comboBox.getEditor().editableProperty().setValue(false);
+            comboBox.setFocusTraversable(false);
+        }
     }
 }

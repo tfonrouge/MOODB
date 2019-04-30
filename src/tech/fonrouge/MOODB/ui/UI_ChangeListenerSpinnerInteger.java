@@ -33,13 +33,6 @@ class UI_ChangeListenerSpinnerInteger extends UI_ChangeListener0<Integer, Spinne
     }
 
     @Override
-    public void update(Integer value) {
-        if (!mField.valueEquals(property.getValue())) {
-            property.setValue(value);
-        }
-    }
-
-    @Override
     public void removePropertyListener() {
         property.removeListener(this);
     }
@@ -50,6 +43,13 @@ class UI_ChangeListenerSpinnerInteger extends UI_ChangeListener0<Integer, Spinne
             spinner.editableProperty().setValue(false);
             spinner.setDisable(true);
             spinner.setFocusTraversable(false);
+        }
+    }
+
+    @Override
+    public void update(Integer value) {
+        if (!mField.valueEquals(property.getValue())) {
+            property.setValue(value);
         }
     }
 }

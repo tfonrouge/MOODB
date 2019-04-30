@@ -23,17 +23,6 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
     protected Parent parent;
     private UI_CtrlList<T> ctrlList;
 
-    <U extends UI_CtrlList<T>> void setCtrlList(U ctrlList) {
-        this.ctrlList = ctrlList;
-        this.table = ctrlList.table;
-        this.parent = ctrlList.parent;
-        NoAutoBinding noAutoBinding = getClass().getAnnotation(NoAutoBinding.class);
-        if (noAutoBinding == null) {
-            bindControls();
-        }
-        initData();
-    }
-
     protected abstract void initData();
 
     @SuppressWarnings("unused")
@@ -73,6 +62,17 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
         if (source != null) {
             source.getScene().getWindow().hide();
         }
+    }
+
+    <U extends UI_CtrlList<T>> void setCtrlList(U ctrlList) {
+        this.ctrlList = ctrlList;
+        this.table = ctrlList.table;
+        this.parent = ctrlList.parent;
+        NoAutoBinding noAutoBinding = getClass().getAnnotation(NoAutoBinding.class);
+        if (noAutoBinding == null) {
+            bindControls();
+        }
+        initData();
     }
 
     @Retention(RetentionPolicy.RUNTIME)

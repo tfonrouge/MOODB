@@ -12,10 +12,6 @@ public abstract class UI_ChangeListener<T, N extends Node> extends UI_ChangeList
         super(node, mField);
     }
 
-    abstract T propertyGetValue();
-
-    abstract void propertySetValue(T oldValue);
-
     @Override
     final public void changed(ObservableValue<? extends T> observable, T oldValue, T newValue) {
         if (!ignore && !mField.valueEquals(newValue)) {
@@ -38,6 +34,10 @@ public abstract class UI_ChangeListener<T, N extends Node> extends UI_ChangeList
             }
         }
     }
+
+    abstract T propertyGetValue();
+
+    abstract void propertySetValue(T oldValue);
 
     @Override
     public void update(T value) {

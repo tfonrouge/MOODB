@@ -38,34 +38,15 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         this.table = table;
     }
 
-    TableView<MBaseData> getTableView() {
-        return tableView;
-    }
+    private void buildColumns() {
 
-    void showWindow(Parent parent) {
+        for (String fieldExpression : getColumns()) {
 
-        initController(parent);
+            TableColumn<MBaseData, ?> column = getColumn(fieldExpression);
 
-        stage = new Stage();
+            tableView.getColumns().add(column);
 
-        buildTableView();
-
-        Scene scene = new Scene(parent);
-
-        tableView.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ESCAPE) {
-                stage.hide();
-            }
-        });
-
-        stage.setScene(scene);
-        stage.setTitle(table.getGenres());
-
-        stage.show();
-    }
-
-    protected void initController(Parent parent) {
-
+        }
     }
 
     private void buildTableView() {
@@ -80,149 +61,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         tableView.setItems(observableList);
 
-    }
-
-    private void buildColumns() {
-
-        for (String fieldExpression : getColumns()) {
-
-            TableColumn<MBaseData, ?> column = getColumn(fieldExpression);
-
-            tableView.getColumns().add(column);
-
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    protected void populateList() {
-
-        observableList.clear();
-
-        for (int i = 0; i < getColumns().length; i++) {
-            if (getColumns()[i].indexOf(".") > 0) {
-                table.addLookupField(getColumns()[i]);
-            }
-        }
-
-        tableFind();
-
-        while (!table.getEof()) {
-            MBaseData e = table.getData();
-            observableList.add(e);
-            table.next();
-        }
-    }
-
-    protected abstract String[] getColumns();
-
-    private TableColumn<MBaseData, ?> getColumn(String fieldExpression) {
-
-        if (fieldExpression.indexOf('.') > 0) {
-            String[] fieldList = fieldExpression.split("\\.");
-            if (fieldList.length > 1) {
-                TableColumn<MBaseData, String> column;
-                column = new TableColumn<>();
-                column.setCellValueFactory(param -> {
-
-                    String label = "";
-                    String value = "";
-
-                    MField mField = param.getValue()._getTable().fieldByName(fieldList[0]);
-
-                    if (mField != null) {
-
-                        MTable table = mField.getTable();
-
-                        TableState tableState = table.getTableState();
-                        table.setTableState(param.getValue()._getTableState());
-
-                        MFieldTableField mFieldTableField = table.fieldTableFieldByName(fieldList[0]);
-
-                        if (mFieldTableField != null) {
-                            Document document = param.getValue()._getTableState().getFieldStateDocument(mFieldTableField.index);
-                            if (document != null) {
-                                label = mFieldTableField.getLabel();
-                                int i = 1;
-                                do {
-                                    mField = mFieldTableField.linkedTable().fieldByName(fieldList[i]);
-                                    if (mField != null) {
-                                        if (mField instanceof MFieldTableField) {
-                                            mFieldTableField = (MFieldTableField) mField;
-                                        } else {
-                                            mFieldTableField = null;
-                                        }
-                                        label += " " + mField.getLabel();
-                                        if (mField.isCalculated()) {
-                                            value = mField.valueAsString();
-                                        } else {
-                                            value = document.get(mField.getName()).toString();
-                                        }
-                                    } else {
-                                        //label = "!" + fieldExpression + "!";
-                                        //value = "!error!";
-                                        break;
-                                    }
-                                    document = document.get("@" + mField.getName(), Document.class);
-                                } while (mFieldTableField != null && document != null && ++i < fieldList.length);
-                            }
-                        } else {
-                            if (mField.getValueItems() != null) {
-                                if (fieldList[1].equalsIgnoreCase("value")) {
-                                    label = mField.getLabel();
-                                    value = mField.getLabelOfValue();
-                                }
-                            }
-                        }
-                        table.setTableState(tableState);
-                    }
-
-                    column.setText(label);
-                    return new ReadOnlyObjectWrapper<>(value);
-                });
-                return column;
-            }
-        } else {
-            MField mField = table.fieldByName(fieldExpression);
-            if (mField != null) {
-                TableColumn<MBaseData, ?> column;
-                column = new TableColumn<>(mField.getLabel());
-                column.setCellValueFactory(new PropertyValueFactory<>(mField.getName()));
-                return column;
-            }
-        }
-
-        return new TableColumn<>(fieldExpression);
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    protected void tableFind() {
-        table.find();
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void onActionDeleteDocument() {
-
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
-
-        if (item != null) {
-            if (table.field__id.find(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
-                table.delete();
-                populateList();
-            }
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void onActionEditDocument() {
-
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
-
-        if (item != null) {
-            Object id = item.get_id();
-            if (table.field__id.find(id) && table.edit()) {
-                doInsertEdit();
-            }
-        }
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -317,7 +155,122 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
+    private TableColumn<MBaseData, ?> getColumn(String fieldExpression) {
+
+        if (fieldExpression.indexOf('.') > 0) {
+            String[] fieldList = fieldExpression.split("\\.");
+            if (fieldList.length > 1) {
+                TableColumn<MBaseData, String> column;
+                column = new TableColumn<>();
+                column.setCellValueFactory(param -> {
+
+                    String label = "";
+                    String value = "";
+
+                    MField mField = param.getValue()._getTable().fieldByName(fieldList[0]);
+
+                    if (mField != null) {
+
+                        MTable table = mField.getTable();
+
+                        TableState tableState = table.getTableState();
+                        table.setTableState(param.getValue()._getTableState());
+
+                        MFieldTableField mFieldTableField = table.fieldTableFieldByName(fieldList[0]);
+
+                        if (mFieldTableField != null) {
+                            Document document = param.getValue()._getTableState().getFieldStateDocument(mFieldTableField.index);
+                            if (document != null) {
+                                label = mFieldTableField.getLabel();
+                                int i = 1;
+                                do {
+                                    mField = mFieldTableField.linkedTable().fieldByName(fieldList[i]);
+                                    if (mField != null) {
+                                        if (mField instanceof MFieldTableField) {
+                                            mFieldTableField = (MFieldTableField) mField;
+                                        } else {
+                                            mFieldTableField = null;
+                                        }
+                                        label += " " + mField.getLabel();
+                                        if (mField.isCalculated()) {
+                                            value = mField.valueAsString();
+                                        } else {
+                                            value = document.get(mField.getName()).toString();
+                                        }
+                                    } else {
+                                        //label = "!" + fieldExpression + "!";
+                                        //value = "!error!";
+                                        break;
+                                    }
+                                    document = document.get("@" + mField.getName(), Document.class);
+                                } while (mFieldTableField != null && document != null && ++i < fieldList.length);
+                            }
+                        } else {
+                            if (mField.getValueItems() != null) {
+                                if (fieldList[1].equalsIgnoreCase("value")) {
+                                    label = mField.getLabel();
+                                    value = mField.getLabelOfValue();
+                                }
+                            }
+                        }
+                        table.setTableState(tableState);
+                    }
+
+                    column.setText(label);
+                    return new ReadOnlyObjectWrapper<>(value);
+                });
+                return column;
+            }
+        } else {
+            MField mField = table.fieldByName(fieldExpression);
+            if (mField != null) {
+                TableColumn<MBaseData, ?> column;
+                column = new TableColumn<>(mField.getLabel());
+                column.setCellValueFactory(new PropertyValueFactory<>(mField.getName()));
+                return column;
+            }
+        }
+
+        return new TableColumn<>(fieldExpression);
+    }
+
+    protected abstract String[] getColumns();
+
     abstract protected String getResourceRecordName();
+
+    TableView<MBaseData> getTableView() {
+        return tableView;
+    }
+
+    protected void initController(Parent parent) {
+
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void onActionDeleteDocument() {
+
+        MBaseData item = tableView.getSelectionModel().getSelectedItem();
+
+        if (item != null) {
+            if (table.field__id.find(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
+                table.delete();
+                populateList();
+            }
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void onActionEditDocument() {
+
+        MBaseData item = tableView.getSelectionModel().getSelectedItem();
+
+        if (item != null) {
+            Object id = item.get_id();
+            if (table.field__id.find(id) && table.edit()) {
+                doInsertEdit();
+            }
+        }
+    }
 
     @SuppressWarnings("WeakerAccess")
     public void onActionInsertDocument() {
@@ -332,5 +285,52 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         if (item != null && table.field__id.find(item.get_id())) {
             doInsertEdit();
         }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    protected void populateList() {
+
+        observableList.clear();
+
+        for (int i = 0; i < getColumns().length; i++) {
+            if (getColumns()[i].indexOf(".") > 0) {
+                table.addLookupField(getColumns()[i]);
+            }
+        }
+
+        tableFind();
+
+        while (!table.getEof()) {
+            MBaseData e = table.getData();
+            observableList.add(e);
+            table.next();
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    protected void tableFind() {
+        table.find();
+    }
+
+    void showWindow(Parent parent) {
+
+        initController(parent);
+
+        stage = new Stage();
+
+        buildTableView();
+
+        Scene scene = new Scene(parent);
+
+        tableView.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                stage.hide();
+            }
+        });
+
+        stage.setScene(scene);
+        stage.setTitle(table.getGenres());
+
+        stage.show();
     }
 }

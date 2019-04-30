@@ -28,13 +28,6 @@ class UI_ChangeListenerTextInputControl<T> extends UI_ChangeListener0<T, TextInp
     }
 
     @Override
-    public void update(T value) {
-        if (!mField.valueAsString().equals(property.getValue())) {
-            property.setValue(mField.valueAsString(value));
-        }
-    }
-
-    @Override
     public void removePropertyListener() {
         property.removeListener(this);
     }
@@ -44,6 +37,13 @@ class UI_ChangeListenerTextInputControl<T> extends UI_ChangeListener0<T, TextInp
         if (getTable().getState() == MTable.STATE.NORMAL || getWorkField().isReadOnly()) {
             textInputControl.editableProperty().setValue(false);
             textInputControl.setFocusTraversable(false);
+        }
+    }
+
+    @Override
+    public void update(T value) {
+        if (!mField.valueAsString().equals(property.getValue())) {
+            property.setValue(mField.valueAsString(value));
         }
     }
 }
