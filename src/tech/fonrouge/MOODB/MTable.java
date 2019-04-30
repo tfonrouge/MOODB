@@ -87,7 +87,9 @@ abstract public class MTable {
      * delete
      */
     public boolean delete() {
-        return engine.delete();
+        boolean result = engine.delete();
+        onAfterDelete();
+        return result;
     }
 
     /**
