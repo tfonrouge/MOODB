@@ -155,6 +155,8 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
+    protected abstract String getBaseResourcePath();
+
     private TableColumn<MBaseData, ?> getColumn(String fieldExpression) {
 
         if (fieldExpression.indexOf('.') > 0) {
@@ -310,6 +312,54 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     @SuppressWarnings("WeakerAccess")
     protected void tableFind() {
         table.find();
+    }
+
+    static private Constructor<?> getCtorClass(Class<?> tableClass) {
+        Constructor<?> constructor;
+        String className;
+
+        if (tableClass.equals(MTable.class)) {
+            return null;
+        }
+
+        className = tableClass.getName() + "CtrlList";
+
+        try {
+            constructor = Class.forName(className).getConstructor(tableClass);
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            return getCtorClass(tableClass.getSuperclass());
+        }
+        return constructor;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    static public void showList(MTable table) {
+        UI_CtrlList ui_ctrlList = null;
+
+        try {
+            Constructor<?> constructor = getCtorClass(table.getClass());
+            if (constructor != null) {
+                ui_ctrlList = (UI_CtrlList) constructor.newInstance(table);
+            }
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            e.printStackTrace();
+            UI_Message.Warning("Warning", e.toString());
+        }
+
+        if (ui_ctrlList != null) {
+            FXMLLoader loader = new FXMLLoader(ui_ctrlList.getClass().getResource(ui_ctrlList.getBaseResourcePath()));
+            loader.setController(ui_ctrlList);
+            Parent parent = null;
+            try {
+                parent = loader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+                UI_Message.Warning("Warning", e.toString());
+            }
+            if (parent != null) {
+                ui_ctrlList.showWindow(parent);
+            }
+        }
     }
 
     void showWindow(Parent parent) {
