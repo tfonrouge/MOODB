@@ -30,6 +30,11 @@ public abstract class TableBaseCtrlList<T extends TableBase> extends UI_CtrlList
     }
 
     @Override
+    protected String getBaseResourcePath() {
+        return "/test01/ui/baseList.fxml";
+    }
+
+    @Override
     protected void initController(Parent parent) {
         super.initController(parent);
 
