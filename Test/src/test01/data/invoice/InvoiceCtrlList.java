@@ -14,7 +14,7 @@ public class InvoiceCtrlList extends TableBaseCtrlList<Invoice> {
     }
 
     @Override
-    protected String getResourceRecordName() {
+    protected String getCtrlRecordFXMLPath() {
         return "/test01/data/invoice/record.fxml";
     }
 }

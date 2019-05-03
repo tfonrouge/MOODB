@@ -65,7 +65,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     protected void doInsertEdit() {
-        String resourceRecordName = getResourceRecordName();
+        String resourceRecordName = getCtrlRecordFXMLPath();
 
         if (resourceRecordName != null && !resourceRecordName.isEmpty()) {
             URL resource = getClass().getResource(resourceRecordName);
@@ -155,7 +155,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
-    protected abstract String getBaseResourcePath();
+    protected abstract String getCtrlListFXMLPath();
 
     private TableColumn<MBaseData, ?> getColumn(String fieldExpression) {
 
@@ -238,7 +238,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     protected abstract String[] getColumns();
 
-    abstract protected String getResourceRecordName();
+    abstract protected String getCtrlRecordFXMLPath();
 
     TableView<MBaseData> getTableView() {
         return tableView;
@@ -347,7 +347,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
 
         if (ui_ctrlList != null) {
-            FXMLLoader loader = new FXMLLoader(ui_ctrlList.getClass().getResource(ui_ctrlList.getBaseResourcePath()));
+            FXMLLoader loader = new FXMLLoader(ui_ctrlList.getClass().getResource(ui_ctrlList.getCtrlListFXMLPath()));
             loader.setController(ui_ctrlList);
             Parent parent = null;
             try {
