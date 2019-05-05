@@ -128,7 +128,7 @@ And then you can use this Java class in the form:
         }
     }
     
-    if (inventoryItem.field_name.find("Mouse")) {
+    if (inventoryItem.field_name.aggregateFind("Mouse")) {
         ...
     }
 

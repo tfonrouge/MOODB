@@ -64,23 +64,23 @@ public abstract class MField<T> {
 
     }
 
-    public boolean find() {
+    public boolean aggregateFind() {
         ArrayList<Document> pipeline = new ArrayList<>();
         pipeline.add(
                 new Document().
                         append("$sort", new Document().
                                 append(name, 1))
         );
-        return table.setTableDocument(table.engine.executeAggregate(pipeline));
+        return table.setTableDocument(table.engine.aggregateFind(pipeline));
     }
 
     /**
-     * find
+     * aggregateFind
      *
      * @param keyValue
      * @return
      */
-    public boolean find(Object keyValue) {
+    public boolean aggregateFind(Object keyValue) {
         ArrayList<Document> pipeline = new ArrayList<>();
         pipeline.add(
                 new Document().
@@ -89,7 +89,7 @@ public abstract class MField<T> {
         pipeline.add(
                 new Document().
                         append("$limit", 1));
-        return table.setTableDocument(table.engine.executeAggregate(pipeline));
+        return table.setTableDocument(table.engine.aggregateFind(pipeline));
     }
 
     public abstract T getAsValue(Object anyValue);
@@ -162,7 +162,7 @@ public abstract class MField<T> {
                 new Document().
                         append("$project", new Document().
                                 append("folio", 1)));
-        MongoCursor<Document> mongoCursor = table.engine.executeAggregate(pipeline);
+        MongoCursor<Document> mongoCursor = table.engine.aggregateFind(pipeline);
         if (mongoCursor.hasNext()) {
             Document d = mongoCursor.next();
             value = d.get(name, getEmptyValue());

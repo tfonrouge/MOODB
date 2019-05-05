@@ -102,12 +102,12 @@ public abstract class MIndex {
     /* public methods */
     /* ************** */
 
-    public boolean find(Object... objects) {
+    public boolean aggregateFind(Object... objects) {
         Document document = getMasterKeyFindExpression(masterKeyField);
         getKeyFieldFindExpression(document, objects);
         ArrayList<Document> pipeline = new ArrayList<>();
         pipeline.add(new Document().append("$match", document));
-        return table.setTableDocument(table.engine.executeAggregate(pipeline));
+        return table.setTableDocument(table.engine.aggregateFind(pipeline));
     }
 
     private void getKeyFieldFindExpression(Document document, Object... objects) {

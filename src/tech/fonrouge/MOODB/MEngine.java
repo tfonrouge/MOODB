@@ -5,7 +5,6 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -16,7 +15,7 @@ import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
-class MEngine {
+public class MEngine {
 
     private static HashMap<String, MongoCollection<Document>> collections;
 
@@ -24,6 +23,7 @@ class MEngine {
     Exception exception;
     private MTable table;
     private ArrayList<Document> pipeline;
+    private MongoClient mongoClient;
     private MongoDatabase mongoDatabase;
 
     /* ******************* */
@@ -78,7 +78,7 @@ class MEngine {
         }
 
         MongoClientURI mongoClientURI = new MongoClientURI(clientURI);
-        MongoClient mongoClient = new MongoClient(mongoClientURI);
+        mongoClient = new MongoClient(mongoClientURI);
         mongoDatabase = mongoClient.getDatabase(table.getDatabase().getDatabaseName());
 
         if (collections.containsKey(key)) {
@@ -101,18 +101,17 @@ class MEngine {
     @SuppressWarnings("WeakerAccess")
     public boolean delete() {
         Document document = new Document().append("_id", table._id());
-        DeleteResult result = collection.deleteOne(document);
-        return result.getDeletedCount() == 1;
+        return collection.deleteOne(document).getDeletedCount() == 1;
     }
 
     /**
-     * executeAggregate
+     * aggregateFind
      *
-     * @param documentList bson list for executeAggregate function
+     * @param documentList bson list for aggregateFind function
      * @return iterable
      */
     @SuppressWarnings("WeakerAccess")
-    public MongoCursor<Document> executeAggregate(List<Document> documentList) {
+    public MongoCursor<Document> aggregateFind(List<Document> documentList) {
         for (int i = 0; i < table.fieldList.size(); i++) {
             if (table.fieldList.get(i).fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
                 MFieldTableField mFieldTableField = (MFieldTableField) table.fieldList.get(i);
@@ -173,11 +172,11 @@ class MEngine {
     }
 
     /**
-     * find : go to the first document in scope
+     * aggregateFind : go to the first document in scope
      *
-     * @return success on find
+     * @return success on aggregateFind
      */
-    public boolean find() {
+    public boolean aggregateFind() {
         Document masterSourceFilter = buildMasterSourceFilter();
         if (masterSourceFilter != null) {
             pipeline = new ArrayList<>();
@@ -187,7 +186,12 @@ class MEngine {
         } else {
             pipeline = new ArrayList<>();
         }
-        return table.setTableDocument(executeAggregate(pipeline));
+        return table.setTableDocument(aggregateFind(pipeline));
+    }
+
+    @SuppressWarnings("unused")
+    public MongoClient getMongoClient() {
+        return mongoClient;
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -210,7 +214,7 @@ class MEngine {
         pipeline.add(
                 new Document().
                         append("$limit", 1));
-        return table.setTableDocument(executeAggregate(pipeline));
+        return table.setTableDocument(aggregateFind(pipeline));
     }
 
     /**

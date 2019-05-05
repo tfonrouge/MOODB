@@ -18,6 +18,7 @@ abstract public class MTable {
 
     ArrayList<MField> fieldList;
     ArrayList<MIndex> indices = new ArrayList<>();
+
     MEngine engine;
     TableState tableState;
     private MDatabase database;
@@ -147,8 +148,8 @@ abstract public class MTable {
         return null;
     }
 
-    public boolean find() {
-        return engine.find();
+    public boolean aggregateFind() {
+        return engine.aggregateFind();
     }
 
     public MTable getChildTable(Class clazz) {
@@ -168,6 +169,10 @@ abstract public class MTable {
      */
     protected MDatabase getDatabase() {
         return database;
+    }
+
+    public MEngine getEngine() {
+        return engine;
     }
 
     /**
@@ -415,6 +420,7 @@ abstract public class MTable {
 
         HashMap<String, String> invalidFieldList = getInvalidFieldList();
         if (invalidFieldList.size() > 0) {
+            tableState.exception = new RuntimeException("Invalid field value: " + invalidFieldList.toString());
             return false;
         }
 

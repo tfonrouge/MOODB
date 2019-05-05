@@ -24,7 +24,7 @@ public abstract class UI_ChangeListener<T, N extends Node> extends UI_ChangeList
                     });
                 }
             } else {
-                if (!mField.find(newValue)) {
+                if (!mField.aggregateFind(newValue)) {
                     ignore = true;
                     Platform.runLater(() -> {
                         propertySetValue(oldValue);

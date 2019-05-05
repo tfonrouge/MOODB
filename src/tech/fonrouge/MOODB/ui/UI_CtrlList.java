@@ -254,7 +254,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         MBaseData item = tableView.getSelectionModel().getSelectedItem();
 
         if (item != null) {
-            if (table.field__id.find(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
+            if (table.field__id.aggregateFind(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
                 table.delete();
                 populateList();
             }
@@ -268,7 +268,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         if (item != null) {
             Object id = item.get_id();
-            if (table.field__id.find(id) && table.edit()) {
+            if (table.field__id.aggregateFind(id) && table.edit()) {
                 doInsertEdit();
             }
         }
@@ -284,7 +284,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     @SuppressWarnings("WeakerAccess")
     public void onActionViewDocument() {
         MBaseData item = tableView.getSelectionModel().getSelectedItem();
-        if (item != null && table.field__id.find(item.get_id())) {
+        if (item != null && table.field__id.aggregateFind(item.get_id())) {
             doInsertEdit();
         }
     }
@@ -311,7 +311,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     protected void tableFind() {
-        table.find();
+        table.aggregateFind();
     }
 
     static private Constructor<?> getCtorClass(Class<?> tableClass) {
