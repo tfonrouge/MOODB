@@ -38,12 +38,12 @@ public class Main extends Application {
         Invoice invoice = new Invoice();
         InvoiceItem_xInvoice invoiceItemXInvoice = new InvoiceItem_xInvoice(invoice);
 
-        if (invoice.find()) {
+        if (invoice.aggregateFind()) {
             while (!invoice.getEof()) {
                 System.out.println("Invoice #" + invoice.field_docNumber.value());
                 System.out.println("    Customer: " + invoice.field_customer.syncedTable().field_name.value());
                 System.out.println("        DATE: " + invoice.field_date.value());
-                if (invoiceItemXInvoice.find()) {
+                if (invoiceItemXInvoice.aggregateFind()) {
                     int row = 0;
                     while (!invoiceItemXInvoice.getEof()) {
                         System.out.println("    * #" +
@@ -199,7 +199,7 @@ public class Main extends Application {
         User user = new User();
         Customer customer = new Customer();
 
-        if (!user.field_name.find("Teo")) {
+        if (!user.field_name.aggregateFind("Teo")) {
             createUser(user);
         }
 
@@ -220,8 +220,8 @@ public class Main extends Application {
             createInventory(inventoryItem);
         }
 
-        //if (!customer.field_customerId.find("BOEING")) {
-        if (!customer.find()) {
+        //if (!customer.field_customerId.aggregateFind("BOEING")) {
+        if (!customer.aggregateFind()) {
             System.out.println("Error, no customer found.");
             return;
         }
@@ -235,7 +235,7 @@ public class Main extends Application {
 
         Invoice invoice = new Invoice();
 
-        inventoryItem.field_name.find();
+        inventoryItem.field_name.aggregateFind();
 
         String[] strings = {"Mouse", "Keyboard", "Monitor", "Motherboard", "UTP Cable", "Intel CPU"};
 
@@ -244,11 +244,12 @@ public class Main extends Application {
                 Random random = new Random();
                 if (invoice.insert()) {
                     invoice.field_customer.setValue(idCustomerList.get(random.nextInt(idCustomerList.size())));
+                    invoice.field_daysOfCredit.setValue(random.nextInt(90));
                     if (invoice.post()) {
                         InvoiceItem_xInvoice invoiceItem = new InvoiceItem_xInvoice(invoice);
                         for (int j = 0; j < 3; j++) {
                             if (invoiceItem.insert()) {
-                                inventoryItem.field_name.find(strings[random.nextInt(strings.length)]);
+                                inventoryItem.field_name.aggregateFind(strings[random.nextInt(strings.length)]);
                                 invoiceItem.field_invItem.setValue(inventoryItem);
                                 invoiceItem.field_qty.setValue((double) (random.nextInt(10) + 1));
                                 invoiceItem.field_unitPrice.setValue(inventoryItem.field_unitPrice.value());
