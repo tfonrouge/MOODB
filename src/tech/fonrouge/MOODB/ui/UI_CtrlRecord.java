@@ -53,7 +53,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
             if (!table.post()) {
                 String errMsg = table.getException().toString();
                 table.cancel();
-                UI_Message.Warning("Post error:", errMsg);
+                UI_Message.Warning("Error", "Post Error", errMsg);
             }
             ctrlList.populateList();
             tableView.getSelectionModel().focus(focusedIndex);

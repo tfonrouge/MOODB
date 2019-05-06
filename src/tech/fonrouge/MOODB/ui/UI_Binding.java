@@ -145,7 +145,7 @@ public class UI_Binding<T extends MTable> {
                         registerControl(node, mField);
                     }
                 } else {
-                    UI_Message.Warning("Table field not found", "Control: " + declaredField.toString());
+                    UI_Message.Warning("UI Controller", "Table field not found", "Control: " + declaredField.toString());
                 }
             }
         }
@@ -227,10 +227,10 @@ public class UI_Binding<T extends MTable> {
                 } else {
                     s = "no field info";
                 }
-                UI_Message.Warning("Bind error:", s + " : " + e.toString());
+                UI_Message.Warning("UI Controller", "Bind error:", s + " : " + e.toString());
             }
         } else {
-            UI_Message.Warning("No Binding Method", "Params: " + Arrays.toString(objects));
+            UI_Message.Warning("UI Controller", "No Binding Method", "Params: " + Arrays.toString(objects));
         }
         return false;
     }

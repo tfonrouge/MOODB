@@ -38,6 +38,54 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         this.table = table;
     }
 
+    static private Constructor<?> getCtorClass(Class<?> tableClass) {
+        Constructor<?> constructor;
+        String className;
+
+        if (tableClass.equals(MTable.class)) {
+            return null;
+        }
+
+        className = tableClass.getName() + "CtrlList";
+
+        try {
+            constructor = Class.forName(className).getConstructor(tableClass);
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            return getCtorClass(tableClass.getSuperclass());
+        }
+        return constructor;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    static public void showList(MTable table) {
+        UI_CtrlList ui_ctrlList = null;
+
+        try {
+            Constructor<?> constructor = getCtorClass(table.getClass());
+            if (constructor != null) {
+                ui_ctrlList = (UI_CtrlList) constructor.newInstance(table);
+            }
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            e.printStackTrace();
+            UI_Message.Warning("UI Controller", "Warning", e.toString());
+        }
+
+        if (ui_ctrlList != null) {
+            FXMLLoader loader = new FXMLLoader(ui_ctrlList.getClass().getResource(ui_ctrlList.getCtrlListFXMLPath()));
+            loader.setController(ui_ctrlList);
+            Parent parent = null;
+            try {
+                parent = loader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+                UI_Message.Warning("UI Controller", "Warning", e.toString());
+            }
+            if (parent != null) {
+                ui_ctrlList.showWindow(parent);
+            }
+        }
+    }
+
     private void buildColumns() {
 
         for (String fieldExpression : getColumns()) {
@@ -93,7 +141,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                     return param.newInstance();
                 } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                     e.printStackTrace();
-                    UI_Message.Warning("Warning", e.toString());
+                    UI_Message.Warning("UI Controller", "Warning", e.toString());
                 }
                 return null;
             });
@@ -102,7 +150,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 parent = fxmlLoader.load();
             } catch (IOException e) {
                 e.printStackTrace();
-                UI_Message.Warning("Warning", e.toString());
+                UI_Message.Warning("UI Controller", "Warning", e.toString());
             }
 
             for (UI_CtrlList ui_ctrlList : ui_ctrlLists) {
@@ -151,7 +199,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 stage.show();
             }
         } else {
-            UI_Message.Warning("Warning", "No form Record XML descriptor found");
+            UI_Message.Warning("UI Controller", "Warning", "No form Record XML descriptor found");
         }
     }
 
@@ -255,11 +303,14 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         if (item != null) {
             if (table.field__id.aggregateFind(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
-                if (table.delete()) {
-                    populateList();
-                } else {
-                    System.out.println(table.getException().getLocalizedMessage());
+                if (!table.delete()) {
+                    if (table.getException() == null) {
+                        UI_Message.Warning("UI Controller", "Unknown error", "Delete error");
+                    } else {
+                        UI_Message.Warning("UI Controller", table.getException().getMessage(), "Delete error");
+                    }
                 }
+                populateList();
             }
         }
     }
@@ -315,54 +366,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     @SuppressWarnings("WeakerAccess")
     protected void tableFind() {
         table.aggregateFind();
-    }
-
-    static private Constructor<?> getCtorClass(Class<?> tableClass) {
-        Constructor<?> constructor;
-        String className;
-
-        if (tableClass.equals(MTable.class)) {
-            return null;
-        }
-
-        className = tableClass.getName() + "CtrlList";
-
-        try {
-            constructor = Class.forName(className).getConstructor(tableClass);
-        } catch (ClassNotFoundException | NoSuchMethodException e) {
-            return getCtorClass(tableClass.getSuperclass());
-        }
-        return constructor;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    static public void showList(MTable table) {
-        UI_CtrlList ui_ctrlList = null;
-
-        try {
-            Constructor<?> constructor = getCtorClass(table.getClass());
-            if (constructor != null) {
-                ui_ctrlList = (UI_CtrlList) constructor.newInstance(table);
-            }
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
-            UI_Message.Warning("Warning", e.toString());
-        }
-
-        if (ui_ctrlList != null) {
-            FXMLLoader loader = new FXMLLoader(ui_ctrlList.getClass().getResource(ui_ctrlList.getCtrlListFXMLPath()));
-            loader.setController(ui_ctrlList);
-            Parent parent = null;
-            try {
-                parent = loader.load();
-            } catch (IOException e) {
-                e.printStackTrace();
-                UI_Message.Warning("Warning", e.toString());
-            }
-            if (parent != null) {
-                ui_ctrlList.showWindow(parent);
-            }
-        }
     }
 
     void showWindow(Parent parent) {

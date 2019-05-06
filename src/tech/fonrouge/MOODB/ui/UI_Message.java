@@ -22,12 +22,13 @@ public class UI_Message {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public static void Warning(String warning, String headerText) {
+    public static void Warning(String title, String headerText, String warning) {
 
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(warning);
+        alert.setTitle(title);
 
         alert.setHeaderText(Wordwrap.wordwrap(headerText, 80));
+        alert.setContentText(warning);
         alert.showAndWait();
     }
 
