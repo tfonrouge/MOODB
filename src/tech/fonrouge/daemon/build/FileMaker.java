@@ -313,15 +313,15 @@ class FileMaker {
                     append("    }\n");
         }
 
-        /* newDatabase */
+        /* getMDatabaseClass */
         if (database != null) {
             builder.
                     append("\n").
                     append("    @Override\n").
-                    append("    protected MDatabase newDatabase() {\n").
-                    append("        return new ").
+                    append("    protected Class getMDatabaseClass() {\n").
+                    append("        return ").
                     append(database).
-                    append("(this);\n").
+                    append(".class;\n").
                     append("    }\n");
         }
 

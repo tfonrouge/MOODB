@@ -255,8 +255,11 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         if (item != null) {
             if (table.field__id.aggregateFind(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
-                table.delete();
-                populateList();
+                if (table.delete()) {
+                    populateList();
+                } else {
+                    System.out.println(table.getException().getLocalizedMessage());
+                }
             }
         }
     }
