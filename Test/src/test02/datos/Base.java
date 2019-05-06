@@ -1,7 +1,6 @@
 package test02.datos;
 
 import org.bson.types.ObjectId;
-import tech.fonrouge.MOODB.MDatabase;
 import tech.fonrouge.MOODB.MFieldDate;
 import tech.fonrouge.MOODB.MTable;
 
@@ -28,8 +27,8 @@ public abstract class Base extends MTable {
 
 
     @Override
-    protected MDatabase newDatabase() {
-        return new Test2Database(this);
+    protected Class getMDatabaseClass() {
+        return Test2Database.class;
     }
     /* @@ end field descriptor @@ */
 

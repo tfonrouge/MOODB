@@ -9,7 +9,7 @@ import org.bson.types.ObjectId;
 import test01.data.customer.Customer;
 import test01.data.inventoryItem.InventoryItem;
 import test01.data.invoice.Invoice;
-import test01.data.invoiceItem_xInvoice.InvoiceItem_xInvoice;
+import test01.data.invoiceItem.xInvoice.InvoiceItem_xInvoice;
 import test01.data.user.User;
 
 import java.util.ArrayList;
@@ -220,7 +220,6 @@ public class Main extends Application {
             createInventory(inventoryItem);
         }
 
-        //if (!customer.field_customerId.aggregateFind("BOEING")) {
         if (!customer.aggregateFind()) {
             System.out.println("Error, no customer found.");
             return;

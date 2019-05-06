@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <GridPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.172-ea"
-          fx:controller="test01.data.invoiceItem_xInvoice.InvoiceItem_xInvoiceCtrlRecord">
+          fx:controller="test01.data.invoiceItem.xInvoice.InvoiceItem_xInvoiceCtrlRecord">
     <columnConstraints>
         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES"/>
         <ColumnConstraints hgrow="SOMETIMES"/>

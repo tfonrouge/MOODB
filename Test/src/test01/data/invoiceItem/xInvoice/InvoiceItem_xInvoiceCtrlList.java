@@ -1,4 +1,4 @@
-package test01.data.invoiceItem_xInvoice;
+package test01.data.invoiceItem.xInvoice;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,7 +21,7 @@ public class InvoiceItem_xInvoiceCtrlList extends TableBaseCtrlList<InvoiceItem_
 
     @Override
     protected String getCtrlRecordFXMLPath() {
-        return "/test01/data/invoiceItem_xInvoice/record.fxml";
+        return "/test01/data/invoiceItem/xInvoice/record.fxml";
     }
 
     @FXML

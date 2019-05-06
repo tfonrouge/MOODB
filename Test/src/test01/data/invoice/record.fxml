@@ -48,7 +48,7 @@
         </padding>
     </GridPane>
     <Label text="Invoice Items:"/>
-    <fx:include source="../invoiceItem_xInvoice/tableView.fxml"/>
+    <fx:include source="../invoiceItem/xInvoice/tableView.fxml"/>
     <HBox alignment="CENTER_RIGHT">
         <padding>
             <Insets top="10.0"/>

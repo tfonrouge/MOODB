@@ -1,9 +1,9 @@
 package test01.data.invoice;
 
 import tech.fonrouge.MOODB.*;
-import test01.data.tableBase.TableBase;
 import test01.data.customer.Customer;
-import test01.data.invoiceItem_xInvoice.InvoiceItem_xInvoice;
+import test01.data.invoiceItem.xInvoice.InvoiceItem_xInvoice;
+import test01.data.tableBase.TableBase;
 
 public class Invoice extends TableBase {
 

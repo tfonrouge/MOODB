@@ -1,4 +1,4 @@
-package test01.data.invoiceItem_xInvoice;
+package test01.data.invoiceItem.xInvoice;
 
 import tech.fonrouge.MOODB.MIndex;
 import test01.data.invoice.Invoice;

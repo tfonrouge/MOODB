@@ -1,4 +1,4 @@
-package test01.data.invoiceItem_xInvoice;
+package test01.data.invoiceItem.xInvoice;
 
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
