@@ -1,13 +1,15 @@
 package tech.fonrouge.MOODB;
 
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
+import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,43 +19,55 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class MEngine {
 
-    private static HashMap<String, MongoCollection<Document>> collections;
+    private static HashMap<Class, MDatabase> mDatabaseHashMap;
 
     MongoCollection<Document> collection;
-    Exception exception;
     private MTable table;
     private ArrayList<Document> pipeline;
-    private MongoClient mongoClient;
     private MongoDatabase mongoDatabase;
+    MDatabase mDatabase;
 
-    /* ******************* */
-    /* constructor methods */
-    /* ******************* */
     MEngine(MTable oTable) {
         table = oTable;
         initialize();
     }
 
-    /* *********************** */
-    /* package-private methods */
-    /* *********************** */
-
     /**
-     * count
+     * aggregateFind : go to the first document in scope
      *
-     * @return long of number of documents
+     * @return success on aggregateFind
      */
-    long count() {
-        Document document = buildMasterSourceFilter();
-        if (document != null) {
-            return collection.countDocuments(document);
+    public boolean aggregateFind() {
+        Document masterSourceFilter = buildMasterSourceFilter();
+        if (masterSourceFilter != null) {
+            pipeline = new ArrayList<>();
+            pipeline.add(
+                    new Document().
+                            append("$match", masterSourceFilter));
+        } else {
+            pipeline = new ArrayList<>();
         }
-        return collection.countDocuments();
+        return table.setTableDocument(aggregateFind(pipeline));
     }
 
-    /* *************** */
-    /* private methods */
-    /* *************** */
+    /**
+     * aggregateFind
+     *
+     * @param documentList bson list for aggregateFind function
+     * @return iterable
+     */
+    public MongoCursor<Document> aggregateFind(List<Document> documentList) {
+        for (int i = 0; i < table.fieldList.size(); i++) {
+            if (table.fieldList.get(i).fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
+                MFieldTableField mFieldTableField = (MFieldTableField) table.fieldList.get(i);
+                if (!mFieldTableField.calculated && mFieldTableField.isLookupDocument()) {
+                    documentList.addAll(getLookupStage(mFieldTableField.name));
+                }
+            }
+        }
+        return collection.aggregate(documentList).iterator();
+    }
+
     private Document buildMasterSourceFilter() {
         Document document = new Document();
         if (table.tableState.masterSource != null) {
@@ -68,30 +82,18 @@ public class MEngine {
         return document;
     }
 
-    private void initialize() {
-        String clientURI = table.getDatabase().getDatabaseURI();
-        String tableName = table.getTableName();
-        String key = clientURI + "/" + tableName;
-
-        if (collections == null) {
-            collections = new HashMap<>();
+    /**
+     * count
+     *
+     * @return long of number of documents
+     */
+    long count() {
+        Document document = buildMasterSourceFilter();
+        if (document != null) {
+            return collection.countDocuments(document);
         }
-
-        MongoClientURI mongoClientURI = new MongoClientURI(clientURI);
-        mongoClient = new MongoClient(mongoClientURI);
-        mongoDatabase = mongoClient.getDatabase(table.getDatabase().getDatabaseName());
-
-        if (collections.containsKey(key)) {
-            collection = collections.get(key);
-        } else {
-            collection = mongoDatabase.getCollection(tableName);
-            collections.put(key, collection);
-        }
+        return collection.countDocuments();
     }
-
-    /* ************** */
-    /* public methods */
-    /* ************** */
 
     /**
      * delete
@@ -100,27 +102,23 @@ public class MEngine {
      */
     @SuppressWarnings("WeakerAccess")
     public boolean delete() {
-        Document document = new Document().append("_id", table._id());
-        return collection.deleteOne(document).getDeletedCount() == 1;
-    }
-
-    /**
-     * aggregateFind
-     *
-     * @param documentList bson list for aggregateFind function
-     * @return iterable
-     */
-    @SuppressWarnings("WeakerAccess")
-    public MongoCursor<Document> aggregateFind(List<Document> documentList) {
-        for (int i = 0; i < table.fieldList.size(); i++) {
-            if (table.fieldList.get(i).fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
-                MFieldTableField mFieldTableField = (MFieldTableField) table.fieldList.get(i);
-                if (!mFieldTableField.calculated && mFieldTableField.isLookupDocument()) {
-                    documentList.addAll(getLookupStage(mFieldTableField.name));
-                }
+        Object _id = table._id();
+        ClientSession session = mDatabase.mongoClient.startSession();
+        session.startTransaction();
+        for (Document document : mDatabase.collReferentialIntegrity.find(session, new Document("master", table.getTableName()))) {
+            MongoCollection<Document> detailCollection = mongoDatabase.getCollection(document.getString("detail"));
+            MongoCursor<Document> detailCursor = detailCollection.find(session, new Document(document.getString("detailField"), _id)).iterator();
+            if (detailCursor.hasNext()) {
+                session.abortTransaction();
+                session.close();
+                table.tableState.exception = new RuntimeException("Delete error: Document has child references...");
+                return false;
             }
         }
-        return collection.aggregate(documentList).iterator();
+        boolean result = collection.deleteOne(session, new Document().append("_id", _id)).getDeletedCount() == 1;
+        session.commitTransaction();
+        session.close();
+        return result;
     }
 
     private List<Document> getLookupStage(String fieldName) {
@@ -171,27 +169,13 @@ public class MEngine {
         return documents;
     }
 
-    /**
-     * aggregateFind : go to the first document in scope
-     *
-     * @return success on aggregateFind
-     */
-    public boolean aggregateFind() {
-        Document masterSourceFilter = buildMasterSourceFilter();
-        if (masterSourceFilter != null) {
-            pipeline = new ArrayList<>();
-            pipeline.add(
-                    new Document().
-                            append("$match", masterSourceFilter));
-        } else {
-            pipeline = new ArrayList<>();
-        }
-        return table.setTableDocument(aggregateFind(pipeline));
+    MDatabase getMDatabase() {
+        return mDatabase;
     }
 
     @SuppressWarnings("unused")
     public MongoClient getMongoClient() {
-        return mongoClient;
+        return mDatabase.mongoClient;
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -217,20 +201,42 @@ public class MEngine {
         return table.setTableDocument(aggregateFind(pipeline));
     }
 
+    private void initialize() {
+        Class<?> mDatabaseClass = table.getMDatabaseClass();
+
+        if (mDatabaseHashMap == null) {
+            mDatabaseHashMap = new HashMap<>();
+        }
+
+        mDatabase = mDatabaseHashMap.get(mDatabaseClass);
+
+        if (mDatabase == null) {
+            try {
+                Constructor<?> ctor = mDatabaseClass.getConstructor(MTable.class);
+                mDatabase = (MDatabase) ctor.newInstance(table);
+                mDatabaseHashMap.put(mDatabaseClass, mDatabase);
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+
+        mongoDatabase = mDatabase.mongoDatabase;
+        collection = mDatabase.getCollection(table.getTableName());
+    }
+
     /**
      * insert
      *
      * @param document document to insert
      * @return iterable
      */
-    @SuppressWarnings("WeakerAccess")
     public boolean insert(Document document) {
         try {
             collection.insertOne(document);
             Object a = document.get("_id");
             table.set_id(a);
         } catch (Exception e) {
-            exception = e;
+            table.tableState.exception = e;
             return false;
         }
         return true;
@@ -262,7 +268,7 @@ public class MEngine {
             Bson bson = new Document("$set", document);
             collection.updateOne(eq("_id", table._id()), bson);
         } catch (Exception e) {
-            exception = e;
+            table.tableState.exception = e;
             return false;
         }
         return true;

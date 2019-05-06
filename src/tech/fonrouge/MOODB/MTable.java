@@ -1,12 +1,15 @@
 package tech.fonrouge.MOODB;
 
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.UpdateOneModel;
+import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Stream;
 
 abstract public class MTable {
@@ -21,7 +24,6 @@ abstract public class MTable {
 
     MEngine engine;
     TableState tableState;
-    private MDatabase database;
     private int tableStateIndex = 0;
     private ArrayList<TableState> tableStateList = new ArrayList<>();
 
@@ -168,7 +170,7 @@ abstract public class MTable {
      * @return
      */
     protected MDatabase getDatabase() {
-        return database;
+        return engine.getMDatabase();
     }
 
     public MEngine getEngine() {
@@ -305,7 +307,6 @@ abstract public class MTable {
     protected void initialize() {
         indices = new ArrayList<>();
 
-        database = newDatabase();
         engine = new MEngine(this);
 
         buildIndices();
@@ -355,11 +356,11 @@ abstract public class MTable {
     }
 
     /**
-     * newDatabase
+     * getMDatabaseClass
      *
      * @return
      */
-    abstract protected MDatabase newDatabase();
+    abstract protected Class getMDatabaseClass();
 
     protected void onAfterDelete() {
 
@@ -439,12 +440,17 @@ abstract public class MTable {
 
         /* build rawDocument and checks for validation on fields */
 
+        List<MFieldTableField> refList = new ArrayList<>();
+
         if (onBeforePost()) {
             boolean result;
             switch (tableState.state) {
                 case EDIT:
                     fieldList.forEach(mField -> {
                         if (!mField.calculated && !mField.getName().contentEquals("_id") && mField.valueChanged()) {
+                            if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
+                                refList.add((MFieldTableField) mField);
+                            }
                             document.put(mField.getName(), mField.value());
                         }
                     });
@@ -453,6 +459,9 @@ abstract public class MTable {
                 case INSERT:
                     fieldList.forEach(mField -> {
                         if (!mField.calculated) {
+                            if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
+                                refList.add((MFieldTableField) mField);
+                            }
                             if (mField.autoInc) {
                                 document.put(mField.name, mField.getNextSequence());
                             } else if (!(mField instanceof MFieldObjectId && mField.getName().contentEquals("_id")) && !(tableState.getFieldValue(mField) == null)) {
@@ -466,9 +475,12 @@ abstract public class MTable {
                     result = false;
             }
             if (!result) {
-                tableState.exception = engine.exception;
                 return false;
             }
+        }
+
+        if (refList.size() > 0) {
+            updateReferentialIntegrity(refList);
         }
 
         tableState.eof = false;
@@ -572,6 +584,18 @@ abstract public class MTable {
             tableState.fieldStateList.add(fieldState.cloneThis());
         }
         tableStateList.add(tableState);
+    }
+
+    private void updateReferentialIntegrity(List<MFieldTableField> refList) {
+        List<UpdateOneModel<Document>> updates = new ArrayList<>();
+        refList.forEach(mFieldTableField -> {
+            Document filter = new Document("detail", getTableName()).append("master", mFieldTableField.linkedTable().getTableName());
+            Document update = new Document("$set", new Document("detailField", mFieldTableField.getName()));
+            UpdateOptions options = new UpdateOptions().upsert(true);
+            UpdateOneModel<Document> updateOneModel = new UpdateOneModel<>(filter, update, options);
+            updates.add(updateOneModel);
+        });
+        engine.mDatabase.collReferentialIntegrity.bulkWrite(updates);
     }
 
     public enum FIELD_TYPE {
