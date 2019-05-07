@@ -1,5 +1,6 @@
 package tech.fonrouge.MOODB.ui;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,6 +23,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
@@ -30,9 +34,12 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     @SuppressWarnings("unused")
     @FXML
     protected TableView<MBaseData> tableView;
+
     protected Stage stage;
     @SuppressWarnings("WeakerAccess")
     protected Parent parent;
+    private ScheduledExecutorService executorServiceRefresh;
+    private boolean populatingList = false;
 
     public UI_CtrlList(T table) {
         this.table = table;
@@ -56,7 +63,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         return constructor;
     }
 
-    @SuppressWarnings("WeakerAccess")
     static public void showList(MTable table) {
         UI_CtrlList ui_ctrlList = null;
 
@@ -105,7 +111,12 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         buildColumns();
 
-        populateList();
+        if (executorServiceRefresh == null) {
+            Runnable runnable = () -> Platform.runLater(this::populateList);
+
+            executorServiceRefresh = Executors.newSingleThreadScheduledExecutor();
+            executorServiceRefresh.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
+        }
 
         tableView.setItems(observableList);
 
@@ -185,6 +196,9 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 stage.setTitle(title + ": " + table.getGenre());
 
                 stage.setOnHidden(event -> {
+                    for (UI_CtrlList ui_ctrlList : ui_ctrlLists) {
+                        ui_ctrlList.stopExecutorServiceRefresh();
+                    }
                     if (table.getState() != MTable.STATE.NORMAL) {
                         table.cancel();
                     }
@@ -346,20 +360,44 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     @SuppressWarnings("WeakerAccess")
     protected void populateList() {
 
-        observableList.clear();
+        if (!populatingList) {
 
-        for (int i = 0; i < getColumns().length; i++) {
-            if (getColumns()[i].indexOf(".") > 0) {
-                table.addLookupField(getColumns()[i]);
+            populatingList = true;
+
+            int focusedIndex = tableView.getSelectionModel().getFocusedIndex();
+            int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
+
+            table.tableStatePush();
+
+            observableList.clear();
+
+            for (int i = 0; i < getColumns().length; i++) {
+                if (getColumns()[i].indexOf(".") > 0) {
+                    table.addLookupField(getColumns()[i]);
+                }
             }
+
+            tableFind();
+
+            while (!table.getEof()) {
+                MBaseData e = table.getData();
+                observableList.add(e);
+                table.next();
+            }
+
+            tableView.getFocusModel().focus(focusedIndex);
+            tableView.getSelectionModel().select(selectedIndex);
+
+            table.tableStatePull();
+
+            populatingList = false;
         }
+    }
 
-        tableFind();
-
-        while (!table.getEof()) {
-            MBaseData e = table.getData();
-            observableList.add(e);
-            table.next();
+    private void stopExecutorServiceRefresh() {
+        if (executorServiceRefresh != null) {
+            executorServiceRefresh.shutdown();
+            executorServiceRefresh = null;
         }
     }
 
@@ -368,6 +406,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         table.aggregateFind();
     }
 
+    @SuppressWarnings("WeakerAccess")
     void showWindow(Parent parent) {
 
         initController(parent);
@@ -383,6 +422,8 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 stage.hide();
             }
         });
+
+        stage.setOnHidden(event -> stopExecutorServiceRefresh());
 
         stage.setScene(scene);
         stage.setTitle(table.getGenres());
