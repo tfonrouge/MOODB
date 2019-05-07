@@ -36,7 +36,7 @@ public class TestDatabase extends MDatabase {
 
     @Override
     public String getServerName() {
-        return "10.51.11.148";
+        return "localhost";
     }
 
     @Override
