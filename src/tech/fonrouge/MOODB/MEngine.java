@@ -70,8 +70,8 @@ public class MEngine {
 
     private Document buildMasterSourceFilter() {
         Document document = new Document();
-        if (table.tableState.masterSource != null) {
-            document.append(table.tableState.masterSourceField.name, table.tableState.masterSource._id());
+        if (table.getMasterSource() != null) {
+            document.append(table.getMasterSourceField().name, table.getMasterSource()._id());
         }
         table.setFieldFilters();
         table.fieldList.forEach(mField -> {
