@@ -508,7 +508,7 @@ abstract public class MTable {
             UpdateOneModel<Document> updateOneModel = new UpdateOneModel<>(filter, update, options);
             updates.add(updateOneModel);
         });
-        engine.mDatabase.collReferentialIntegrity.bulkWrite(updates);
+        engine.mDatabase.getReferentialIntegrityTable().bulkWrite(updates);
     }
 
     protected void onAfterPost() {

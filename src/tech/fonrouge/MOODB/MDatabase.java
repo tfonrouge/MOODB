@@ -11,8 +11,7 @@ public abstract class MDatabase {
 
     MongoClient mongoClient;
     MongoDatabase mongoDatabase;
-    MongoCollection<Document> collReferentialIntegrity;
-
+    private MongoCollection<Document> referentialIntegrityTable;
     private MTable table;
 
     public MDatabase(MTable oTable) {
@@ -22,12 +21,17 @@ public abstract class MDatabase {
         mongoClient = new MongoClient(mongoClientURI);
         mongoDatabase = mongoClient.getDatabase(getDatabaseName());
 
-        collReferentialIntegrity = mongoDatabase.getCollection("__referentialIntegrity");
-        Document indexDoc = new Document("master", 1).append("detail", 1).append("detailField", 1);
-        IndexOptions options = new IndexOptions().unique(true);
-        collReferentialIntegrity.createIndex(indexDoc, options);
-
         defineRelations();
+    }
+
+    public MongoCollection<Document> getReferentialIntegrityTable() {
+        if (referentialIntegrityTable == null) {
+            referentialIntegrityTable = mongoDatabase.getCollection("__referentialIntegrity");
+            Document indexDoc = new Document("master", 1).append("detail", 1).append("detailField", 1);
+            IndexOptions options = new IndexOptions().unique(true);
+            referentialIntegrityTable.createIndex(indexDoc, options);
+        }
+        return referentialIntegrityTable;
     }
 
     public MTable getTable() {

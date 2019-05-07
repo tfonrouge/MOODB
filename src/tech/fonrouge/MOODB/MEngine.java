@@ -7,6 +7,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import tech.fonrouge.MOODB.ui.UI_Message;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -22,10 +23,10 @@ public class MEngine {
     private static HashMap<Class, MDatabase> mDatabaseHashMap;
 
     MongoCollection<Document> collection;
+    MDatabase mDatabase;
     private MTable table;
     private ArrayList<Document> pipeline;
     private MongoDatabase mongoDatabase;
-    MDatabase mDatabase;
 
     MEngine(MTable oTable) {
         table = oTable;
@@ -105,7 +106,7 @@ public class MEngine {
         Object _id = table._id();
         ClientSession session = mDatabase.mongoClient.startSession();
         session.startTransaction();
-        for (Document document : mDatabase.collReferentialIntegrity.find(session, new Document("master", table.getTableName()))) {
+        for (Document document : mDatabase.getReferentialIntegrityTable().find(session, new Document("master", table.getTableName()))) {
             MongoCollection<Document> detailCollection = mongoDatabase.getCollection(document.getString("detail"));
             MongoCursor<Document> detailCursor = detailCollection.find(session, new Document(document.getString("detailField"), _id)).iterator();
             if (detailCursor.hasNext()) {
@@ -215,13 +216,13 @@ public class MEngine {
                 Constructor<?> ctor = mDatabaseClass.getConstructor(MTable.class);
                 mDatabase = (MDatabase) ctor.newInstance(table);
                 mDatabaseHashMap.put(mDatabaseClass, mDatabase);
+                mongoDatabase = mDatabase.mongoDatabase;
+                collection = mDatabase.getCollection(table.getTableName());
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 e.printStackTrace();
+                UI_Message.Error("Database Error", "MongoDb Engine Error", e.getMessage());
             }
         }
-
-        mongoDatabase = mDatabase.mongoDatabase;
-        collection = mDatabase.getCollection(table.getTableName());
     }
 
     /**
