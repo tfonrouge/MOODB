@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
+import tech.fonrouge.MOODB.ui.UI_Message;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -306,7 +307,8 @@ abstract public class MTable {
     public boolean insert() {
 
         if (tableState.state != STATE.NORMAL) {
-            throw new RuntimeException("Table previously on EDIT/INSERT State.");
+            UI_Message.Error("Table Insert Error", "Table previously on EDIT/INSERT State.", "check code logic.");
+            return false;
         }
 
         if (!onBeforeInsert()) {
