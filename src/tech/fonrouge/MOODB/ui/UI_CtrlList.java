@@ -21,6 +21,7 @@ import tech.fonrouge.MOODB.*;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
@@ -77,11 +78,27 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
 
         if (ui_ctrlList != null) {
-            FXMLLoader loader = new FXMLLoader(ui_ctrlList.getClass().getResource(ui_ctrlList.getCtrlListFXMLPath()));
-            loader.setController(ui_ctrlList);
+            FXMLLoader fxmlLoader = new FXMLLoader(ui_ctrlList.getClass().getResource(ui_ctrlList.getCtrlListFXMLPath()));
+            fxmlLoader.setController(ui_ctrlList);
             Parent parent = null;
+            Class<?> uiCtrlListClass = ui_ctrlList.getClass();
+
+            UI_CtrlList finalUi_ctrlList = ui_ctrlList;
+            fxmlLoader.setControllerFactory(param -> {
+                try {
+                    if (param.isAssignableFrom(uiCtrlListClass)) {
+                        return finalUi_ctrlList;
+                    }
+                    return param.newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                    UI_Message.Warning("UI Controller", "Warning", e.toString());
+                }
+                return null;
+            });
+
             try {
-                parent = loader.load();
+                parent = fxmlLoader.load();
             } catch (IOException e) {
                 e.printStackTrace();
                 UI_Message.Warning("UI Controller", "Warning", e.toString());
@@ -136,16 +153,22 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 try {
                     if (UI_CtrlList.class.isAssignableFrom(param)) {
                         Class<?> tableClass = param.getConstructors()[0].getParameterTypes()[0];
-                        Constructor<?>[] constructors = tableClass.getConstructors();
-                        MTable childTable;
-                        if (constructors.length == 0 || constructors[0].getParameterTypes().length == 0) {
-                            childTable = (MTable) tableClass.newInstance();
+                        UI_CtrlList ui_ctrlList;
+                        /* if table is abstract uses last know (if any) controller stored on ui_ctrlLists */
+                        if (Modifier.isAbstract(tableClass.getModifiers())) {
+                            ui_ctrlList = ui_ctrlLists.get(ui_ctrlLists.size() - 1);
                         } else {
-                            Constructor<?> ctor = tableClass.getConstructor(table.getClass());
-                            childTable = (MTable) ctor.newInstance(table);
+                            Constructor<?>[] constructors = tableClass.getConstructors();
+                            MTable childTable;
+                            if (constructors.length == 0 || constructors[0].getParameterTypes().length == 0) {
+                                childTable = (MTable) tableClass.newInstance();
+                            } else {
+                                Constructor<?> ctor = tableClass.getConstructor(table.getClass());
+                                childTable = (MTable) ctor.newInstance(table);
+                            }
+                            Constructor<?> constructor = param.getConstructor(tableClass);
+                            ui_ctrlList = (UI_CtrlList) constructor.newInstance(childTable);
                         }
-                        Constructor<?> constructor = param.getConstructor(tableClass);
-                        UI_CtrlList ui_ctrlList = (UI_CtrlList) constructor.newInstance(childTable);
                         ui_ctrlLists.add(ui_ctrlList);
                         return ui_ctrlList;
                     }
