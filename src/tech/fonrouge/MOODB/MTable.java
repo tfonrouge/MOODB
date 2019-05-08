@@ -39,19 +39,11 @@ abstract public class MTable {
         initialize();
     }
 
-    protected void initialize() {
-        indices = new ArrayList<>();
-
-        engine = new MEngine(this);
-
-        buildIndices();
-    }
-
     /**
-     * buildIndices
+     * @return OBJECT_ID for current rawDocument in table
      */
-    protected void buildIndices() {
-        indices.forEach(MIndex::buildIndex);
+    public Object _id() {
+        return field__id.getTypedValue();
     }
 
     @SuppressWarnings("unused")
@@ -67,17 +59,15 @@ abstract public class MTable {
         }
     }
 
-    public MFieldTableField fieldTableFieldByName(String name) {
-        for (MField mField : fieldList) {
-            if (mField.name.contentEquals(name) && mField instanceof MFieldTableField) {
-                return (MFieldTableField) mField;
-            }
-        }
-        return null;
-    }
-
     public boolean aggregateFind() {
         return engine.aggregateFind();
+    }
+
+    /**
+     * buildIndices
+     */
+    protected void buildIndices() {
+        indices.forEach(MIndex::buildIndex);
     }
 
     /**
@@ -94,16 +84,6 @@ abstract public class MTable {
         goTo(field__id.getTypedValue());
 
         tableState.state = STATE.NORMAL;
-    }
-
-    /**
-     * goTo
-     *
-     * @param objectId : _id of rawDocument to go
-     */
-    @SuppressWarnings("WeakerAccess")
-    public boolean goTo(Object objectId) {
-        return engine.goTo(objectId);
     }
 
     /**
@@ -124,14 +104,6 @@ abstract public class MTable {
             }
         }
         return false;
-    }
-
-    protected boolean onBeforeDelete() {
-        return true;
-    }
-
-    protected void onAfterDelete() {
-
     }
 
     /**
@@ -164,15 +136,6 @@ abstract public class MTable {
     }
 
     /**
-     * onBeforeEdit
-     *
-     * @return true if edit is allowed
-     */
-    protected boolean onBeforeEdit() {
-        return true;
-    }
-
-    /**
      * @param fieldName name of looked field
      * @return MField
      */
@@ -180,6 +143,15 @@ abstract public class MTable {
         for (MField mField : fieldList) {
             if (mField.name.contentEquals(fieldName)) {
                 return (MField<T>) mField; /* TODO: fix this */
+            }
+        }
+        return null;
+    }
+
+    public MFieldTableField fieldTableFieldByName(String name) {
+        for (MField mField : fieldList) {
+            if (mField.name.contentEquals(name) && mField instanceof MFieldTableField) {
+                return (MFieldTableField) mField;
             }
         }
         return null;
@@ -245,19 +217,31 @@ abstract public class MTable {
     }
 
     /**
-     * getTableName
-     *
-     * @return String table name on collection
-     */
-    abstract public String getTableName();
-
-    /**
      * getGenres
      *
      * @return plural of genre
      */
     public String getGenres() {
         return getTableName() + "'s";
+    }
+
+    /**
+     * getInvalidFieldList
+     *
+     * @return hash of invalid fields info
+     */
+    public HashMap<String, String> getInvalidFieldList() {
+        HashMap<String, String> result = new HashMap<>();
+        fieldList.forEach(mField -> {
+            String item = null;
+            if (!mField.getValidStatus()) {
+                item = mField.getInvalidCause();
+            }
+            if (item != null) {
+                result.put(mField.name, item);
+            }
+        });
+        return result;
     }
 
     /**
@@ -272,9 +256,25 @@ abstract public class MTable {
         tableState.linkedField = linkedField;
     }
 
+    /**
+     * getMasterSource
+     *
+     * @return masgter source table
+     */
+    public MTable getMasterSource() {
+        return masterSource;
+    }
+
     public MFieldTableField getMasterSourceField() {
         return masterSourceField;
     }
+
+    /**
+     * getMDatabaseClass
+     *
+     * @return
+     */
+    abstract protected Class getMDatabaseClass();
 
     /**
      * getState
@@ -283,6 +283,23 @@ abstract public class MTable {
      */
     public STATE getState() {
         return tableState.state;
+    }
+
+    /**
+     * getTableName
+     *
+     * @return String table name on collection
+     */
+    abstract public String getTableName();
+
+    /**
+     * goTo
+     *
+     * @param objectId : _id of rawDocument to go
+     */
+    @SuppressWarnings("WeakerAccess")
+    public boolean goTo(Object objectId) {
+        return engine.goTo(objectId);
     }
 
     public TableState getTableState() {
@@ -299,6 +316,14 @@ abstract public class MTable {
     @SuppressWarnings("unused")
     public boolean hasNext() {
         return tableState.mongoCursor != null && tableState.mongoCursor.hasNext();
+    }
+
+    protected void initialize() {
+        indices = new ArrayList<>();
+
+        engine = new MEngine(this);
+
+        buildIndices();
     }
 
     /**
@@ -347,6 +372,30 @@ abstract public class MTable {
         return true;
     }
 
+    public boolean next() {
+        return engine.next();
+    }
+
+    protected void onAfterDelete() {
+
+    }
+
+    protected void onAfterPost() {
+    }
+
+    protected void onAfterPostEdit() {
+
+    }
+
+    /**
+     * onBeforeEdit
+     *
+     * @return true if edit is allowed
+     */
+    protected boolean onBeforeEdit() {
+        return true;
+    }
+
     /**
      * onBeforeInsert
      *
@@ -356,25 +405,9 @@ abstract public class MTable {
         return true;
     }
 
-    /**
-     * getMasterSource
-     *
-     * @return masgter source table
-     */
-    public MTable getMasterSource() {
-        return masterSource;
-    }
+    protected void onAfterPostInsert() {
 
-    public boolean next() {
-        return engine.next();
     }
-
-    /**
-     * getMDatabaseClass
-     *
-     * @return
-     */
-    abstract protected Class getMDatabaseClass();
 
     /**
      * @return boolean
@@ -473,23 +506,8 @@ abstract public class MTable {
         return true;
     }
 
-    /**
-     * getInvalidFieldList
-     *
-     * @return hash of invalid fields info
-     */
-    public HashMap<String, String> getInvalidFieldList() {
-        HashMap<String, String> result = new HashMap<>();
-        fieldList.forEach(mField -> {
-            String item = null;
-            if (!mField.getValidStatus()) {
-                item = mField.getInvalidCause();
-            }
-            if (item != null) {
-                result.put(mField.name, item);
-            }
-        });
-        return result;
+    protected boolean onBeforeDelete() {
+        return true;
     }
 
     /**
@@ -501,29 +519,6 @@ abstract public class MTable {
         return true;
     }
 
-    private void updateReferentialIntegrity(List<MFieldTableField> refList) {
-        List<UpdateOneModel<Document>> updates = new ArrayList<>();
-        refList.forEach(mFieldTableField -> {
-            Document filter = new Document("detail", getTableName()).append("master", mFieldTableField.linkedTable().getTableName());
-            Document update = new Document("$set", new Document("detailField", mFieldTableField.getName()));
-            UpdateOptions options = new UpdateOptions().upsert(true);
-            UpdateOneModel<Document> updateOneModel = new UpdateOneModel<>(filter, update, options);
-            updates.add(updateOneModel);
-        });
-        engine.mDatabase.getReferentialIntegrityTable().bulkWrite(updates);
-    }
-
-    protected void onAfterPost() {
-    }
-
-    protected void onAfterPostEdit() {
-
-    }
-
-    protected void onAfterPostInsert() {
-
-    }
-
     void set_id(Object value) {
         field__id.table.tableState.setFieldValue(field__id.index, value);
     }
@@ -531,17 +526,6 @@ abstract public class MTable {
     @SuppressWarnings("WeakerAccess")
     public void setFieldFilters() {
 
-    }
-
-    /**
-     * setMasterSource
-     *
-     * @param masterSourceTable : the master source table
-     * @param masterSourceField : the field on the master source table
-     */
-    protected void setMasterSource(MTable masterSourceTable, MFieldTableField masterSourceField) {
-        masterSource = masterSourceTable;
-        this.masterSourceField = masterSourceField;
     }
 
     /**
@@ -584,10 +568,14 @@ abstract public class MTable {
     }
 
     /**
-     * @return OBJECT_ID for current rawDocument in table
+     * setMasterSource
+     *
+     * @param masterSourceTable : the master source table
+     * @param masterSourceField : the field on the master source table
      */
-    public Object _id() {
-        return field__id.getTypedValue();
+    protected void setMasterSource(MTable masterSourceTable, MFieldTableField masterSourceField) {
+        masterSource = masterSourceTable;
+        this.masterSourceField = masterSourceField;
     }
 
     @SuppressWarnings("unused")
@@ -610,6 +598,18 @@ abstract public class MTable {
             tableState.fieldStateList.add(fieldState.cloneThis());
         }
         tableStateList.add(tableState);
+    }
+
+    private void updateReferentialIntegrity(List<MFieldTableField> refList) {
+        List<UpdateOneModel<Document>> updates = new ArrayList<>();
+        refList.forEach(mFieldTableField -> {
+            Document filter = new Document("detail", getTableName()).append("master", mFieldTableField.linkedTable().getTableName());
+            Document update = new Document("$set", new Document("detailField", mFieldTableField.getName()));
+            UpdateOptions options = new UpdateOptions().upsert(true);
+            UpdateOneModel<Document> updateOneModel = new UpdateOneModel<>(filter, update, options);
+            updates.add(updateOneModel);
+        });
+        engine.mDatabase.getReferentialIntegrityTable().bulkWrite(updates);
     }
 
     public enum FIELD_TYPE {
