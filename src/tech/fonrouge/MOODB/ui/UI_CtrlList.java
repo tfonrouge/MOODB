@@ -142,115 +142,102 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     @SuppressWarnings("WeakerAccess")
     protected void doInsertEdit() {
 
-        String resourceRecordName = getCtrlRecordFXMLPath();
+        URL resource = getClass().getResource(getCtrlRecordFXMLPath());
+        FXMLLoader fxmlLoader = new FXMLLoader(resource);
 
-        if (resourceRecordName == null) {
-            resourceRecordName = "record.fxml";
-        }
+        ArrayList<UI_CtrlList> ui_ctrlLists = new ArrayList<>();
 
-        if (!resourceRecordName.isEmpty()) {
-            URL resource = getClass().getResource(resourceRecordName);
-            FXMLLoader fxmlLoader = new FXMLLoader(resource);
-
-            ArrayList<UI_CtrlList> ui_ctrlLists = new ArrayList<>();
-
-            fxmlLoader.setControllerFactory(param -> {
-                try {
-                    if (UI_CtrlList.class.isAssignableFrom(param)) {
-                        Class<?> tableClass = param.getConstructors()[0].getParameterTypes()[0];
-                        UI_CtrlList ui_ctrlList;
-                        /* if table is abstract uses last know (if any) controller stored on ui_ctrlLists */
-                        if (Modifier.isAbstract(tableClass.getModifiers())) {
-                            ui_ctrlList = ui_ctrlLists.get(ui_ctrlLists.size() - 1);
-                        } else {
-                            Constructor<?>[] constructors = tableClass.getConstructors();
-                            MTable childTable;
-                            if (constructors.length == 0 || constructors[0].getParameterTypes().length == 0) {
-                                childTable = (MTable) tableClass.newInstance();
-                            } else {
-                                Constructor<?> ctor = tableClass.getConstructor(table.getClass());
-                                childTable = (MTable) ctor.newInstance(table);
-                            }
-                            Constructor<?> constructor = param.getConstructor(tableClass);
-                            ui_ctrlList = (UI_CtrlList) constructor.newInstance(childTable);
-                        }
-                        ui_ctrlLists.add(ui_ctrlList);
-                        return ui_ctrlList;
-                    }
-                    return param.newInstance();
-                } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                    if (table.getState() != MTable.STATE.NORMAL) {
-                        table.cancel();
-                    }
-                    e.printStackTrace();
-                    UI_Message.Warning("UI Controller", "Warning", e.toString());
-                }
-                return null;
-            });
-
+        fxmlLoader.setControllerFactory(param -> {
             try {
-                parent = fxmlLoader.load();
-            } catch (IOException e) {
+                if (UI_CtrlList.class.isAssignableFrom(param)) {
+                    Class<?> tableClass = param.getConstructors()[0].getParameterTypes()[0];
+                    UI_CtrlList ui_ctrlList;
+                    /* if table is abstract uses last know (if any) controller stored on ui_ctrlLists */
+                    if (Modifier.isAbstract(tableClass.getModifiers())) {
+                        ui_ctrlList = ui_ctrlLists.get(ui_ctrlLists.size() - 1);
+                    } else {
+                        Constructor<?>[] constructors = tableClass.getConstructors();
+                        MTable childTable;
+                        if (constructors.length == 0 || constructors[0].getParameterTypes().length == 0) {
+                            childTable = (MTable) tableClass.newInstance();
+                        } else {
+                            Constructor<?> ctor = tableClass.getConstructor(table.getClass());
+                            childTable = (MTable) ctor.newInstance(table);
+                        }
+                        Constructor<?> constructor = param.getConstructor(tableClass);
+                        ui_ctrlList = (UI_CtrlList) constructor.newInstance(childTable);
+                    }
+                    ui_ctrlLists.add(ui_ctrlList);
+                    return ui_ctrlList;
+                }
+                return param.newInstance();
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 if (table.getState() != MTable.STATE.NORMAL) {
                     table.cancel();
                 }
                 e.printStackTrace();
                 UI_Message.Warning("UI Controller", "Warning", e.toString());
             }
+            return null;
+        });
 
-            for (UI_CtrlList ui_ctrlList : ui_ctrlLists) {
-                ui_ctrlList.buildTableView();
-            }
-
-            if (parent != null) {
-                fxmlLoader.<UI_CtrlRecord>getController().setCtrlList(this);
-
-                Stage stage = new Stage();
-                Scene scene = new Scene(parent);
-
-                stage.setScene(scene);
-                stage.initModality(Modality.APPLICATION_MODAL);
-
-                String title;
-
-                switch (table.getState()) {
-                    case NORMAL:
-                        title = "Mostrar Detalle";
-                        break;
-                    case EDIT:
-                        title = "Modificar";
-                        break;
-                    case INSERT:
-                        title = "Agregar";
-                        break;
-                    default:
-                        title = "?";
-                }
-
-                stage.setTitle(title + ": " + table.getGenre());
-
-                stage.setOnHidden(event -> {
-                    for (UI_CtrlList ui_ctrlList : ui_ctrlLists) {
-                        ui_ctrlList.stopExecutorServiceRefresh();
-                    }
-                    if (table.getState() != MTable.STATE.NORMAL) {
-                        table.cancel();
-                    }
-                });
-
-                scene.setOnKeyPressed(event -> {
-                    if (event.getCode() == KeyCode.ESCAPE) {
-                        stage.close();
-                    }
-                });
-
-                stage.show();
-            }
-        } else {
+        try {
+            parent = fxmlLoader.load();
+        } catch (IOException e) {
             if (table.getState() != MTable.STATE.NORMAL) {
                 table.cancel();
             }
-            UI_Message.Warning("UI Controller", "Warning", "No form Record XML descriptor found");
+            e.printStackTrace();
+            UI_Message.Warning("UI Controller", "Warning", e.toString());
+        }
+
+        for (UI_CtrlList ui_ctrlList : ui_ctrlLists) {
+            ui_ctrlList.buildTableView();
+        }
+
+        if (parent != null) {
+            fxmlLoader.<UI_CtrlRecord>getController().setCtrlList(this);
+
+            Stage stage = new Stage();
+            Scene scene = new Scene(parent);
+
+            stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            String title;
+
+            switch (table.getState()) {
+                case NORMAL:
+                    title = "Mostrar Detalle";
+                    break;
+                case EDIT:
+                    title = "Modificar";
+                    break;
+                case INSERT:
+                    title = "Agregar";
+                    break;
+                default:
+                    title = "?";
+            }
+
+            stage.setTitle(title + ": " + table.getGenre());
+
+            stage.setOnHidden(event -> {
+                for (UI_CtrlList ui_ctrlList : ui_ctrlLists) {
+                    ui_ctrlList.stopExecutorServiceRefresh();
+                }
+                if (table.getState() != MTable.STATE.NORMAL) {
+                    table.cancel();
+                }
+            });
+
+            scene.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    stage.close();
+                }
+            });
+
+            stage.show();
         }
     }
 
@@ -335,9 +322,13 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     protected abstract String[] getColumns();
 
-    protected abstract String getCtrlListFXMLPath();
+    protected String getCtrlListFXMLPath() {
+        return "listView.fxml";
+    }
 
-    abstract protected String getCtrlRecordFXMLPath();
+    protected String getCtrlRecordFXMLPath() {
+        return "recordView.fxml";
+    }
 
     TableView<MBaseData> getTableView() {
         return tableView;
