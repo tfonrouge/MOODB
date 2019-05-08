@@ -141,9 +141,14 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     protected void doInsertEdit() {
+
         String resourceRecordName = getCtrlRecordFXMLPath();
 
-        if (resourceRecordName != null && !resourceRecordName.isEmpty()) {
+        if (resourceRecordName == null) {
+            resourceRecordName = "record.fxml";
+        }
+
+        if (!resourceRecordName.isEmpty()) {
             URL resource = getClass().getResource(resourceRecordName);
             FXMLLoader fxmlLoader = new FXMLLoader(resource);
 
@@ -174,6 +179,9 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                     }
                     return param.newInstance();
                 } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                    if (table.getState() != MTable.STATE.NORMAL) {
+                        table.cancel();
+                    }
                     e.printStackTrace();
                     UI_Message.Warning("UI Controller", "Warning", e.toString());
                 }
@@ -183,6 +191,9 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             try {
                 parent = fxmlLoader.load();
             } catch (IOException e) {
+                if (table.getState() != MTable.STATE.NORMAL) {
+                    table.cancel();
+                }
                 e.printStackTrace();
                 UI_Message.Warning("UI Controller", "Warning", e.toString());
             }
@@ -236,11 +247,12 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 stage.show();
             }
         } else {
+            if (table.getState() != MTable.STATE.NORMAL) {
+                table.cancel();
+            }
             UI_Message.Warning("UI Controller", "Warning", "No form Record XML descriptor found");
         }
     }
-
-    protected abstract String getCtrlListFXMLPath();
 
     private TableColumn<MBaseData, ?> getColumn(String fieldExpression) {
 
@@ -322,6 +334,8 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     }
 
     protected abstract String[] getColumns();
+
+    protected abstract String getCtrlListFXMLPath();
 
     abstract protected String getCtrlRecordFXMLPath();
 
@@ -417,20 +431,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
-    private void stopExecutorServiceRefresh() {
-        if (executorServiceRefresh != null) {
-            executorServiceRefresh.shutdown();
-            executorServiceRefresh = null;
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    protected void tableFind() {
-        table.aggregateFind();
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    void showWindow(Parent parent) {
+    private void showWindow(Parent parent) {
 
         initController(parent);
 
@@ -452,5 +453,17 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         stage.setTitle(table.getGenres());
 
         stage.show();
+    }
+
+    private void stopExecutorServiceRefresh() {
+        if (executorServiceRefresh != null) {
+            executorServiceRefresh.shutdown();
+            executorServiceRefresh = null;
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    protected void tableFind() {
+        table.aggregateFind();
     }
 }
