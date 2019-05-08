@@ -6,7 +6,6 @@ import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
 import tech.fonrouge.MOODB.ui.UI_Message;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -157,10 +156,17 @@ abstract public class MTable {
         return null;
     }
 
-    public MTable getChildTable(Class clazz) {
-        Method[] a = getClass().getDeclaredMethods();
-        for (Method method : a) {
-            System.out.println(a);
+    public Class<?> getBaseClass() {
+        Class<?> clazz = getClass();
+        while (clazz != MTable.class) {
+            try {
+                if (clazz.getDeclaredMethod("getTableName") != null) {
+                    return clazz;
+                }
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+            clazz = clazz.getSuperclass();
         }
         return null;
     }
