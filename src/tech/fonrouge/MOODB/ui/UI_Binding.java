@@ -192,6 +192,10 @@ public class UI_Binding<T extends MTable> {
         return null;
     }
 
+    public T getTable() {
+        return table;
+    }
+
     private MField getTableField(Field field) {
         String full = field.getName();
         if (full.contains("_")) {
@@ -246,8 +250,8 @@ public class UI_Binding<T extends MTable> {
 
     }
 
-    @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
     public @interface AssignWith {
         String parentNode();
 
