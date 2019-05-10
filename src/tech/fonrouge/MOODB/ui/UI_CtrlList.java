@@ -21,17 +21,19 @@ import tech.fonrouge.MOODB.*;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static tech.fonrouge.MOODB.ui.UI_FXMLLoader.fxmlHasFXController;
+
 public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
+    public static UI_CtrlList currentCtrlList = null;
     private final ObservableList<MBaseData> observableList = FXCollections.observableArrayList();
-
     @SuppressWarnings("unused")
     @FXML
     protected TableView<MBaseData> tableView;
@@ -74,38 +76,53 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             }
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
-            UI_Message.Warning("UI Controller", "Warning", e.toString());
+            UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
         }
 
         if (ui_ctrlList != null) {
-            FXMLLoader fxmlLoader = new FXMLLoader(ui_ctrlList.getClass().getResource(ui_ctrlList.getCtrlListFXMLPath()));
-            fxmlLoader.setController(ui_ctrlList);
-            Parent parent = null;
-            Class<?> uiCtrlListClass = ui_ctrlList.getClass();
 
-            UI_CtrlList finalUi_ctrlList = ui_ctrlList;
-            fxmlLoader.setControllerFactory(param -> {
-                try {
-                    if (param.isAssignableFrom(uiCtrlListClass)) {
-                        return finalUi_ctrlList;
+            URL resource = ui_ctrlList.getClass().getResource(ui_ctrlList.getCtrlListFXMLPath());
+            Boolean hasController = fxmlHasFXController(resource);
+
+            if (hasController != null) {
+                FXMLLoader fxmlLoader = new FXMLLoader(resource);
+                Class<?> uiCtrlListClass = ui_ctrlList.getClass();
+
+                UI_CtrlList finalUi_ctrlList = ui_ctrlList;
+                fxmlLoader.setControllerFactory(param -> {
+                    try {
+                        if (param.isAssignableFrom(uiCtrlListClass)) {
+                            return finalUi_ctrlList;
+                        }
+                        return param.newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        e.printStackTrace();
+                        UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
                     }
-                    return param.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                    UI_Message.Warning("UI Controller", "Warning", e.toString());
-                }
-                return null;
-            });
+                    return null;
+                });
 
-            try {
-                parent = fxmlLoader.load();
-            } catch (IOException e) {
-                e.printStackTrace();
-                UI_Message.Warning("UI Controller", "Warning", e.toString());
+                if (!hasController) {
+                    fxmlLoader.setController(ui_ctrlList);
+                }
+
+                Parent parent = null;
+                try {
+                    currentCtrlList = ui_ctrlList;
+                    parent = fxmlLoader.load();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
+                } finally {
+                    currentCtrlList = null;
+                }
+                if (parent != null) {
+                    ui_ctrlList.showWindow(parent);
+                }
+
             }
-            if (parent != null) {
-                ui_ctrlList.showWindow(parent);
-            }
+        } else {
+            UI_Message.Error("UI_CtrlList Error", "No controller found.", "define controller for table.");
         }
     }
 
@@ -143,31 +160,32 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     protected void doInsertEdit() {
 
         URL resource = getClass().getResource(getCtrlRecordFXMLPath());
+
         FXMLLoader fxmlLoader = new FXMLLoader(resource);
 
-        ArrayList<UI_CtrlList> ui_ctrlLists = new ArrayList<>();
+        List<UI_CtrlList> localCtrlListStack = new ArrayList<>();
 
         fxmlLoader.setControllerFactory(param -> {
             try {
                 if (UI_CtrlList.class.isAssignableFrom(param)) {
+
                     Class<?> tableClass = param.getConstructors()[0].getParameterTypes()[0];
                     UI_CtrlList ui_ctrlList;
-                    /* if table is abstract uses last know (if any) controller stored on ui_ctrlLists */
-                    if (Modifier.isAbstract(tableClass.getModifiers())) {
-                        ui_ctrlList = ui_ctrlLists.get(ui_ctrlLists.size() - 1);
+
+                    Constructor<?>[] constructors = tableClass.getConstructors();
+                    MTable childTable;
+                    if (constructors.length == 0 || constructors[0].getParameterTypes().length == 0) {
+                        childTable = (MTable) tableClass.newInstance();
                     } else {
-                        Constructor<?>[] constructors = tableClass.getConstructors();
-                        MTable childTable;
-                        if (constructors.length == 0 || constructors[0].getParameterTypes().length == 0) {
-                            childTable = (MTable) tableClass.newInstance();
-                        } else {
-                            Constructor<?> ctor = tableClass.getConstructor(table.getClass());
-                            childTable = (MTable) ctor.newInstance(table);
-                        }
-                        Constructor<?> constructor = param.getConstructor(tableClass);
-                        ui_ctrlList = (UI_CtrlList) constructor.newInstance(childTable);
+                        Constructor<?> ctor = tableClass.getConstructor(table.getClass());
+                        childTable = (MTable) ctor.newInstance(table);
                     }
-                    ui_ctrlLists.add(ui_ctrlList);
+                    Constructor<?> constructor = param.getConstructor(tableClass);
+                    ui_ctrlList = (UI_CtrlList) constructor.newInstance(childTable);
+
+                    currentCtrlList = ui_ctrlList;
+                    localCtrlListStack.add(ui_ctrlList);
+
                     return ui_ctrlList;
                 }
                 return param.newInstance();
@@ -176,7 +194,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                     table.cancel();
                 }
                 e.printStackTrace();
-                UI_Message.Warning("UI Controller", "Warning", e.toString());
+                UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
             }
             return null;
         });
@@ -188,11 +206,12 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 table.cancel();
             }
             e.printStackTrace();
-            UI_Message.Warning("UI Controller", "Warning", e.toString());
-        }
-
-        for (UI_CtrlList ui_ctrlList : ui_ctrlLists) {
-            ui_ctrlList.buildTableView();
+            UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
+        } finally {
+            currentCtrlList = null;
+            for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
+                ui_ctrlList.buildTableView();
+            }
         }
 
         if (parent != null) {
@@ -223,7 +242,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             stage.setTitle(title + ": " + table.getGenre());
 
             stage.setOnHidden(event -> {
-                for (UI_CtrlList ui_ctrlList : ui_ctrlLists) {
+                for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
                     ui_ctrlList.stopExecutorServiceRefresh();
                 }
                 if (table.getState() != MTable.STATE.NORMAL) {
@@ -347,9 +366,9 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             if (table.field__id.aggregateFind(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
                 if (!table.delete()) {
                     if (table.getException() == null) {
-                        UI_Message.Warning("UI Controller", "Unknown error", "Delete error");
+                        UI_Message.Error("UI_CtrlList Error", "Unknown error", "Delete error");
                     } else {
-                        UI_Message.Warning("UI Controller", table.getException().getMessage(), "Delete error");
+                        UI_Message.Error("UI_CtrlList Error", table.getException().getMessage(), "Delete error");
                     }
                 }
                 populateList();
