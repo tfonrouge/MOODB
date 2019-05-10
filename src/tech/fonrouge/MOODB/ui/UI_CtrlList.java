@@ -32,7 +32,9 @@ import static tech.fonrouge.MOODB.ui.UI_FXMLLoader.fxmlHasFXController;
 
 public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
+    @SuppressWarnings("WeakerAccess")
     public static UI_CtrlList currentCtrlList = null;
+
     private final ObservableList<MBaseData> observableList = FXCollections.observableArrayList();
     @SuppressWarnings("unused")
     @FXML
