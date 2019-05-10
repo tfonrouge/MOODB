@@ -18,7 +18,8 @@ public class UI_Binding<T extends MTable> {
 
     @SuppressWarnings("WeakerAccess")
     protected final HashMap<String, Node> nodeHashMap = new HashMap<>();
-    protected T table;
+
+    T table;
 
     private void assignFieldWith(Field declaredField, AssignWith assignWith) {
         Field parentField = null;
