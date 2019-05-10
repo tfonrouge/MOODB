@@ -15,6 +15,7 @@ import java.net.URL;
 
 public class UI_FXMLLoader {
 
+    @SuppressWarnings("unused")
     public static void fxmlLoadBindCtrlList(FXMLLoader fxmlLoader) {
         try {
             Object controller = fxmlLoader.load();
