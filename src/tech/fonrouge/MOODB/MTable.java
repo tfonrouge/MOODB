@@ -156,6 +156,7 @@ abstract public class MTable {
         return null;
     }
 
+    @SuppressWarnings("unused")
     public Class<?> getBaseClass() {
         Class<?> clazz = getClass();
         while (clazz != MTable.class) {
@@ -163,8 +164,8 @@ abstract public class MTable {
                 if (clazz.getDeclaredMethod("getTableName") != null) {
                     return clazz;
                 }
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+            } catch (NoSuchMethodException ignored) {
+
             }
             clazz = clazz.getSuperclass();
         }
