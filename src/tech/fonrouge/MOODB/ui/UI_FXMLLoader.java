@@ -10,6 +10,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.net.URL;
 
@@ -24,6 +28,20 @@ public class UI_FXMLLoader {
                 last_ui_ctrlList = UI_CtrlList.currentCtrlList;
                 setControllerMember(controller, last_ui_ctrlList);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static void fxmlLoadBindCtrlList(FXMLLoader fxmlLoader, Object controller) {
+        try {
+            UI_CtrlList last_ui_ctrlList;
+            if (UI_CtrlList.currentCtrlList != null) {
+                last_ui_ctrlList = UI_CtrlList.currentCtrlList;
+                setControllerMember(controller, last_ui_ctrlList);
+            }
+            fxmlLoader.load();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -50,7 +68,8 @@ public class UI_FXMLLoader {
     private static void setControllerMember(Object controller, UI_CtrlList last_ui_ctrlList) {
         Field field = null;
         for (Field declaredField : controller.getClass().getDeclaredFields()) {
-            if (UI_CtrlList.class.isAssignableFrom(declaredField.getType())) {
+            BindCtrlList annotation = declaredField.getAnnotation(BindCtrlList.class);
+            if (annotation != null && UI_CtrlList.class.isAssignableFrom(declaredField.getType())) {
                 field = declaredField;
                 break;
             }
@@ -69,5 +88,12 @@ public class UI_FXMLLoader {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    @SuppressWarnings("WeakerAccess")
+    public @interface BindCtrlList {
+
     }
 }
