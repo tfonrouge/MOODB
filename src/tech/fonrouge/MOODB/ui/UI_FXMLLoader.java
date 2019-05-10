@@ -23,10 +23,8 @@ public class UI_FXMLLoader {
     public static void fxmlLoadBindCtrlList(FXMLLoader fxmlLoader) {
         try {
             Object controller = fxmlLoader.load();
-            UI_CtrlList last_ui_ctrlList;
             if (UI_CtrlList.currentCtrlList != null) {
-                last_ui_ctrlList = UI_CtrlList.currentCtrlList;
-                setControllerMember(controller, last_ui_ctrlList);
+                setControllerMember(controller, UI_CtrlList.currentCtrlList);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -36,10 +34,8 @@ public class UI_FXMLLoader {
     @SuppressWarnings("unused")
     public static void fxmlLoadBindCtrlList(FXMLLoader fxmlLoader, Object controller) {
         try {
-            UI_CtrlList last_ui_ctrlList;
             if (UI_CtrlList.currentCtrlList != null) {
-                last_ui_ctrlList = UI_CtrlList.currentCtrlList;
-                setControllerMember(controller, last_ui_ctrlList);
+                setControllerMember(controller, UI_CtrlList.currentCtrlList);
             }
             fxmlLoader.load();
         } catch (IOException e) {
