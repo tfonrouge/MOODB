@@ -18,7 +18,6 @@ import javafx.stage.Stage;
 import org.bson.Document;
 import tech.fonrouge.MOODB.*;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -112,7 +111,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 try {
                     currentCtrlList = ui_ctrlList;
                     parent = fxmlLoader.load();
-                } catch (IOException e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                     UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
                 } finally {
@@ -128,34 +127,88 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
-    private void buildColumns() {
+    protected String getCtrlListFXMLPath() {
+        return "listView.fxml";
+    }
 
-        for (String fieldExpression : getColumns()) {
+    TableView<MBaseData> getTableView() {
+        return tableView;
+    }
 
-            TableColumn<MBaseData, ?> column = getColumn(fieldExpression);
+    @SuppressWarnings("WeakerAccess")
+    public void onActionDeleteDocument() {
 
-            tableView.getColumns().add(column);
+        MBaseData item = tableView.getSelectionModel().getSelectedItem();
 
+        if (item != null) {
+            if (table.field__id.aggregateFind(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
+                if (!table.delete()) {
+                    if (table.getException() == null) {
+                        UI_Message.Error("UI_CtrlList Error", "Unknown error", "Delete error");
+                    } else {
+                        UI_Message.Error("UI_CtrlList Error", table.getException().getMessage(), "Delete error");
+                    }
+                }
+                populateList();
+            }
         }
     }
 
-    private void buildTableView() {
+    @SuppressWarnings("WeakerAccess")
+    protected void populateList() {
 
-        tableView.getColumns().clear();
+        if (!populatingList) {
 
-        tableView.setMaxHeight(Control.USE_COMPUTED_SIZE);
+            populatingList = true;
 
-        buildColumns();
+            int focusedIndex = tableView.getSelectionModel().getFocusedIndex();
+            int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
 
-        if (executorServiceRefresh == null) {
-            Runnable runnable = () -> Platform.runLater(this::populateList);
+            table.tableStatePush();
 
-            executorServiceRefresh = Executors.newSingleThreadScheduledExecutor();
-            executorServiceRefresh.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
+            observableList.clear();
+
+            for (int i = 0; i < getColumns().length; i++) {
+                if (getColumns()[i].indexOf(".") > 0) {
+                    table.addLookupField(getColumns()[i]);
+                }
+            }
+
+            tableFind();
+
+            while (!table.getEof()) {
+                MBaseData e = table.getData();
+                observableList.add(e);
+                table.next();
+            }
+
+            tableView.getFocusModel().focus(focusedIndex);
+            tableView.getSelectionModel().select(selectedIndex);
+
+            table.tableStatePull();
+
+            populatingList = false;
         }
+    }
 
-        tableView.setItems(observableList);
+    protected abstract String[] getColumns();
 
+    @SuppressWarnings("WeakerAccess")
+    protected void tableFind() {
+        table.aggregateFind();
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void onActionEditDocument() {
+
+        MBaseData item = tableView.getSelectionModel().getSelectedItem();
+
+        if (item != null) {
+            Object id = item.get_id();
+            if (table.field__id.aggregateFind(id) && table.edit()) {
+                doInsertEdit();
+            }
+        }
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -203,17 +256,18 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         try {
             parent = fxmlLoader.load();
-        } catch (IOException e) {
+        } catch (Throwable e) {
             if (table.getState() != MTable.STATE.NORMAL) {
                 table.cancel();
             }
             e.printStackTrace();
             UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
-        } finally {
-            currentCtrlList = null;
-            for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
-                ui_ctrlList.buildTableView();
-            }
+        }
+
+        currentCtrlList = null;
+
+        for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
+            ui_ctrlList.buildTableView();
         }
 
         if (parent != null) {
@@ -259,6 +313,90 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             });
 
             stage.show();
+        }
+    }
+
+    protected String getCtrlRecordFXMLPath() {
+        return "recordView.fxml";
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void onActionInsertDocument() {
+        if (table.insert()) {
+            doInsertEdit();
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void onActionViewDocument() {
+        MBaseData item = tableView.getSelectionModel().getSelectedItem();
+        if (item != null && table.field__id.aggregateFind(item.get_id())) {
+            doInsertEdit();
+        }
+    }
+
+    private void showWindow(Parent parent) {
+
+        initController(parent);
+
+        stage = new Stage();
+
+        buildTableView();
+
+        Scene scene = new Scene(parent);
+
+        tableView.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                stage.hide();
+            }
+        });
+
+        stage.setOnHidden(event -> stopExecutorServiceRefresh());
+
+        stage.setScene(scene);
+        stage.setTitle(table.getGenres());
+
+        stage.show();
+    }
+
+    protected void initController(Parent parent) {
+
+    }
+
+    private void buildTableView() {
+
+        tableView.getColumns().clear();
+
+        tableView.setMaxHeight(Control.USE_COMPUTED_SIZE);
+
+        buildColumns();
+
+        if (executorServiceRefresh == null) {
+            Runnable runnable = () -> Platform.runLater(this::populateList);
+
+            executorServiceRefresh = Executors.newSingleThreadScheduledExecutor();
+            executorServiceRefresh.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
+        }
+
+        tableView.setItems(observableList);
+
+    }
+
+    private void stopExecutorServiceRefresh() {
+        if (executorServiceRefresh != null) {
+            executorServiceRefresh.shutdown();
+            executorServiceRefresh = null;
+        }
+    }
+
+    private void buildColumns() {
+
+        for (String fieldExpression : getColumns()) {
+
+            TableColumn<MBaseData, ?> column = getColumn(fieldExpression);
+
+            tableView.getColumns().add(column);
+
         }
     }
 
@@ -339,143 +477,5 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
 
         return new TableColumn<>(fieldExpression);
-    }
-
-    protected abstract String[] getColumns();
-
-    protected String getCtrlListFXMLPath() {
-        return "listView.fxml";
-    }
-
-    protected String getCtrlRecordFXMLPath() {
-        return "recordView.fxml";
-    }
-
-    TableView<MBaseData> getTableView() {
-        return tableView;
-    }
-
-    protected void initController(Parent parent) {
-
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void onActionDeleteDocument() {
-
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
-
-        if (item != null) {
-            if (table.field__id.aggregateFind(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
-                if (!table.delete()) {
-                    if (table.getException() == null) {
-                        UI_Message.Error("UI_CtrlList Error", "Unknown error", "Delete error");
-                    } else {
-                        UI_Message.Error("UI_CtrlList Error", table.getException().getMessage(), "Delete error");
-                    }
-                }
-                populateList();
-            }
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void onActionEditDocument() {
-
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
-
-        if (item != null) {
-            Object id = item.get_id();
-            if (table.field__id.aggregateFind(id) && table.edit()) {
-                doInsertEdit();
-            }
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void onActionInsertDocument() {
-        if (table.insert()) {
-            doInsertEdit();
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void onActionViewDocument() {
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
-        if (item != null && table.field__id.aggregateFind(item.get_id())) {
-            doInsertEdit();
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    protected void populateList() {
-
-        if (!populatingList) {
-
-            populatingList = true;
-
-            int focusedIndex = tableView.getSelectionModel().getFocusedIndex();
-            int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
-
-            table.tableStatePush();
-
-            observableList.clear();
-
-            for (int i = 0; i < getColumns().length; i++) {
-                if (getColumns()[i].indexOf(".") > 0) {
-                    table.addLookupField(getColumns()[i]);
-                }
-            }
-
-            tableFind();
-
-            while (!table.getEof()) {
-                MBaseData e = table.getData();
-                observableList.add(e);
-                table.next();
-            }
-
-            tableView.getFocusModel().focus(focusedIndex);
-            tableView.getSelectionModel().select(selectedIndex);
-
-            table.tableStatePull();
-
-            populatingList = false;
-        }
-    }
-
-    private void showWindow(Parent parent) {
-
-        initController(parent);
-
-        stage = new Stage();
-
-        buildTableView();
-
-        Scene scene = new Scene(parent);
-
-        tableView.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ESCAPE) {
-                stage.hide();
-            }
-        });
-
-        stage.setOnHidden(event -> stopExecutorServiceRefresh());
-
-        stage.setScene(scene);
-        stage.setTitle(table.getGenres());
-
-        stage.show();
-    }
-
-    private void stopExecutorServiceRefresh() {
-        if (executorServiceRefresh != null) {
-            executorServiceRefresh.shutdown();
-            executorServiceRefresh = null;
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    protected void tableFind() {
-        table.aggregateFind();
     }
 }
