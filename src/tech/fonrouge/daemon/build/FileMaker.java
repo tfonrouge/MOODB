@@ -1,19 +1,23 @@
 package tech.fonrouge.daemon.build;
 
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.body.*;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.Type;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicReference;
 
 class FileMaker {
     private final Path pathTable;
@@ -28,13 +32,9 @@ class FileMaker {
     private String masterSourceClass = null;
     private String masterSourceField = null;
 
-    private int numCalcFields = 0;
-    private int numValidateFields = 0;
     private List<FieldModel> fieldModels;
     private List<IndexModel> indexModels;
     private List<FieldFilterModel> fieldFilterModels;
-    private List<String> calcFieldList = new ArrayList<>();
-    private List<String> onValidateList = new ArrayList<>();
 
     FileMaker(final Path pathExtLess, final Document document, String className) {
 
@@ -61,12 +61,6 @@ class FileMaker {
                 FieldModel fieldModel = new FieldModel(node);
                 if (fieldModel.valid()) {
                     fieldModels.add(fieldModel);
-                    if (fieldModel.calculated) {
-                        ++numCalcFields;
-                    }
-                    if (fieldModel.validate) {
-                        ++numValidateFields;
-                    }
                 }
             }
         }
@@ -93,319 +87,338 @@ class FileMaker {
         }
     }
 
-    void run() throws IOException {
-        if (Files.exists(pathTable) && Files.size(pathTable) > 0) {
-            updateFileTable();
-        } else {
-            createFileTable();
+    void run() {
+
+        updateFileTable();
+
+        updateDataModel();
+
+    }
+
+    private String getInitializeString(FieldModel fieldModel) {
+        StringBuilder builder = new StringBuilder();
+
+        builder.
+                append("new MField").append(fieldModel.type).
+                append(fieldModel.getCast()).
+                append("(this, \"").
+                append(fieldModel.fieldName).
+                append("\"").
+                append(")");
+
+        String initializeString = "";
+
+        if (fieldModel.autoInc) {
+            initializeString += "            autoInc = true;\n";
         }
-        if (Files.exists(pathModel) && Files.size(pathModel) > 0) {
-            updateDataModel();
-        } else {
-            createDataModel();
+
+        if (fieldModel.calculated) {
+            initializeString += "            calculated = true;\n";
+            initializeString += "            calcValue = () -> calcField_" + fieldModel.fieldName + "();\n";
+        }
+
+        if (fieldModel.newFinal) {
+            initializeString += "            newFinal = true;\n";
+        }
+
+        if (fieldModel.validate) {
+            initializeString += "            onValidate = () -> onValidate_" + fieldModel.fieldName + "();\n";
+        }
+
+        if (fieldModel.required) {
+            initializeString += "            required = true;\n";
+        }
+
+        if (fieldModel.description != null) {
+            initializeString += "            description = \"" + fieldModel.description + "\";\n";
+        }
+
+        if (fieldModel.label != null) {
+            initializeString += "            label = \"" + fieldModel.label + "\";\n";
+        }
+
+        if (fieldModel.newValue != null) {
+            initializeString += "            setCallableNewValue(() -> " + fieldModel.newValue + ");\n";
+        }
+
+        if (fieldModel.defaultValue != null) {
+            initializeString += "            setDefaultValue(" + fieldModel.defaultValue + ");\n";
+        }
+
+        if (fieldModel.onAfterChangeValue != null) {
+            initializeString += "            setRunnableOnAfterChangeValue(() -> " + fieldModel.onAfterChangeValue + ");\n";
+        }
+
+        if (fieldModel.keyValueItems.size() > 0) {
+            initializeString += "\n            valueItems = new ValueItems<>();\n";
+            final String[] line = {""};
+            fieldModel.keyValueItems.forEach((key, value) -> line[0] += "            valueItems.put(" + key + ", \"" + value + "\");\n");
+            initializeString += line[0];
+        }
+
+        /* initialize method */
+        builder.
+                append(" {\n").
+                append("        @Override\n").
+                append("        protected void initialize() {\n").
+                append(initializeString).
+                append("        }\n");
+
+        /* FieldTableField */
+        if (fieldModel.type.contentEquals("TableField")) {
+            builder.
+                    append("\n").
+                    append("        @Override\n").
+                    append("        protected ").
+                    append(fieldModel.className).
+                    append(" buildTableField() {\n").
+                    append("            return new ").
+                    append(fieldModel.className).
+                    append("();\n").
+                    append("        }\n");
+        }
+
+        builder.append("    }");
+        return builder.toString();
+    }
+
+    private <T extends BodyDeclaration<?>> void setNodeAnnotation(BodyDeclaration<T> node, String annotation) {
+        AtomicReference<Boolean> hasOurAnnotation = new AtomicReference<>(false);
+        node.getAnnotations().forEach(annotationExpr -> {
+            if (!hasOurAnnotation.get() && annotationExpr.getNameAsString().contentEquals(annotation)) {
+                hasOurAnnotation.set(true);
+            }
+        });
+
+        if (!hasOurAnnotation.get()) {
+            node.addAnnotation(annotation);
         }
     }
 
-    private String getTableDescriptorBuffer() {
-        StringBuilder builder = new StringBuilder();
+    private void buildFieldDeclaration(ClassOrInterfaceDeclaration coid, String fieldType, String fieldName, String initializeString) {
+        AtomicReference<FieldDeclaration> fda = new AtomicReference<>();
 
-        if (fieldModels.size() > 0) {
-            builder.append("\n");
-            for (FieldModel fieldModel : fieldModels) {
-                String cast;
-                if (fieldModel.type.contentEquals("TableField")) {
-                    cast = "<" + fieldModel.className + ">";
-                } else {
-                    cast = "";
-                }
-                builder.
-                        append("    public final MField").
-                        append(fieldModel.type).append(cast).
-                        append(" field_").
-                        append(fieldModel.fieldName).
-                        append(" = new MField").append(fieldModel.type).
-                        append(cast).
-                        append("(this, \"").
-                        append(fieldModel.fieldName).
-                        append("\"").
-                        append(")");
+        coid.findAll(FieldDeclaration.class)
+                .forEach(fd -> {
+                    if (fda.get() == null) {
+                        fd.getVariables().forEach(variableDeclarator -> {
+                            if (variableDeclarator.getNameAsString().contentEquals(fieldName)) {
+                                fda.set(fd);
+                            }
+                        });
+                    }
+                });
 
-                String initializeString = "";
+        FieldDeclaration fieldDeclaration = fda.get();
 
-                if (fieldModel.autoInc) {
-                    initializeString += "            autoInc = true;\n";
-                }
+        VariableDeclarator vd;
 
-                if (fieldModel.calculated) {
-                    initializeString += "            calculated = true;\n";
-                    initializeString += "            calcValue = () -> calcField_" + fieldModel.fieldName + "();\n";
-                }
+        if (fieldDeclaration == null) {
 
-                if (fieldModel.newFinal) {
-                    initializeString += "            newFinal = true;\n";
-                }
+            Type type = new ClassOrInterfaceType(null, fieldType);
+            vd = new VariableDeclarator(type, fieldName);
 
-                if (fieldModel.validate) {
-                    initializeString += "            onValidate = () -> onValidate_" + fieldModel.fieldName + "();\n";
-                }
+            fieldDeclaration = new FieldDeclaration().addVariable(vd);
 
-                if (fieldModel.required) {
-                    initializeString += "            required = true;\n";
-                }
-
-                if (fieldModel.description != null) {
-                    initializeString += "            description = \"" + fieldModel.description + "\";\n";
-                }
-
-                if (fieldModel.label != null) {
-                    initializeString += "            label = \"" + fieldModel.label + "\";\n";
-                }
-
-                if (fieldModel.newValue != null) {
-                    initializeString += "            setCallableNewValue(() -> " + fieldModel.newValue + ");\n";
-                }
-
-                if (fieldModel.defaultValue != null) {
-                    initializeString += "            setDefaultValue(" + fieldModel.defaultValue + ");\n";
-                }
-
-                if (fieldModel.onAfterChangeValue != null) {
-                    initializeString += "            setRunnableOnAfterChangeValue(() -> " + fieldModel.onAfterChangeValue + ");\n";
-                }
-
-                if (fieldModel.keyValueItems.size() > 0) {
-                    initializeString += "\n            valueItems = new ValueItems<>();\n";
-                    final String[] line = {""};
-                    fieldModel.keyValueItems.forEach((key, value) -> line[0] += "            valueItems.put(" + key + ", \"" + value + "\");\n");
-                    initializeString += line[0];
-                }
-
-                /* initialize method */
-                builder.
-                        append(" {\n").
-                        append("        @Override\n").
-                        append("        protected void initialize() {\n").
-                        append(initializeString).
-                        append("        }\n");
-
-                /* FieldTableField */
-                if (fieldModel.type.contentEquals("TableField")) {
-                    builder.
-                            append("\n").
-                            append("        @Override\n").
-                            append("        protected ").
-                            append(fieldModel.className).
-                            append(" buildTableField() {\n").
-                            append("            return new ").
-                            append(fieldModel.className).
-                            append("();\n").
-                            append("        }\n");
-                }
-
-                builder.append("    };\n\n");
-            }
+            coid.getMembers().add(fieldDeclaration);
+        } else {
+            vd = fieldDeclaration.getVariable(0);
         }
 
-        /* Indexes */
-        if (indexModels.size() > 0) {
-            indexModels.forEach(indexModel -> {
-                builder.
-                        append("    public final MIndex index_").
-                        append(indexModel.getName()).
-                        append(" = new MIndex(").
-                        append("this, \"").
-                        append(indexModel.getName()).
-                        append("\", \"").
-                        append(indexModel.getMasterKeyField()).
-                        append("\", \"").
-                        append(indexModel.getKeyField()).
-                        append("\", ").
-                        append(indexModel.isUnique()).
-                        append(", ").
-                        append(indexModel.isSparse()).
-                        append(") {\n").
-                        append("        @Override\n").
-                        append("        protected void initialize() {\n");
-                if (indexModel.getIndexFieldItems().size() > 0) {
-                    indexModel.getIndexFieldItems().forEach(indexFieldItem -> {
-                        builder.append("            partialFilter = Filters.").append(indexFieldItem.getLogicOperator()).append("(");
-                        if (indexFieldItem.getPartialFilterItems().size() > 0) {
-                            final String[] s = {""};
-                            indexFieldItem.getPartialFilterItems().forEach((value) -> s[0] += s[0].isEmpty() ? value : (", " + value));
-                            builder.append(s[0]);
+        setNodeAnnotation(fieldDeclaration, "AutoGenerated");
+
+        vd.setInitializer(initializeString);
+
+        fieldDeclaration.setModifiers(Modifier.Keyword.PUBLIC, Modifier.Keyword.FINAL);
+    }
+
+    private MethodDeclaration buildMethodDeclaration(ClassOrInterfaceDeclaration coid, String methodType, String methodName, BlockStmt body) {
+
+        AtomicReference<MethodDeclaration> mda = new AtomicReference<>();
+
+        coid.findAll(MethodDeclaration.class)
+                .forEach(md -> {
+                    if (mda.get() == null) {
+                        if (md.getType().asString().contentEquals(methodType) && md.getNameAsString().contentEquals(methodName)) {
+                            mda.set(md);
                         }
-                    });
-                    builder.append(");\n");
+                    }
+                });
+
+        MethodDeclaration methodDeclaration = mda.get();
+
+        if (methodDeclaration == null) {
+            methodDeclaration = new MethodDeclaration();
+            Type type = new ClassOrInterfaceType(null, methodType);
+            methodDeclaration.setType(type);
+            if (body == null) {
+                if (!methodType.contentEquals("void")) {
+                    body = new BlockStmt();
+                    body.addStatement("return null;");
                 }
-                builder.append("        }\n");
-                builder.append("    };\n");
-            });
+            }
+            coid.addMember(methodDeclaration);
+        }
+
+        methodDeclaration.setName(methodName);
+
+        if (body != null) {
+            methodDeclaration.setBody(body);
+        }
+
+        methodDeclaration.setModifiers(Modifier.Keyword.PUBLIC);
+
+        setNodeAnnotation(methodDeclaration, "AutoGenerated");
+
+        return methodDeclaration;
+    }
+
+    private void buildTableDescriptor(ClassOrInterfaceDeclaration coid) {
+
+        for (FieldModel fieldModel : fieldModels) {
+
+            buildFieldDeclaration(coid, "MField" + fieldModel.type + fieldModel.getCast(), "field_" + fieldModel.fieldName, getInitializeString(fieldModel));
+
+        }
+
+        /*
+         * generate index method's
+         */
+        for (IndexModel indexModel : indexModels) {
+
+            StringBuilder builder = new StringBuilder();
+            builder.
+                    append("new MIndex(").
+                    append("this, \"").
+                    append(indexModel.getName()).
+                    append("\", \"").
+                    append(indexModel.getMasterKeyField()).
+                    append("\", \"").
+                    append(indexModel.getKeyField()).
+                    append("\", ").
+                    append(indexModel.isUnique()).
+                    append(", ").
+                    append(indexModel.isSparse()).
+                    append(") {\n").
+                    append("        @Override\n").
+                    append("        protected void initialize() {\n");
+            if (indexModel.getIndexFieldItems().size() > 0) {
+                indexModel.getIndexFieldItems().forEach(indexFieldItem -> {
+                    builder.append("            partialFilter = Filters.").append(indexFieldItem.getLogicOperator()).append("(");
+                    if (indexFieldItem.getPartialFilterItems().size() > 0) {
+                        final String[] s = {""};
+                        indexFieldItem.getPartialFilterItems().forEach((value) -> s[0] += s[0].isEmpty() ? value : (", " + value));
+                        builder.append(s[0]);
+                    }
+                });
+                builder.append(");");
+            }
+            builder.append("        }\n");
+            builder.append("    }");
+
+            buildFieldDeclaration(coid, "MIndex", "index_" + indexModel.getName(), builder.toString());
+
         }
 
         /* masterSource */
         if (masterSourceClass != null) {
-            builder.
-                    append("\n").
-                    append("    public ").
-                    append(className).append("(").
-                    append(masterSourceClass).
-                    append(" masterSource) {\n").
-                    append("        setMasterSource(masterSource, field_").
-                    append(masterSourceField).
-                    append(");\n").
-                    append("    }\n");
 
-            builder.
-                    append("\n").
-                    append("    @Override\n").
-                    append("    public ").
-                    append(masterSourceClass).
-                    append(" getMasterSource() {\n").
-                    append("        return (").
-                    append(masterSourceClass).
-                    append(") super.getMasterSource();\n").
-                    append("    }\n");
+            BlockStmt body;
+
+            /*
+             * build constructor on table with masterSource
+             */
+            ConstructorDeclaration constructorDeclaration = getCtor(coid);
+
+            if (constructorDeclaration == null) {
+                constructorDeclaration = new ConstructorDeclaration();
+                Type type = new ClassOrInterfaceType(null, masterSourceClass);
+                constructorDeclaration.setName(className);
+                constructorDeclaration.addParameter(type, "masterSource");
+                coid.getMembers().add(constructorDeclaration);
+            }
+
+            constructorDeclaration.setModifiers(Modifier.Keyword.PUBLIC);
+            body = new BlockStmt();
+            body.addStatement("setMasterSource(masterSource, field_" + masterSourceField + ");");
+            setNodeAnnotation(constructorDeclaration, "AutoGenerated");
+            constructorDeclaration.setBody(body);
+
+            /*
+             * build getMasterSource method
+             */
+            body = new BlockStmt();
+            body.addStatement("return (" + masterSourceClass + ") super.getMasterSource();");
+            buildMethodDeclaration(coid, masterSourceClass, "getMasterSource", body);
         }
 
         /* FieldFilters */
         if (fieldFilterModels.size() > 0) {
-            builder.append("\n");
-            builder.append("    public void setFieldFilters() {\n");
-            fieldFilterModels.forEach(fieldFilterModel -> {
-                builder.append("        field_").append(fieldFilterModel.fieldName).append(".setFilterValue(").append(fieldFilterModel.filterValue).append(");\n");
-            });
-            builder.append("    }\n");
+            BlockStmt body = new BlockStmt();
+            fieldFilterModels.forEach(fieldFilterModel -> body.addStatement("field_" + fieldFilterModel.fieldName + ".setFilterValue(" + fieldFilterModel.filterValue + ");"));
+            buildMethodDeclaration(coid, "void", "setFieldFilters", body);
         }
 
         /* getTableName */
         if (tableName != null) {
-            builder.
-                    append("\n").
-                    append("    @Override\n").
-                    append("    public final String getTableName() {\n").
-                    append("        return \"").
-                    append(tableName).
-                    append("\";\n").
-                    append("    }\n");
+            BlockStmt body = new BlockStmt();
+            body.addStatement("return \"" + tableName + "\";");
+            MethodDeclaration md = buildMethodDeclaration(coid, "String", "getTableName", body);
+            md.addModifier(Modifier.Keyword.FINAL);
+            setNodeAnnotation(md, "Override");
         }
 
         /* getGenre */
         if (genre != null) {
-            builder.
-                    append("\n").
-                    append("    @Override\n").
-                    append("    public String getGenre() {\n").
-                    append("        return \"").
-                    append(genre).
-                    append("\";\n").
-                    append("    }\n");
+            BlockStmt body = new BlockStmt();
+            body.addStatement("return \"" + genre + "\";");
+            MethodDeclaration md = buildMethodDeclaration(coid, "String", "getGenre", body);
+            setNodeAnnotation(md, "Override");
         }
 
         /* getGenres */
         if (genre != null) {
-            builder.
-                    append("\n").
-                    append("    @Override\n").
-                    append("    public String getGenres() {\n").
-                    append("        return \"").
-                    append(genres).
-                    append("\";\n").
-                    append("    }\n");
+            BlockStmt body = new BlockStmt();
+            body.addStatement("return \"" + genres + "\";");
+            MethodDeclaration md = buildMethodDeclaration(coid, "String", "getGenres", body);
+            setNodeAnnotation(md, "Override");
         }
 
         /* getMDatabaseClass */
         if (database != null) {
-            builder.
-                    append("\n").
-                    append("    @Override\n").
-                    append("    protected Class getMDatabaseClass() {\n").
-                    append("        return ").
-                    append(database).
-                    append(".class;\n").
-                    append("    }\n");
+            BlockStmt body = new BlockStmt();
+            body.addStatement("return " + database + ".class;");
+            MethodDeclaration md = buildMethodDeclaration(coid, "Class", "getMDatabaseClass", body);
+            setNodeAnnotation(md, "Override");
         }
 
         if (!isAbstract) {
-            builder.
-                    append("\n").
-                    append("    @Override\n").
-                    append("    public ").
-                    append(className).
-                    append("Data getData() {\n").
-                    append("        return new ").
-                    append(className).
-                    append("Data<>(this);\n").
-                    append("    }\n");
+            BlockStmt body = new BlockStmt();
+            body.addStatement("return new " + className + "Data<>(this);");
+            MethodDeclaration md = buildMethodDeclaration(coid, className + "Data", "getData", body);
+            setNodeAnnotation(md, "Override");
         }
-
-        return builder.toString();
     }
 
-    private void createFileTable() {
-        PrintWriter writer = null;
-
-        try {
-            writer = new PrintWriter(pathTable.toString());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        if (writer != null) {
-
-            writer.println("package " + getPackageName() + ";");
-            writer.println();
-            writer.println("import tech.fonrouge.MOODB.*;");
-            writer.println();
-            writer.print("public ");
-            if (isAbstract) {
-                writer.print("abstract ");
-            }
-            writer.println("class " + className + " extends " + extendClass + " {");
-            writer.println();
-            writer.println("    /* @@ begin field descriptor @@ */");
-            writer.print(getTableDescriptorBuffer());
-            writer.println("    /* @@ end field descriptor @@ */");
-            if (fieldModels.size() > 0 && numCalcFields > 0) {
-                for (FieldModel fieldModel : fieldModels) {
-                    if (fieldModel.calculated) {
-                        writer.println(getCalculatedFieldBuffer(fieldModel));
+    private ConstructorDeclaration getCtor(ClassOrInterfaceDeclaration coid) {
+        AtomicReference<ConstructorDeclaration> cda = new AtomicReference<>();
+        coid.findAll(ConstructorDeclaration.class)
+                .forEach(cd -> {
+                    if (cda.get() == null && cd.getParameters().size() == 1) {
+                        cda.set(cd);
                     }
-                }
-            }
-            if (fieldModels.size() > 0 && numValidateFields > 0) {
-                for (FieldModel fieldModel : fieldModels) {
-                    if (fieldModel.validate) {
-                        writer.println(getValidateFieldBuffer(fieldModel));
-                    }
-                }
-            }
-            writer.println("}");
-            writer.close();
-        }
+                });
+        return cda.get();
     }
 
-    private String getCalculatedFieldBuffer(FieldModel fieldModel) {
-        String buffer = "";
-
-        buffer += "\n";
-        buffer += "    /* @@ begin calcField_" + fieldModel.fieldName + " @@ */\n";
-        buffer += "    private " + fieldModel.type + " calcField_" + fieldModel.fieldName + "() {\n";
-        buffer += "        return null;\n";
-        buffer += "    }\n";
-        buffer += "    /* @@ end calcField_" + fieldModel.fieldName + " @@ */";
-        return buffer;
+    private void buildCalculatedField(ClassOrInterfaceDeclaration coid, FieldModel fieldModel) {
+        MethodDeclaration md = buildMethodDeclaration(coid, fieldModel.type, "calcField_" + fieldModel.fieldName, null);
+        md.setModifiers(Modifier.Keyword.PRIVATE);
     }
 
-    private String getValidateFieldBuffer(FieldModel fieldModel) {
-        String buffer = "";
-
-        buffer += "\n";
-        buffer += "    /* @@ begin onValidate_" + fieldModel.fieldName + " @@ */\n";
-        buffer += "    private boolean onValidate_" + fieldModel.fieldName + "() {\n";
-        buffer += "        return true;\n";
-        buffer += "    }\n";
-        buffer += "    /* @@ end onValidate_" + fieldModel.fieldName + " @@ */";
-        return buffer;
+    private void buildValidateField(ClassOrInterfaceDeclaration coid, FieldModel fieldModel) {
+        MethodDeclaration md = buildMethodDeclaration(coid, "boolean", "onValidate_" + fieldModel.fieldName, null);
+        md.setModifiers(Modifier.Keyword.PRIVATE);
     }
 
     private String getPackageName() {
@@ -422,262 +435,105 @@ class FileMaker {
     }
 
     private void updateFileTable() {
-        Scanner scanner = null;
-        StringBuilder calculatedFieldsBuffer = new StringBuilder();
-        StringBuilder validateFieldsBuffer = new StringBuilder();
 
         try {
-            scanner = new Scanner(pathTable).useDelimiter("\n");
-        } catch (IOException e) {
+            CompilationUnit compilationUnit = StaticJavaParser.parse(pathTable.toFile());
+
+            if (!compilationUnit.getClassByName(className).isPresent()) {
+                compilationUnit = new CompilationUnit();
+                compilationUnit.setPackageDeclaration(getPackageName());
+                compilationUnit.addImport("tech.fonrouge.MOODB.*");
+                compilationUnit.addClass(className);
+            }
+
+            compilationUnit.getClassByName(className).ifPresent(coid -> {
+                coid.setModifier(Modifier.Keyword.PUBLIC, true);
+                coid.setAbstract(isAbstract);
+                coid.getExtendedTypes().clear();
+                coid.addExtendedType(extendClass);
+
+                buildTableDescriptor(coid);
+
+                for (FieldModel fieldModel : fieldModels) {
+                    if (fieldModel.calculated) {
+                        buildCalculatedField(coid, fieldModel);
+                    }
+                    if (fieldModel.validate) {
+                        buildValidateField(coid, fieldModel);
+                    }
+                }
+            });
+
+            Files.write(pathTable, compilationUnit.toString().getBytes());
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        if (scanner != null) {
-            List<String> stringList = new ArrayList<>();
-
-            String line;
-            final String tokenCalcField = "@@ begin calcField_";
-            final String tokenOnValidate = "@@ begin onValidate_";
-            String fieldName;
-
-            while (scanner.hasNext()) {
-                line = scanner.next();
-                if (line.contains(tokenCalcField)) {
-                    fieldName = line.substring(line.indexOf(tokenCalcField) + tokenCalcField.length(), line.lastIndexOf(" @@"));
-                    if (calcFieldList.indexOf(fieldName) < 0) {
-                        calcFieldList.add(fieldName);
-                    }
-                } else if (line.contains(tokenOnValidate)) {
-                    fieldName = line.substring(line.indexOf(tokenOnValidate) + tokenOnValidate.length(), line.lastIndexOf(" @@"));
-                    if (onValidateList.indexOf(fieldName) < 0) {
-                        onValidateList.add(fieldName);
-                    }
-                } else {
-                    /* check abstract */
-                    if (line.contains("class " + className + " extends")) {
-                        if (isAbstract && !line.contains("abstract")) {
-                            line = line.replace(" class", " abstract class");
-                        }
-                        if (!isAbstract && line.contains("abstract")) {
-                            line = line.replace(" abstract ", " ");
-                        }
-                        /* checks extends class */
-                        if (!line.matches(".* +extends +" + extendClass + " +" + extendClass + ".*")) {
-                            line = line.replaceFirst("(extends +\\w+ \\{)", "extends " + extendClass + " {");
-                        }
-                    }
-                }
-                stringList.add(line);
-            }
-
-            for (FieldModel fieldModel : fieldModels) {
-                int i = calcFieldList.indexOf(fieldModel.fieldName);
-                if (fieldModel.calculated)
-                    if (i >= 0) {
-                        calcFieldList.remove(i);
-                    } else {
-                        calcFieldList.add(fieldModel.fieldName);
-                        calculatedFieldsBuffer.append(getCalculatedFieldBuffer(fieldModel));
-                    }
-                i = onValidateList.indexOf(fieldModel.fieldName);
-                if (fieldModel.validate)
-                    if (i >= 0) {
-                        onValidateList.remove(i);
-                    } else {
-                        onValidateList.add(fieldModel.fieldName);
-                        validateFieldsBuffer.append(getValidateFieldBuffer(fieldModel));
-                    }
-            }
-
-            PrintWriter writer = getPrintWriter(pathTable);
-
-            boolean insideDescriptor = false;
-
-            if (writer != null) {
-                for (String s : stringList) {
-                    if (!insideDescriptor) {
-                        writer.println(s);
-                    }
-                    if (s.contains("/* @@ begin field descriptor @@ */")) {
-                        writer.print(getTableDescriptorBuffer());
-                        insideDescriptor = true;
-                    }
-                    if (s.contains("/* @@ end field descriptor @@ */")) {
-                        insideDescriptor = false;
-                        writer.println(s);
-                        if (calculatedFieldsBuffer.length() > 0) {
-                            writer.println(calculatedFieldsBuffer);
-                        }
-                        if (validateFieldsBuffer.length() > 0) {
-                            writer.println(validateFieldsBuffer);
-                        }
-                    }
-                }
-                writer.close();
-            }
-        }
-    }
-
-    private String getModelDescriptorBuffer() {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append("    public ").
-                append(className).
-                append("Data(").
-                append("T").
-                append(" ").
-                append(className.toLowerCase()).
-                append(") {\n");
-        builder.append("        super(").
-                append(className.toLowerCase()).
-                append(");\n");
-        builder.append("    }\n");
-
-        for (FieldModel fieldModel : fieldModels) {
-            builder.append("\n");
-            builder.append("    public ");
-            String type;
-            if ("TableField".equals(fieldModel.type)) {
-                type = "ObjectId";
-            } else {
-                type = fieldModel.type;
-            }
-            builder.append(type);
-            builder.append(" get").
-                    append(fieldModel.fieldName.substring(0, 1).toUpperCase()).
-                    append(fieldModel.fieldName.substring(1)).
-                    append("() {\n");
-            builder.append("        return tableState.getFieldValue(");
-            builder.append("table.field_").
-                    append(fieldModel.fieldName).
-                    append(", ").
-                    append(type).
-                    append(".").
-                    append("class);\n");
-            builder.append("    }\n");
-        }
-
-        return builder.toString();
-    }
-
-    private void createDataModel() {
-        PrintWriter writer = null;
-
-        try {
-            writer = new PrintWriter(pathModel.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (writer != null) {
-            boolean importDate = false;
-            boolean importOTable = false;
-            for (FieldModel fieldModel : fieldModels) {
-                if (!importDate && fieldModel.type.equals("Date")) {
-                    importDate = true;
-                }
-                if (!importOTable && fieldModel.type.equals("TableField")) {
-                    importOTable = true;
-                }
-            }
-            writer.println("package " + getPackageName() + ";");
-            writer.println();
-            if (importDate) {
-                writer.println("import org.bson.types.Binary;\n");
-            }
-            if (importOTable) {
-                writer.println("import org.bson.types.ObjectId;\n");
-            }
-            if (importDate) {
-                writer.println("import java.util.Date;\n");
-            }
-
-            writer.println(classInit());
-
-            writer.println();
-            writer.println("    /* @@ begin field descriptor @@ */");
-            writer.print(getModelDescriptorBuffer());
-            writer.println("    /* @@ end field descriptor @@ */");
-            writer.println("}\n");
-
-            writer.close();
-        }
-    }
-
-    private String classInit() {
-        String classInit = "public ";
-        if (isAbstract) {
-            classInit += "abstract ";
-        }
-        classInit += ("class " + className + "Data<T extends " + className + "> ");
-        if (extendClass.contentEquals("MTable")) {
-            classInit += ("extends " + "MBaseData");
-        } else {
-            classInit += ("extends " + extendClass + "Data");
-        }
-        classInit += ("<T> {");
-        return classInit;
     }
 
     private void updateDataModel() {
-        Scanner scanner = null;
-        boolean hasFieldDescriptor = false;
-        boolean findClassInit = false;
 
         try {
-            scanner = new Scanner(pathModel).useDelimiter("\n");
-        } catch (IOException e) {
+            CompilationUnit compilationUnit = StaticJavaParser.parse(pathModel.toFile());
+
+            String dataClassName = className + "Data<T extends " + className + ">";
+
+            if (!compilationUnit.getClassByName(className + "Data").isPresent()) {
+                compilationUnit = new CompilationUnit();
+                compilationUnit.setPackageDeclaration(getPackageName());
+                compilationUnit.addImport("tech.fonrouge.MOODB.MTable.*");
+                compilationUnit.addImport("org.bson.types.ObjectId");
+                compilationUnit.addClass(dataClassName);
+            }
+            compilationUnit.getClassByName(dataClassName).ifPresent(coid -> {
+                coid.setModifier(Modifier.Keyword.PUBLIC, true);
+                coid.setAbstract(isAbstract);
+                coid.getExtendedTypes().clear();
+                String extend = extendClass.contentEquals("MTable") ? "MBaseData" : extendClass + "Data";
+                coid.addExtendedType(extend + "<T>");
+
+                buildDataDescriptor(coid);
+
+            });
+
+            Files.write(pathModel, compilationUnit.toString().getBytes());
+
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-
-        if (scanner != null) {
-            List<String> stringList = new ArrayList<>();
-
-            String line;
-
-            while (scanner.hasNext()) {
-                line = scanner.next();
-                if (!findClassInit && line.matches(" *public +(abstract +)*class .*")) {
-                    findClassInit = true;
-                    line = classInit();
-                }
-                stringList.add(line);
-            }
-
-            PrintWriter writer = getPrintWriter(pathModel);
-
-            boolean insideDescriptor = false;
-
-            if (writer != null) {
-                for (String s : stringList) {
-                    if (!insideDescriptor) {
-                        writer.println(s);
-                    }
-                    if (s.contains("/* @@ begin field descriptor @@ */")) {
-                        writer.print(getModelDescriptorBuffer());
-                        insideDescriptor = true;
-                        hasFieldDescriptor = true;
-                    }
-                    if (s.contains("/* @@ end field descriptor @@ */")) {
-                        insideDescriptor = false;
-                        writer.println(s);
-                    }
-                }
-                if (!hasFieldDescriptor) {
-                    writer.println("/* ERROR: can't find field descriptor delimiters */");
-                }
-                writer.close();
-            }
         }
     }
 
-    private PrintWriter getPrintWriter(Path path) {
-        PrintWriter writer = null;
+    private void buildDataDescriptor(ClassOrInterfaceDeclaration coid) {
 
-        try {
-            writer = new PrintWriter(path.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
+        BlockStmt body;
+        ConstructorDeclaration constructorDeclaration = getCtor(coid);
+
+        if (constructorDeclaration == null) {
+            constructorDeclaration = new ConstructorDeclaration();
+            Type type = new ClassOrInterfaceType(null, "T");
+            constructorDeclaration.setName(className + "Data");
+            constructorDeclaration.addParameter(type, className.toLowerCase());
+            coid.getMembers().add(constructorDeclaration);
         }
-        return writer;
+
+        constructorDeclaration.setModifiers(Modifier.Keyword.PUBLIC);
+        body = new BlockStmt();
+        body.addStatement("super(" + className.toLowerCase() + ");");
+        setNodeAnnotation(constructorDeclaration, "AutoGenerated");
+        constructorDeclaration.setBody(body);
+
+        for (FieldModel fieldModel : fieldModels) {
+            String methodType;
+            if ("TableField".equals(fieldModel.type)) {
+                methodType = "ObjectId";
+            } else {
+                methodType = fieldModel.type;
+            }
+            String methodName = "get" + fieldModel.fieldName.substring(0, 1).toUpperCase();
+            methodName += fieldModel.fieldName.substring(1);
+            body = new BlockStmt();
+            body.addStatement("return tableState.getFieldValue(table.field_" + fieldModel.fieldName + ", " + methodType + ".class);");
+            buildMethodDeclaration(coid, methodType, methodName, body);
+        }
     }
 }

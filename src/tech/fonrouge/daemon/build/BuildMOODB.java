@@ -21,11 +21,7 @@ public class BuildMOODB {
             System.out.println(pathExtLess);
 
             FileMaker fileMaker = new FileMaker(pathExtLess, document, className);
-            try {
-                fileMaker.run();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            fileMaker.run();
         }
     }
 

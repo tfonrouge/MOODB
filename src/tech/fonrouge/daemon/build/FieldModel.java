@@ -114,6 +114,16 @@ class FieldModel {
         }
     }
 
+    String getCast() {
+        String cast;
+        if (type.contentEquals("TableField")) {
+            cast = "<" + className + ">";
+        } else {
+            cast = "";
+        }
+        return cast;
+    }
+
     boolean valid() {
         return valid;
     }

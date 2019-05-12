@@ -24,3 +24,4 @@
     <oons:Index name="taxId" keyField="taxId" unique="true"/>
 
 </oons:Table>
+

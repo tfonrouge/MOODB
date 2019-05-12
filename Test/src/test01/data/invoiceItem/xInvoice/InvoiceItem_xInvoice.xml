@@ -13,4 +13,3 @@
     <oons:Index name="invoice_invItem" masterKeyField="invoice" keyField="invItem" unique="true"/>
 
 </oons:Table>
-

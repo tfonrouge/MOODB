@@ -19,3 +19,4 @@
     <oons:Index name="docNumber" keyField="docNumber" unique="true"/>
 
 </oons:Table>
+
