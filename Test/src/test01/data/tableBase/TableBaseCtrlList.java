@@ -11,6 +11,9 @@ public abstract class TableBaseCtrlList<T extends TableBase> extends UI_CtrlList
 
     @SuppressWarnings("unused")
     @FXML
+    public MenuItem menuItem_view;
+    @SuppressWarnings("unused")
+    @FXML
     private MenuItem menuItem_close;
     @SuppressWarnings("unused")
     @FXML
@@ -21,9 +24,6 @@ public abstract class TableBaseCtrlList<T extends TableBase> extends UI_CtrlList
     @SuppressWarnings("unused")
     @FXML
     private MenuItem menuItem_delete;
-    @SuppressWarnings("unused")
-    @FXML
-    public MenuItem menuItem_view;
 
     public TableBaseCtrlList(T table) {
         super(table);

@@ -52,7 +52,7 @@ class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T, ComboBox<T>> {
     T propertyGetValue() {
         return property.getValue();
     }
-    
+
     @Override
     void propertySetValue(T oldValue) {
         property.setValue(oldValue);

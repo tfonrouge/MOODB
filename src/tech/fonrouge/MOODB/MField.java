@@ -379,13 +379,13 @@ public abstract class MField<T> {
         return getFieldState().defaultValue;
     }
 
-    final public T getOrigValue() {
-        return (T) getFieldState().origValue;
-    }
-
     @SuppressWarnings("unused")
     final public void setDefaultValue(T defaultValue) {
         getFieldState().defaultValue = defaultValue;
+    }
+
+    final public T getOrigValue() {
+        return (T) getFieldState().origValue;
     }
 
     @SuppressWarnings("unused")

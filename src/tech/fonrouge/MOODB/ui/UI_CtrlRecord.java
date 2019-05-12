@@ -6,14 +6,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TableView;
+import tech.fonrouge.MOODB.Annotations.NoAutoBinding;
 import tech.fonrouge.MOODB.MBaseData;
 import tech.fonrouge.MOODB.MField;
 import tech.fonrouge.MOODB.MTable;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,12 +67,5 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
             bindControls();
         }
         initData();
-    }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.TYPE)
-    @SuppressWarnings("WeakerAccess")
-    public @interface NoAutoBinding {
-
     }
 }
