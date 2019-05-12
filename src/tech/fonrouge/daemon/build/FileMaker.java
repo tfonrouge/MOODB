@@ -536,8 +536,6 @@ class FileMaker {
 
             });
 
-            System.out.println(compilationUnit.toString());
-
             Files.write(pathModel, compilationUnit.toString().getBytes());
 
         } catch (Exception e) {
