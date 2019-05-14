@@ -429,7 +429,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                                 label = mFieldTableField.getLabel();
                                 int i = 1;
                                 do {
-                                    mField = mFieldTableField.linkedTable().fieldByName(fieldList[i]);
+                                    mField = mFieldTableField.syncedTable().fieldByName(fieldList[i]);
                                     if (mField != null) {
                                         if (mField instanceof MFieldTableField) {
                                             mFieldTableField = (MFieldTableField) mField;
