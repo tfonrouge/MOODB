@@ -48,7 +48,7 @@ public class MEngine {
         } else {
             pipeline = new ArrayList<>();
         }
-        return table.setTableDocument(aggregateFind(pipeline));
+        return table.setMongoCursor(aggregateFind(pipeline));
     }
 
     /**
@@ -199,7 +199,7 @@ public class MEngine {
         pipeline.add(
                 new Document().
                         append("$limit", 1));
-        return table.setTableDocument(aggregateFind(pipeline));
+        return table.setMongoCursor(aggregateFind(pipeline));
     }
 
     private void initialize() {
@@ -251,10 +251,10 @@ public class MEngine {
     public boolean next() {
         if (table.tableState.mongoCursor != null) {
             if (table.tableState.mongoCursor.hasNext()) {
-                return table.setTableDocument(table.tableState.mongoCursor);
+                return table.setMongoCursor(table.tableState.mongoCursor);
             }
         }
-        return table.setTableDocument(null);
+        return table.setMongoCursor(null);
     }
 
     /**

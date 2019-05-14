@@ -56,10 +56,17 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
 
     public final T syncedTable() {
 
-        Object objectId = linkedTable()._id();
+        T linkedTable = linkedTable();
+
+        Object objectId = linkedTable._id();
 
         if (objectId == null || !objectId.equals(table.tableState.getFieldValue(this))) {
-            linkedTable().goTo(table.tableState.getFieldValue(this));
+            Document fieldTableDocument = table.tableState.fieldStateList.get(index).document;
+            if (fieldTableDocument != null) {
+                linkedTable.setDocumentToTableState(fieldTableDocument);
+            } else {
+                linkedTable.goTo(table.tableState.getFieldValue(this));
+            }
         }
 
         return linkedTable();

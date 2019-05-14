@@ -535,29 +535,21 @@ abstract public class MTable {
 
     }
 
-    /**
-     * setTableDocument
-     */
-    boolean setTableDocument(MongoCursor<Document> mongoCursor) {
-
-        tableState.mongoCursor = mongoCursor;
-
-        Document rawDocument = (mongoCursor == null || !mongoCursor.hasNext()) ? null : mongoCursor.next();
-
-        tableState.eof = rawDocument == null;
+    boolean setDocumentToTableState(Document document) {
+        tableState.eof = document == null;
 
         fieldList.forEach(mField -> {
             if (!mField.calculated) {
-                Object value = rawDocument == null ? null : rawDocument.getOrDefault(mField.name, null);
+                Object value = document == null ? null : document.getOrDefault(mField.name, null);
                 if (value == null && mField.required) {
                     value = mField.getEmptyValue();
                 }
                 if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {
                     tableState.fieldStateList.get(mField.index).document = null;
                     if (value instanceof Document) {
-                        Document document = (Document) value;
-                        tableState.fieldStateList.get(mField.index).document = document;
-                        value = document.get("_id");
+                        Document fieldTableDocument = (Document) value;
+                        tableState.fieldStateList.get(mField.index).document = fieldTableDocument;
+                        value = fieldTableDocument.get("_id");
                     }
                 }
                 tableState.setFieldValue(mField.index, value);
@@ -572,6 +564,18 @@ abstract public class MTable {
         }
 
         return !tableState.eof;
+    }
+
+    /**
+     * setMongoCursor
+     */
+    boolean setMongoCursor(MongoCursor<Document> mongoCursor) {
+
+        tableState.mongoCursor = mongoCursor;
+
+        Document rawDocument = (mongoCursor == null || !mongoCursor.hasNext()) ? null : mongoCursor.next();
+
+        return setDocumentToTableState(rawDocument);
     }
 
     /**

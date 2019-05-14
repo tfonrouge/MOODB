@@ -71,7 +71,7 @@ public abstract class MField<T> {
                         append("$sort", new Document().
                                 append(name, 1))
         );
-        return table.setTableDocument(table.engine.aggregateFind(pipeline));
+        return table.setMongoCursor(table.engine.aggregateFind(pipeline));
     }
 
     /**
@@ -89,7 +89,7 @@ public abstract class MField<T> {
         pipeline.add(
                 new Document().
                         append("$limit", 1));
-        return table.setTableDocument(table.engine.aggregateFind(pipeline));
+        return table.setMongoCursor(table.engine.aggregateFind(pipeline));
     }
 
     public abstract T getAsValue(Object anyValue);

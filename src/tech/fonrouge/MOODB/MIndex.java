@@ -107,7 +107,7 @@ public abstract class MIndex {
         getKeyFieldFindExpression(document, objects);
         ArrayList<Document> pipeline = new ArrayList<>();
         pipeline.add(new Document().append("$match", document));
-        return table.setTableDocument(table.engine.aggregateFind(pipeline));
+        return table.setMongoCursor(table.engine.aggregateFind(pipeline));
     }
 
     private void getKeyFieldFindExpression(Document document, Object... objects) {
