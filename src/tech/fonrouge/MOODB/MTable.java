@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
+/* TODO: define behavior on re-declared same field names on subclasses s*/
 abstract public class MTable {
 
     /**
