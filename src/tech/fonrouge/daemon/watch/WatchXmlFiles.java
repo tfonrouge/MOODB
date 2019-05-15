@@ -14,7 +14,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 public class WatchXmlFiles {
-    static int counter = 0;
+    private static int counter = 0;
     private final WatchService watchService;
     private final Map<WatchKey, Path> watchKeyPathMap;
     private final PathMatcher matcher;

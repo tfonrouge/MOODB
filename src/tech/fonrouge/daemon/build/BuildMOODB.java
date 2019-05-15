@@ -18,7 +18,6 @@ public class BuildMOODB {
         if (document != null) {
             String className = fileName(pathXml.getFileName());
             Path pathExtLess = convertPathExtensionLess(pathXml);
-            System.out.println(pathExtLess);
 
             FileMaker fileMaker = new FileMaker(pathExtLess, document, className);
             fileMaker.run();
