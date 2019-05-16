@@ -3,9 +3,9 @@
     <output-path>$PROJECT_DIR$/out/artifacts/MOODB_jar</output-path>
     <root id="archive" name="MOODB.jar">
       <element id="module-output" name="MOODB" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/annotations/16.0.2/annotations-16.0.2.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core-generators/3.14.0/javaparser-core-generators-3.14.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.14.0/javaparser-core-3.14.0.jar" path-in-jar="/" />
+      <element id="module-output" name="Test" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core-generators/3.14.1/javaparser-core-generators-3.14.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.14.1/javaparser-core-3.14.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.11.0-beta3/mongo-java-driver-3.11.0-beta3.jar" path-in-jar="/" />
     </root>
   </artifact>
