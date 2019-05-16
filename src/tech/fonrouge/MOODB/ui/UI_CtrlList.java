@@ -18,6 +18,11 @@ import javafx.stage.Stage;
 import org.bson.Document;
 import tech.fonrouge.MOODB.*;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -26,8 +31,6 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import static tech.fonrouge.MOODB.ui.UI_FXMLLoader.fxmlHasFXController;
 
 public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
@@ -82,8 +85,9 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         if (ui_ctrlList != null) {
 
-            URL resource = ui_ctrlList.getClass().getResource(ui_ctrlList.getCtrlListFXMLPath());
-            Boolean hasController = fxmlHasFXController(resource);
+            String ctrlListFXMLPath = ui_ctrlList.getCtrlListFXMLPath();
+            URL resource = ui_ctrlList.getClass().getResource(ctrlListFXMLPath);
+            Boolean hasController = fxmlHasFXController(ctrlListFXMLPath);
 
             if (hasController != null) {
                 FXMLLoader fxmlLoader = new FXMLLoader(resource);
@@ -125,6 +129,24 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         } else {
             UI_Message.Error("UI_CtrlList Error", "No controller found.", "define controller for table.");
         }
+    }
+
+    private static Boolean fxmlHasFXController(String fxmlPath) {
+        try {
+            InputStream inputStream = UI_CtrlList.class.getResourceAsStream(fxmlPath);
+            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(inputStream);
+            while (xmlStreamReader.hasNext()) {
+                int next = xmlStreamReader.next();
+                if (next == XMLStreamConstants.START_ELEMENT) {
+                    return xmlStreamReader.getAttributeValue(xmlStreamReader.getNamespaceURI("fx"), "controller") != null;
+                }
+            }
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+            UI_Message.Error("UI_CtrlList Error", "FXML not found or not valid.", e.toString());
+        }
+        return null;
     }
 
     protected String getCtrlListFXMLPath() {
