@@ -2,12 +2,12 @@
   <library name="com.github.javaparser:javaparser-core-generators:3.5.11" type="repository">
     <properties maven-id="com.github.javaparser:javaparser-core-generators:RELEASE" />
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core-generators/3.14.1/javaparser-core-generators-3.14.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.14.1/javaparser-core-3.14.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core-generators/3.14.2/javaparser-core-generators-3.14.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.14.2/javaparser-core-3.14.2.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core-generators/3.14.1/javaparser-core-generators-3.14.1-javadoc.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.14.1/javaparser-core-3.14.1-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core-generators/3.14.2/javaparser-core-generators-3.14.2-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.14.2/javaparser-core-3.14.2-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES />
   </library>
