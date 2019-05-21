@@ -153,6 +153,34 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         return "listView.fxml";
     }
 
+    private URL getCtrlRecordResourceURL() {
+
+        Class<?> tableClass = table.getClass();
+
+        while (!tableClass.equals(MTable.class)) {
+
+            String uiCtrlRecordClassName = tableClass.getName() + "CtrlRecord";
+
+            Class<?> uiCtrlRecordClass = null;
+
+            try {
+                uiCtrlRecordClass = Class.forName(uiCtrlRecordClassName);
+            } catch (ClassNotFoundException ignored) {
+
+            }
+
+            if (uiCtrlRecordClass != null) {
+                URL resource = tableClass.getResource(getCtrlRecordFXMLPath());
+                if (resource != null) {
+                    return resource;
+                }
+            }
+            tableClass = tableClass.getSuperclass();
+        }
+
+        return null;
+    }
+
     TableView<MBaseData> getTableView() {
         return tableView;
     }
@@ -236,7 +264,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     @SuppressWarnings("WeakerAccess")
     protected void doInsertEdit() {
 
-        URL resource = getClass().getResource(getCtrlRecordFXMLPath());
+        URL resource = getCtrlRecordResourceURL();
 
         FXMLLoader fxmlLoader = new FXMLLoader(resource);
 
