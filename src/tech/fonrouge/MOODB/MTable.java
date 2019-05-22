@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
 /* TODO: define behavior on re-declared same field names on subclasses s*/
@@ -29,6 +30,7 @@ abstract public class MTable {
     private ArrayList<TableState> tableStateList = new ArrayList<>();
     private MTable masterSource = null;
     private MFieldTableField masterSourceField;
+    private Callable<Boolean> onValidateFields;
 
     public MTable() {
         initialize();
@@ -348,10 +350,21 @@ abstract public class MTable {
             return false;
         }
 
-        MTable mTable = getMasterSource();
+        MTable masterSource = getMasterSource();
 
-        if (mTable != null && mTable.getState() == STATE.INSERT) {
-            if (!(mTable.post() && mTable.edit())) {
+        if (masterSource != null && masterSource.getState() == STATE.INSERT) {
+            if (masterSource.getOnValidateFields() != null) {
+                boolean valid = false;
+                try {
+                    valid = masterSource.onValidateFields.call();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (!valid) {
+                    return false;
+                }
+            }
+            if (!(masterSource.post() && masterSource.edit())) {
                 return false;
             }
         }
@@ -361,8 +374,8 @@ abstract public class MTable {
         /* fill field values */
         fieldList.forEach(mField -> {
             if (!mField.calculated) {
-                if (masterSource != null && mField.equals(masterSourceField)) {
-                    tableState.setFieldValue(mField.index, masterSource._id());
+                if (this.masterSource != null && mField.equals(masterSourceField)) {
+                    tableState.setFieldValue(mField.index, this.masterSource._id());
                 } else {
                     Object value = mField.getNewValue();
                     if (mField.fieldType == FIELD_TYPE.DATE && value == null && ((MFieldDate) mField).required) {
@@ -622,6 +635,14 @@ abstract public class MTable {
             updates.add(updateOneModel);
         });
         engine.mDatabase.getReferentialIntegrityTable().bulkWrite(updates);
+    }
+
+    public Callable<Boolean> getOnValidateFields() {
+        return onValidateFields;
+    }
+
+    public void setOnValidateFields(Callable<Boolean> onValidateFields) {
+        this.onValidateFields = onValidateFields;
     }
 
     public enum FIELD_TYPE {
