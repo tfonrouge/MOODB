@@ -31,26 +31,16 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
         int focusedIndex = tableView.getSelectionModel().getFocusedIndex();
         int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
         if (state != MTable.STATE.NORMAL) {
-            HashMap<String, String> list = table.getInvalidFieldList();
-            if (list.size() > 0) {
-                Map.Entry<String, String> i = list.entrySet().iterator().next();
-                final MField[] mField = new MField[1];
-                table.getFieldListStream().forEach(mField1 -> {
-                    if (mField1.getName().contentEquals(i.getKey())) {
-                        mField[0] = mField1;
-                    }
-                });
-                new Alert(Alert.AlertType.WARNING, i.getValue() + ": '" + mField[0].getLabel() + "'").showAndWait();
-                Node node = nodeHashMap.get(i.getKey());
-                if (node != null) {
-                    node.requestFocus();
-                }
+            if (!testValidFields()) {
                 return;
             }
             if (!table.post()) {
-                String errMsg = table.getException().toString();
                 table.cancel();
-                UI_Message.Warning("Error", "Post Error", errMsg);
+                Exception e = table.getException();
+                if (e != null) {
+                    String errMsg = e.toString();
+                    UI_Message.Warning("Error", "Post Error", errMsg);
+                }
             }
         }
         if (source != null) {
@@ -67,5 +57,28 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
             bindControls();
         }
         initData();
+    }
+
+    boolean testValidFields() {
+        if (table.getState() != MTable.STATE.NORMAL) {
+            HashMap<String, String> list = table.getInvalidFieldList();
+            if (list.size() > 0) {
+                Map.Entry<String, String> i = list.entrySet().iterator().next();
+                final MField[] mField = new MField[1];
+                table.getFieldListStream().forEach(mField1 -> {
+                    if (mField1.getName().contentEquals(i.getKey())) {
+                        mField[0] = mField1;
+                    }
+                });
+                new Alert(Alert.AlertType.WARNING, i.getValue() + ": '" + mField[0].getLabel() + "'").showAndWait();
+                Node node = nodeHashMap.get(i.getKey());
+                if (node != null) {
+                    node.requestFocus();
+                }
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 }

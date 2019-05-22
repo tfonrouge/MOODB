@@ -28,6 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -316,11 +317,12 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         currentCtrlList = null;
 
-        for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
-            ui_ctrlList.buildTableView();
-        }
-
         if (parent != null) {
+
+            for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
+                ui_ctrlList.buildTableView();
+            }
+
             fxmlLoader.<UI_CtrlRecord>getController().setCtrlList(this);
 
             Stage stage = new Stage();
@@ -331,7 +333,15 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
             String title;
 
-            switch (table.getState()) {
+            MTable.STATE state = table.getState();
+
+            Callable<Boolean> onValidateFields = table.getOnValidateFields();
+
+            if (state != MTable.STATE.NORMAL) {
+                table.setOnValidateFields(() -> fxmlLoader.<UI_CtrlRecord>getController().testValidFields());
+            }
+
+            switch (state) {
                 case NORMAL:
                     title = "Mostrar Detalle";
                     break;
@@ -348,6 +358,9 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             stage.setTitle(title + ": " + table.getGenre());
 
             stage.setOnHidden(event -> {
+                if (state != MTable.STATE.NORMAL) {
+                    table.setOnValidateFields(onValidateFields);
+                }
                 for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
                     ui_ctrlList.stopExecutorServiceRefresh();
                 }
