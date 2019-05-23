@@ -12,7 +12,7 @@ public class InvoiceItemCtrlList extends TableBaseCtrlList<InvoiceItem> {
     }
 
     @Override
-    protected String[] getColumns() {
+    protected String[] getFieldColumnList() {
         return new String[]{"rowNumber", "invoice.docNumber", "invoice.customer", "invItem.name", "qty", "unitPrice"};
     }
 

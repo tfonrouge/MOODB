@@ -9,7 +9,7 @@ public class InvoiceCtrlList extends TableBaseCtrlList<Invoice> {
     }
 
     @Override
-    protected String[] getColumns() {
+    protected String[] getFieldColumnList() {
         return new String[]{"docNumber", "daysOfCredit", "date", "customer", "customer.name", "customer.address", "itemsCount"};
     }
 

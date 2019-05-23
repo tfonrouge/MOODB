@@ -15,7 +15,7 @@ public class InvoiceItem_xInvoiceCtrlList extends TableBaseCtrlList<InvoiceItem_
     }
 
     @Override
-    protected String[] getColumns() {
+    protected String[] getFieldColumnList() {
         return new String[]{"rowNumber", "invoice.customer", "invItem.name", "qty", "unitPrice"};
     }
 
