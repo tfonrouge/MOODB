@@ -12,6 +12,7 @@ public abstract class MField<T> {
     public final MTable.FIELD_TYPE fieldType = getFieldType();
     final MTable table;
     protected boolean required;
+    protected boolean notEmpty;
     protected boolean calculated;
     protected boolean newFinal;
     protected String description;
@@ -44,6 +45,7 @@ public abstract class MField<T> {
         autoInc = false;
         readOnly = false;
         required = false;
+        notEmpty = false;
         index = table.fieldList.size();
         table.fieldList.add(this);
         if (table.tableState == null) {
@@ -215,8 +217,12 @@ public abstract class MField<T> {
      */
     public boolean getValidStatus() {
         invalidCause = null;
-        if (!calculated && required && isEmpty() && !autoInc) {
-            invalidCause = "Empty value on required field";
+        if (!calculated && required && value() == null && !autoInc) {
+            invalidCause = "Not Null value required on field";
+            return false;
+        }
+        if (!calculated && fieldType == MTable.FIELD_TYPE.STRING && notEmpty && ((String) value()).isEmpty()) {
+            invalidCause = "Not Empty string value required on field";
             return false;
         }
         if (onValidate == null) {

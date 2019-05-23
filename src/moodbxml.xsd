@@ -82,6 +82,7 @@
         <xs:complexContent>
             <xs:extension base="FieldBaseType">
                 <xs:attribute name="size" type="xs:integer"/>
+                <xs:attribute name="notEmpty" type="xs:boolean"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

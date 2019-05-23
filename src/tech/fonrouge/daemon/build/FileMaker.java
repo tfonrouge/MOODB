@@ -425,6 +425,10 @@ class FileMaker {
             initializeString += "            autoInc = true;\n";
         }
 
+        if (fieldModel.notEmpty) {
+            initializeString += "            notEmpty = true;\n";
+        }
+
         if (fieldModel.calculated) {
             initializeString += "            calculated = true;\n";
             initializeString += "            calcValue = () -> calcField_" + fieldModel.fieldName + "();\n";

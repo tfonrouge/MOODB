@@ -8,18 +8,19 @@ import java.util.HashMap;
 class FieldModel {
     String fieldName;
     String type;
-    boolean calculated;
-    boolean newFinal;
-    boolean validate;
     String description;
     String label;
-    boolean required;
     String className;
-    HashMap<String, String> keyValueItems;
     String newValue;
     String defaultValue;
     String onAfterChangeValue;
+    HashMap<String, String> keyValueItems;
+    boolean calculated;
+    boolean newFinal;
+    boolean validate;
+    boolean required;
     boolean autoInc;
+    boolean notEmpty;
     private boolean valid = true;
 
     FieldModel(Node node) {
@@ -44,6 +45,9 @@ class FieldModel {
 
             node1 = node.getAttributes().getNamedItem("autoInc");
             autoInc = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
+
+            node1 = node.getAttributes().getNamedItem("notEmpty");
+            notEmpty = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
             node1 = node.getAttributes().getNamedItem("class");
             if (node1 != null) {
