@@ -160,156 +160,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
-    private void buildColumns() {
-
-        for (String fieldExpression : getColumns()) {
-
-            TableColumn<MBaseData, ?> column = getColumn(fieldExpression);
-
-            tableView.getColumns().add(column);
-
-        }
-    }
-
-    private void buildTableView() {
-
-        if (tableView != null) {
-
-            tableView.getColumns().clear();
-
-            tableView.setMaxHeight(Control.USE_COMPUTED_SIZE);
-
-            buildColumns();
-
-            if (executorServiceRefresh == null) {
-                Runnable runnable = () -> Platform.runLater(this::populateList);
-
-                executorServiceRefresh = Executors.newSingleThreadScheduledExecutor();
-                executorServiceRefresh.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
-            }
-
-            tableView.setItems(observableList);
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    protected void doInsertEdit() {
-
-        URL resource = getCtrlRecordResourceURL();
-
-        FXMLLoader fxmlLoader = new FXMLLoader(resource);
-
-        List<UI_CtrlList> localCtrlListStack = new ArrayList<>();
-
-        fxmlLoader.setControllerFactory(param -> {
-            try {
-                if (UI_CtrlList.class.isAssignableFrom(param)) {
-
-                    Class<?> tableClass = param.getConstructors()[0].getParameterTypes()[0];
-                    UI_CtrlList ui_ctrlList;
-
-                    Constructor<?>[] constructors = tableClass.getConstructors();
-                    MTable childTable;
-                    if (constructors.length == 0 || constructors[0].getParameterTypes().length == 0) {
-                        childTable = (MTable) tableClass.newInstance();
-                    } else {
-                        Constructor<?> ctor = tableClass.getConstructor(table.getClass());
-                        childTable = (MTable) ctor.newInstance(table);
-                    }
-                    Constructor<?> constructor = param.getConstructor(tableClass);
-                    ui_ctrlList = (UI_CtrlList) constructor.newInstance(childTable);
-
-                    currentCtrlList = ui_ctrlList;
-                    localCtrlListStack.add(ui_ctrlList);
-
-                    return ui_ctrlList;
-                }
-                return param.newInstance();
-            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                if (table.getState() != MTable.STATE.NORMAL) {
-                    table.cancel();
-                }
-                e.printStackTrace();
-                UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
-            }
-            return null;
-        });
-
-        try {
-            parent = fxmlLoader.load();
-        } catch (Throwable e) {
-            if (table.getState() != MTable.STATE.NORMAL) {
-                table.cancel();
-            }
-            e.printStackTrace();
-            UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
-        }
-
-        currentCtrlList = null;
-
-        if (parent != null) {
-
-            for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
-                ui_ctrlList.buildTableView();
-            }
-
-            fxmlLoader.<UI_CtrlRecord>getController().setCtrlList(this);
-
-            Stage stage = new Stage();
-            Scene scene = new Scene(parent);
-
-            stage.setScene(scene);
-            stage.initModality(Modality.APPLICATION_MODAL);
-
-            String title;
-
-            MTable.STATE state = table.getState();
-
-            Callable<Boolean> onValidateFields = table.getOnValidateFields();
-
-            if (state != MTable.STATE.NORMAL) {
-                table.setOnValidateFields(() -> fxmlLoader.<UI_CtrlRecord>getController().testValidFields());
-            }
-
-            switch (state) {
-                case NORMAL:
-                    title = "Mostrar Detalle";
-                    break;
-                case EDIT:
-                    title = "Modificar";
-                    break;
-                case INSERT:
-                    title = "Agregar";
-                    break;
-                default:
-                    title = "?";
-            }
-
-            stage.setTitle(title + ": " + table.getGenre());
-
-            stage.setOnHidden(event -> {
-                if (state != MTable.STATE.NORMAL) {
-                    table.setOnValidateFields(onValidateFields);
-                }
-                for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
-                    ui_ctrlList.stopExecutorServiceRefresh();
-                }
-                if (table.getState() != MTable.STATE.NORMAL) {
-                    table.cancel();
-                }
-            });
-
-            scene.setOnKeyPressed(event -> {
-                if (event.getCode() == KeyCode.ESCAPE) {
-                    stage.close();
-                }
-            });
-
-            stage.show();
-        }
-    }
-
-    private TableColumn<MBaseData, ?> getColumn(String fieldExpression) {
+    private TableColumn<MBaseData, ?> buildColumn(String fieldExpression) {
 
         if (fieldExpression.indexOf('.') > 0) {
             String[] fieldList = fieldExpression.split("\\.");
@@ -388,7 +239,164 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         return new TableColumn<>(fieldExpression);
     }
 
-    protected abstract String[] getColumns();
+    @SuppressWarnings("WeakerAccess")
+    protected void buildColumns() {
+
+        for (String fieldExpression : getFieldColumnList()) {
+
+            TableColumn<MBaseData, ?> column = buildColumn(fieldExpression);
+            column.setId(fieldExpression);
+
+            tableView.getColumns().add(column);
+
+        }
+    }
+
+    private void buildTableView() {
+
+        if (tableView != null) {
+
+            tableView.getColumns().clear();
+
+            tableView.setMaxHeight(Control.USE_COMPUTED_SIZE);
+
+            buildColumns();
+
+            if (executorServiceRefresh == null) {
+                Runnable runnable = () -> Platform.runLater(this::populateList);
+
+                executorServiceRefresh = Executors.newSingleThreadScheduledExecutor();
+                executorServiceRefresh.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
+            }
+
+            tableView.setItems(observableList);
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    protected void doInsertEdit() {
+
+        URL resource = getCtrlRecordResourceURL();
+
+        if (resource != null) {
+
+            FXMLLoader fxmlLoader = new FXMLLoader(resource);
+
+            List<UI_CtrlList> localCtrlListStack = new ArrayList<>();
+
+            fxmlLoader.setControllerFactory(param -> {
+                try {
+                    if (UI_CtrlList.class.isAssignableFrom(param)) {
+
+                        Class<?> tableClass = param.getConstructors()[0].getParameterTypes()[0];
+                        UI_CtrlList ui_ctrlList;
+
+                        Constructor<?>[] constructors = tableClass.getConstructors();
+                        MTable childTable;
+                        if (constructors.length == 0 || constructors[0].getParameterTypes().length == 0) {
+                            childTable = (MTable) tableClass.newInstance();
+                        } else {
+                            Constructor<?> ctor = tableClass.getConstructor(table.getClass());
+                            childTable = (MTable) ctor.newInstance(table);
+                        }
+                        Constructor<?> constructor = param.getConstructor(tableClass);
+                        ui_ctrlList = (UI_CtrlList) constructor.newInstance(childTable);
+
+                        currentCtrlList = ui_ctrlList;
+                        localCtrlListStack.add(ui_ctrlList);
+
+                        return ui_ctrlList;
+                    }
+                    return param.newInstance();
+                } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                    if (table.getState() != MTable.STATE.NORMAL) {
+                        table.cancel();
+                    }
+                    e.printStackTrace();
+                    UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
+                }
+                return null;
+            });
+
+            try {
+                parent = fxmlLoader.load();
+            } catch (Throwable e) {
+                if (table.getState() != MTable.STATE.NORMAL) {
+                    table.cancel();
+                }
+                e.printStackTrace();
+                UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
+            }
+
+            currentCtrlList = null;
+
+            if (parent != null) {
+
+                for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
+                    ui_ctrlList.buildTableView();
+                }
+
+                fxmlLoader.<UI_CtrlRecord>getController().setCtrlList(this);
+
+                Stage stage = new Stage();
+                Scene scene = new Scene(parent);
+
+                stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+
+                String title;
+
+                MTable.STATE state = table.getState();
+
+                Callable<Boolean> onValidateFields = table.getOnValidateFields();
+
+                if (state != MTable.STATE.NORMAL) {
+                    table.setOnValidateFields(() -> fxmlLoader.<UI_CtrlRecord>getController().testValidFields());
+                }
+
+                switch (state) {
+                    case NORMAL:
+                        title = "Mostrar Detalle";
+                        break;
+                    case EDIT:
+                        title = "Modificar";
+                        break;
+                    case INSERT:
+                        title = "Agregar";
+                        break;
+                    default:
+                        title = "?";
+                }
+
+                stage.setTitle(title + ": " + table.getGenre());
+
+                stage.setOnHidden(event -> {
+                    if (state != MTable.STATE.NORMAL) {
+                        table.setOnValidateFields(onValidateFields);
+                    }
+                    for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
+                        ui_ctrlList.stopExecutorServiceRefresh();
+                    }
+                    if (table.getState() != MTable.STATE.NORMAL) {
+                        table.cancel();
+                    }
+                });
+
+                scene.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ESCAPE) {
+                        stage.close();
+                    }
+                });
+
+                stage.show();
+            }
+        } else {
+            if (table.getState() != MTable.STATE.NORMAL) {
+                table.cancel();
+            }
+            UI_Message.Error("UI_CtrlList Error", "Warning", "Define FXML file");
+        }
+    }
 
     protected String getCtrlListFXMLPath() {
         return "listView.fxml";
@@ -424,6 +432,14 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
 
         return null;
+    }
+
+    protected String[] getFieldColumnList() {
+        List<String> strings = new ArrayList<>();
+
+        table.getFieldListStream().forEach(mField -> strings.add(mField.getName()));
+
+        return strings.toArray(new String[0]);
     }
 
     TableView<MBaseData> getTableView() {
@@ -493,15 +509,9 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
             table.tableStatePush();
 
-            observableList.clear();
-
-            for (int i = 0; i < getColumns().length; i++) {
-                if (getColumns()[i].indexOf(".") > 0) {
-                    table.addLookupField(getColumns()[i]);
-                }
-            }
-
             tableFind();
+
+            observableList.clear();
 
             while (!table.getEof()) {
                 MBaseData e = table.getData();
@@ -551,7 +561,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
+    @SuppressWarnings("unused")
     protected void tableFind() {
         table.aggregateFind();
     }

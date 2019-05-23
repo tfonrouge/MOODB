@@ -70,17 +70,20 @@ public class MEngine {
     }
 
     private Document buildMasterSourceFilter() {
-        Document document = new Document();
+        final Document[] document = {null};
         if (table.getMasterSource() != null) {
-            document.append(table.getMasterSourceField().name, table.getMasterSource()._id());
+            document[0] = new Document(table.getMasterSourceField().name, table.getMasterSource()._id());
         }
         table.setFieldFilters();
         table.fieldList.forEach(mField -> {
             if (!mField.isCalculated() && mField.getFieldState().filterValue != null) {
-                document.append(mField.name, mField.getFieldState().filterValue);
+                if (document[0] == null) {
+                    document[0] = new Document();
+                }
+                document[0].append(mField.name, mField.getFieldState().filterValue);
             }
         });
-        return document;
+        return document[0];
     }
 
     /**

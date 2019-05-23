@@ -8,7 +8,7 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
     /**
      * true if document has to be included in aggregated lookup field
      */
-    private boolean lookupDocument = false;
+    private boolean lookupDocument = true;
 
     protected MFieldTableField(MTable owner, String name) {
         super(owner, name);
@@ -49,6 +49,14 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
         return null;
     }
 
+    public boolean isLookupDocument() {
+        return lookupDocument;
+    }
+
+    public void setLookupDocument(boolean lookupDocument) {
+        this.lookupDocument = lookupDocument;
+    }
+
     @SuppressWarnings("unused")
     public boolean setValue(T table) {
         return super.setValue(table._id());
@@ -70,13 +78,5 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
         }
 
         return linkedTable();
-    }
-
-    public boolean isLookupDocument() {
-        return lookupDocument;
-    }
-
-    public void setLookupDocument(boolean lookupDocument) {
-        this.lookupDocument = lookupDocument;
     }
 }

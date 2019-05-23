@@ -48,19 +48,6 @@ abstract public class MTable {
         return field__id.getTypedValue();
     }
 
-    @SuppressWarnings("unused")
-    public void addLookupField(String fieldExpression) {
-
-        String[] fields = fieldExpression.split("\\.");
-
-        for (String field : fields) {
-            MFieldTableField mFieldTableField = fieldTableFieldByName(field);
-            if (mFieldTableField != null) {
-                mFieldTableField.setLookupDocument(true);
-            }
-        }
-    }
-
     public boolean aggregateFind() {
         return engine.aggregateFind();
     }
@@ -447,17 +434,6 @@ abstract public class MTable {
             return false;
         }
 
-        /* checks for empty values on required fields */
-        fieldList.forEach(mField -> {
-            if (!mField.calculated && mField.required && mField.isEmpty() && !mField.autoInc) {
-                tableState.exception = new Exception("Empty Value on Required Field: '" + mField.name + "'");
-            }
-        });
-
-        if (tableState.exception != null) {
-            return false;
-        }
-
         Document document = new Document();
 
         /* build rawDocument and checks for validation on fields */
@@ -618,7 +594,13 @@ abstract public class MTable {
             tableStateList.add(currentTableState);
         }
         ++tableStateIndex;
-        tableState = new TableState();
+        tableState = new TableState(tableState);
+
+        tableState.exception = null;
+        tableState.mongoCursor = null;
+        tableState.linkedField = null;
+        tableState.state = STATE.NORMAL;
+
         for (FieldState fieldState : currentTableState.fieldStateList) {
             tableState.fieldStateList.add(fieldState.cloneThis());
         }

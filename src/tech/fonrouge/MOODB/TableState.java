@@ -8,8 +8,6 @@ import java.util.List;
 
 public class TableState {
 
-    //    MTable masterSource = null;
-//    MFieldTableField masterSourceField;
     MTable.STATE state = MTable.STATE.NORMAL;
     MongoCursor<Document> mongoCursor;
     boolean eof = true;
@@ -26,8 +24,6 @@ public class TableState {
      * @param tableState : copy constructor
      */
     TableState(TableState tableState) {
-//        masterSource = tableState.masterSource;
-//        masterSourceField = tableState.masterSourceField;
         state = tableState.state;
         mongoCursor = tableState.mongoCursor;
         eof = tableState.eof;
@@ -41,10 +37,6 @@ public class TableState {
         for (FieldState fieldState : fieldStateList) {
             fieldState.removeListener();
         }
-    }
-
-    FieldState getFieldState(int index) {
-        return fieldStateList.get(index);
     }
 
     public Object getFieldValue(MField mField) {
