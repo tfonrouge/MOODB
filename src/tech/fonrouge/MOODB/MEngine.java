@@ -39,14 +39,20 @@ public class MEngine {
      * @return success on aggregateFind
      */
     public boolean aggregateFind() {
-        Document masterSourceFilter = buildMasterSourceFilter();
-        if (masterSourceFilter != null) {
-            pipeline = new ArrayList<>();
-            pipeline.add(
-                    new Document().
-                            append("$match", masterSourceFilter));
+        MIndex mIndex = table.getIndex();
+        if (mIndex == null) {
+            Document masterSourceFilter = buildMasterSourceFilter();
+            if (masterSourceFilter != null) {
+                pipeline = new ArrayList<>();
+                pipeline.add(
+                        new Document().
+                                append("$match", masterSourceFilter));
+            } else {
+                pipeline = new ArrayList<>();
+            }
         } else {
             pipeline = new ArrayList<>();
+
         }
         return table.setMongoCursor(aggregateFind(pipeline));
     }

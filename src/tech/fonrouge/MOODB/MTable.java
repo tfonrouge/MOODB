@@ -22,7 +22,7 @@ abstract public class MTable {
     public final MFieldObject field__id = new MFieldObject(this, "_id");
 
     ArrayList<MField> fieldList;
-    ArrayList<MIndex> indices = new ArrayList<>();
+    ArrayList<MIndex> indexList = new ArrayList<>();
 
     MEngine engine;
     TableState tableState;
@@ -31,6 +31,7 @@ abstract public class MTable {
     private MTable masterSource = null;
     private MFieldTableField masterSourceField;
     private Callable<Boolean> onValidateFields;
+    private MIndex index;
 
     public MTable() {
         initialize();
@@ -56,7 +57,7 @@ abstract public class MTable {
      * buildIndices
      */
     protected void buildIndices() {
-        indices.forEach(MIndex::buildIndex);
+        indexList.forEach(MIndex::buildIndex);
     }
 
     /**
@@ -316,7 +317,7 @@ abstract public class MTable {
     }
 
     protected void initialize() {
-        indices = new ArrayList<>();
+        indexList = new ArrayList<>();
 
         engine = new MEngine(this);
 
@@ -625,6 +626,24 @@ abstract public class MTable {
 
     public void setOnValidateFields(Callable<Boolean> onValidateFields) {
         this.onValidateFields = onValidateFields;
+    }
+
+    public MIndex getIndex() {
+        return index;
+    }
+
+    public void setIndex(MIndex index) {
+        this.index = index;
+    }
+
+    public void setIndex(String indexName) {
+        for (MIndex mIndex : indexList) {
+            if (mIndex.getName().contentEquals(indexName)) {
+                setIndex(mIndex);
+                return;
+            }
+        }
+        throw new RuntimeException("index name not exist.");
     }
 
     public enum FIELD_TYPE {

@@ -24,7 +24,15 @@ public abstract class MIndex {
         this.keyField = keyField;
         this.unique = unique;
         this.sparse = sparse;
-        this.table.indices.add(this);
+
+        if (table.indexList == null) {
+            table.indexList = new ArrayList<>();
+        }
+        table.indexList.add(this);
+        if (table.getIndex() == null) {
+            table.setIndex(this);
+        }
+
         initialize();
         buildIndex();
     }
@@ -160,7 +168,7 @@ public abstract class MIndex {
      *
      * @return String name of index
      */
-    public String name() {
+    public String getName() {
         return name;
     }
 
@@ -169,7 +177,7 @@ public abstract class MIndex {
      *
      * @return boolean for unique index value
      */
-    public boolean unique() {
+    public boolean getUnique() {
         return unique;
     }
 
