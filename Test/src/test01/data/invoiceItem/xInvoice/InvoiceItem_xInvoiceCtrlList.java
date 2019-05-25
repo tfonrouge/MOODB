@@ -10,10 +10,6 @@ public class InvoiceItem_xInvoiceCtrlList extends TableBaseCtrlList<InvoiceItem_
 
     public TableView<InvoiceItem_xInvoiceData> tableView_invoiceItem_xInvoice;
 
-    public InvoiceItem_xInvoiceCtrlList(InvoiceItem_xInvoice table) {
-        super(table);
-    }
-
     @Override
     protected String[] getFieldColumnList() {
         return new String[]{"rowNumber", "invoice.customer", "invItem.name", "qty", "unitPrice"};
