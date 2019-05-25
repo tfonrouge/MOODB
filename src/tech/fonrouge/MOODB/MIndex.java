@@ -10,20 +10,21 @@ import java.util.Scanner;
 
 public abstract class MIndex {
     protected Bson partialFilter;
-    private String keyField;
-    private String masterKeyField;
     private String name;
     private boolean unique;
     private boolean sparse;
     private MTable table;
+    private Document masterKeyDocument;
+    private Document keyDocument;
 
     public MIndex(MTable table, String name, String masterKeyField, String keyField, boolean unique, boolean sparse) {
         this.table = table;
         this.name = name;
-        this.masterKeyField = masterKeyField;
-        this.keyField = keyField;
         this.unique = unique;
         this.sparse = sparse;
+
+        masterKeyDocument = getDocumentField(masterKeyField);
+        keyDocument = getDocumentField(keyField);
 
         if (table.indexList == null) {
             table.indexList = new ArrayList<>();
@@ -37,50 +38,31 @@ public abstract class MIndex {
         buildIndex();
     }
 
-    /* *************** */
-    /* private methods */
-    /* *************** */
-
-    private Document getFields(String s) {
-        Document document = new Document();
-
-        Scanner scanner = new Scanner(s).useDelimiter(",");
-        while (scanner.hasNext()) {
-            String field = scanner.next();
-            if (field.contains(":")) {
-                Scanner scanner1 = new Scanner(field).useDelimiter(":");
-                while (scanner1.hasNext()) {
-                    String indexField = scanner1.next();
-                    String indexSortOrder = scanner1.next();
-                    int index = Integer.parseInt(indexSortOrder);
-                    document.append(indexField, index);
-                }
-            } else {
-                document.append(field, 1);
-            }
+    public boolean aggregateFind(Object... objects) {
+        Document document = getMasterKeyFindExpression();
+        getKeyFieldFindExpression(document, objects);
+        ArrayList<Document> pipeline = new ArrayList<>();
+        if (document.size() > 0) {
+            pipeline.add(new Document().append("$match", document));
         }
-        return document;
+        if (keyDocument != null && keyDocument.size() > 0) {
+            pipeline.add(new Document().append("$sort", keyDocument));
+        }
+        return table.setMongoCursor(table.engine.aggregateFind(pipeline));
     }
-
-    /* ***************** */
-    /* protected methods */
-    /* ***************** */
 
     void buildIndex() {
         IndexOptions indexOptions;
-        Bson bson;
-        String s;
 
-        s = masterKeyField;
-        if (!masterKeyField.isEmpty()) {
-            if (!keyField.isEmpty()) {
-                s += "," + keyField;
-            }
-        } else {
-            s = keyField;
+        Document doc = new Document();
+
+        if (masterKeyDocument != null) {
+            masterKeyDocument.forEach(doc::append);
         }
 
-        bson = getFields(s);
+        if (keyDocument != null) {
+            keyDocument.forEach(doc::append);
+        }
 
         indexOptions = new IndexOptions();
         indexOptions.name(name);
@@ -101,84 +83,70 @@ public abstract class MIndex {
                 buildIndex[0] = false;
             }
         });
+
         if (buildIndex[0]) {
-            table.engine.collection.createIndex(bson, indexOptions);
+            table.engine.collection.createIndex(doc, indexOptions);
         }
     }
 
-    /* ************** */
-    /* public methods */
-    /* ************** */
+    private Document getDocumentField(String s) {
+        Document document = null;
 
-    public boolean aggregateFind(Object... objects) {
-        Document document = getMasterKeyFindExpression(masterKeyField);
-        getKeyFieldFindExpression(document, objects);
-        ArrayList<Document> pipeline = new ArrayList<>();
-        pipeline.add(new Document().append("$match", document));
-        return table.setMongoCursor(table.engine.aggregateFind(pipeline));
-    }
+        Scanner scanner = new Scanner(s).useDelimiter(",");
 
-    private void getKeyFieldFindExpression(Document document, Object... objects) {
-        Scanner scanner = new Scanner(keyField).useDelimiter(",");
-        int i = 0;
-        while (scanner.hasNext()) {
-            String fieldName = scanner.next();
-            if (i < objects.length) {
-                document.append(fieldName, objects[i++]);
-            }
-        }
-    }
-
-    private Document getMasterKeyFindExpression(String masterKeyField) {
-        Document document = new Document();
-        Scanner scanner = new Scanner(masterKeyField).useDelimiter(",");
-        while (scanner.hasNext()) {
-            String fieldName = scanner.next();
-            MField mField = table.fieldByName(fieldName);
-            if (mField != null) {
-                document.append(fieldName, mField.getDefaultValue());
+        if (scanner.hasNext()) {
+            document = new Document();
+            while (scanner.hasNext()) {
+                String field = scanner.next();
+                if (field.contains(":")) {
+                    Scanner scanner1 = new Scanner(field).useDelimiter(":");
+                    while (scanner1.hasNext()) {
+                        String indexField = scanner1.next();
+                        String indexSortOrder = scanner1.next();
+                        int index = Integer.parseInt(indexSortOrder);
+                        document.append(indexField, index);
+                    }
+                } else {
+                    document.append(field, 1);
+                }
             }
         }
         return document;
     }
 
-    protected abstract void initialize();
-
-    /**
-     * keyField
-     *
-     * @return String of key field
-     */
-    public String keyField() {
-        return keyField;
+    private void getKeyFieldFindExpression(Document document, Object... objects) {
+        final int[] i = {0};
+        keyDocument.forEach((key, value) -> {
+            if (i[0] < objects.length) {
+                document.append(key, objects[i[0]++]);
+            }
+        });
     }
 
-    /**
-     * masterKeyField
-     *
-     * @return String of master key field
-     */
-    @SuppressWarnings("unused")
-    public String masterKeyField() {
-        return masterKeyField;
+    private Document getMasterKeyFindExpression() {
+
+        Document document = new Document();
+
+        if (masterKeyDocument != null) {
+            masterKeyDocument.forEach((key, value) -> {
+                MField<?> mField = table.fieldByName(key);
+                Object o = null;
+                if (mField != null) {
+                    o = mField.getDefaultValue();
+                }
+                document.append(key, o);
+            });
+        }
+        return document;
     }
 
-    /**
-     * name
-     *
-     * @return String name of index
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * unique
-     *
-     * @return boolean for unique index value
-     */
     public boolean getUnique() {
         return unique;
     }
 
+    protected abstract void initialize();
 }

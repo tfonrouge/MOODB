@@ -51,8 +51,7 @@ public class MEngine {
                 pipeline = new ArrayList<>();
             }
         } else {
-            pipeline = new ArrayList<>();
-
+            return mIndex.aggregateFind();
         }
         return table.setMongoCursor(aggregateFind(pipeline));
     }

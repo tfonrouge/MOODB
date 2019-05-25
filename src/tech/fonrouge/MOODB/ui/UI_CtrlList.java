@@ -38,21 +38,19 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     public static UI_CtrlList currentCtrlList = null;
-
     private final ObservableList<MBaseData> observableList = FXCollections.observableArrayList();
     @SuppressWarnings("unused")
     @FXML
     protected TableView<MBaseData> tableView;
-
     protected Stage stage;
     @SuppressWarnings("WeakerAccess")
     protected Parent parent;
-    private ScheduledExecutorService executorServiceRefresh;
+    /**
+     * refresh lapse for tableView en seconds
+     */
+    private int refreshLapse = 3;
     private boolean populatingList = false;
-
-    public UI_CtrlList(T table) {
-        this.table = table;
-    }
+    private ScheduledExecutorService executorServiceRefresh;
 
     private static boolean fxmlHasFXController(URL fxmlPath) {
         InputStream inputStream = null;
@@ -91,7 +89,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         className = tableClass.getName() + "CtrlList";
 
         try {
-            constructor = Class.forName(className).getConstructor(tableClass);
+            constructor = Class.forName(className).getConstructor();
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             return getCtorClass(tableClass.getSuperclass());
         }
@@ -104,7 +102,8 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         try {
             Constructor<?> constructor = getCtorClass(table.getClass());
             if (constructor != null) {
-                ui_ctrlList = (UI_CtrlList) constructor.newInstance(table);
+                ui_ctrlList = (UI_CtrlList) constructor.newInstance();
+                ui_ctrlList.table = table;
             }
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
@@ -252,6 +251,10 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
+    protected T buildTable() {
+        return null;
+    }
+
     private void buildTableView() {
 
         if (tableView != null) {
@@ -262,14 +265,27 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
             buildColumns();
 
-            if (executorServiceRefresh == null) {
-                Runnable runnable = () -> Platform.runLater(this::populateList);
-
-                executorServiceRefresh = Executors.newSingleThreadScheduledExecutor();
-                executorServiceRefresh.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
-            }
+            Runnable runnable = () -> Platform.runLater(this::populateList);
+            executorServiceRefresh = Executors.newSingleThreadScheduledExecutor();
+            executorServiceRefresh.scheduleAtFixedRate(runnable, 0, refreshLapse, TimeUnit.SECONDS);
 
             tableView.setItems(observableList);
+
+            tableView.sceneProperty().addListener((observable, oldValue, newValue) -> {
+                if (oldValue == null && newValue != null) {
+                    Scene scene = tableView.getScene();
+                    scene.windowProperty().addListener((observable1, oldValue1, newValue1) -> {
+                        if (oldValue1 == null && newValue1 != null) {
+                            tableView.getScene().getWindow().setOnHidden(event -> {
+                                if (executorServiceRefresh != null) {
+                                    executorServiceRefresh.shutdown();
+                                    executorServiceRefresh = null;
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         }
     }
 
@@ -333,7 +349,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             if (parent != null) {
 
                 for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
-                    ui_ctrlList.buildTableView();
+                    //ui_ctrlList.buildTableView();
                 }
 
                 fxmlLoader.<UI_CtrlRecord>getController().setCtrlList(this);
@@ -375,7 +391,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                         table.setOnValidateFields(onValidateFields);
                     }
                     for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
-                        ui_ctrlList.stopExecutorServiceRefresh();
+                        //ui_ctrlList.stopExecutorServiceRefresh();
                     }
                     if (table.getState() != MTable.STATE.NORMAL) {
                         table.cancel();
@@ -448,6 +464,19 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     protected void initController(Parent parent) {
 
+    }
+
+    @FXML
+    protected void initialize() {
+        if (table == null) {
+            table = buildTable();
+        }
+        if (table == null) {
+            System.out.println("ERROR ERROR ERROR");
+            UI_Message.Error("UI_CtrlList Error", "Table not defined.", "build table with buildTable()");
+        } else {
+            buildTableView();
+        }
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -534,8 +563,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         stage = new Stage();
 
-        buildTableView();
-
         Scene scene = new Scene(parent);
 
         if (tableView != null) {
@@ -546,23 +573,22 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             });
         }
 
-        stage.setOnHidden(event -> stopExecutorServiceRefresh());
-
         stage.setScene(scene);
         stage.setTitle(table.getGenres());
 
         stage.show();
     }
 
-    private void stopExecutorServiceRefresh() {
-        if (executorServiceRefresh != null) {
-            executorServiceRefresh.shutdown();
-            executorServiceRefresh = null;
-        }
-    }
-
     @SuppressWarnings("unused")
     protected void tableFind() {
         table.aggregateFind();
+    }
+
+    public int getRefreshLapse() {
+        return refreshLapse;
+    }
+
+    public void setRefreshLapse(int refreshLapse) {
+        this.refreshLapse = refreshLapse;
     }
 }
