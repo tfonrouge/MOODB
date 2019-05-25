@@ -375,13 +375,6 @@ public abstract class MField<T> {
 
     @SuppressWarnings("WeakerAccess")
     final public Object getDefaultValue() {
-        if (getFieldState().defaultValue == null) {
-            try {
-                return callableNewValue.call();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
         return getFieldState().defaultValue;
     }
 

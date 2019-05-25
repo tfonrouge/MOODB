@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -304,7 +305,9 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 try {
                     if (UI_CtrlList.class.isAssignableFrom(param)) {
 
-                        Class<?> tableClass = param.getConstructors()[0].getParameterTypes()[0];
+                        ParameterizedType parameterizedType = (ParameterizedType) param.getGenericSuperclass();
+
+                        Class<?> tableClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
                         UI_CtrlList ui_ctrlList;
 
                         Constructor<?>[] constructors = tableClass.getConstructors();
@@ -315,8 +318,9 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                             Constructor<?> ctor = tableClass.getConstructor(table.getClass());
                             childTable = (MTable) ctor.newInstance(table);
                         }
-                        Constructor<?> constructor = param.getConstructor(tableClass);
-                        ui_ctrlList = (UI_CtrlList) constructor.newInstance(childTable);
+                        Constructor<?> constructor = param.getConstructor();
+                        ui_ctrlList = (UI_CtrlList) constructor.newInstance();
+                        ui_ctrlList.table = childTable;
 
                         currentCtrlList = ui_ctrlList;
                         localCtrlListStack.add(ui_ctrlList);

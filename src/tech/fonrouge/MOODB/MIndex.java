@@ -132,7 +132,11 @@ public abstract class MIndex {
                 MField<?> mField = table.fieldByName(key);
                 Object o = null;
                 if (mField != null) {
-                    o = mField.getDefaultValue();
+                    if (table.getMasterSourceField() != null && table.getMasterSourceField().equals(mField)) {
+                        o = table.getMasterSource()._id();
+                    } else {
+                        o = mField.getDefaultValue();
+                    }
                 }
                 document.append(key, o);
             });
