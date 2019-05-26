@@ -20,8 +20,6 @@ public abstract class MDatabase {
         MongoClientURI mongoClientURI = new MongoClientURI(clientURI);
         mongoClient = new MongoClient(mongoClientURI);
         mongoDatabase = mongoClient.getDatabase(getDatabaseName());
-
-        defineRelations();
     }
 
     public MongoCollection<Document> getReferentialIntegrityTable() {
@@ -54,8 +52,6 @@ public abstract class MDatabase {
         }
         return uri;
     }
-
-    protected abstract void defineRelations();
 
     public abstract String getAuthSource();
 

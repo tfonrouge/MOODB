@@ -10,11 +10,6 @@ public class TestDatabase extends MDatabase {
     }
 
     @Override
-    protected void defineRelations() {
-
-    }
-
-    @Override
     public String getAuthSource() {
         return "";
     }
