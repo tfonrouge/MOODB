@@ -530,8 +530,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         if (!populatingList) {
 
-            System.out.print(".");
-
             populatingList = true;
 
             if (refreshTimer != null) {
@@ -546,7 +544,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 protected Void call() {
 
                     ObservableList<MBaseData> observableList = FXCollections.observableArrayList();
-
 
                     try {
                         table.tableStatePush();
@@ -564,13 +561,13 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                     }
 
                     Platform.runLater(() -> {
-                        populatingList = false;
                         tableView.setItems(observableList);
                         tableView.getFocusModel().focus(focusedIndex);
                         tableView.getSelectionModel().select(selectedIndex);
                         if (refreshTimer != null) {
                             refreshTimer.play();
                         }
+                        populatingList = false;
                     });
                     return null;
                 }
