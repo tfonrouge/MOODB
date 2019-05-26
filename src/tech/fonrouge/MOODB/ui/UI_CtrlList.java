@@ -1,9 +1,12 @@
 package tech.fonrouge.MOODB.ui;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,6 +18,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import org.bson.Document;
 import tech.fonrouge.MOODB.*;
 
@@ -31,15 +36,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     public static UI_CtrlList currentCtrlList = null;
-    private final ObservableList<MBaseData> observableList = FXCollections.observableArrayList();
+    private static int numTimers = 0;
     @SuppressWarnings("unused")
     @FXML
     protected TableView<MBaseData> tableView;
@@ -47,11 +49,11 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     @SuppressWarnings("WeakerAccess")
     protected Parent parent;
     /**
-     * refresh lapse for tableView en seconds
+     * refresh lapse for tableView in seconds
      */
     private int refreshLapse = 3;
     private boolean populatingList = false;
-    private ScheduledExecutorService executorServiceRefresh;
+    private Timeline refreshTimer;
 
     private static boolean fxmlHasFXController(URL fxmlPath) {
         InputStream inputStream = null;
@@ -252,6 +254,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     protected T buildTable() {
         return null;
     }
@@ -266,23 +269,15 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
             buildColumns();
 
-            Runnable runnable = () -> Platform.runLater(this::populateList);
-            executorServiceRefresh = Executors.newSingleThreadScheduledExecutor();
-            executorServiceRefresh.scheduleAtFixedRate(runnable, 0, refreshLapse, TimeUnit.SECONDS);
+            refreshTimerStart();
 
-            tableView.setItems(observableList);
-
-            tableView.sceneProperty().addListener((observable, oldValue, newValue) -> {
-                if (oldValue == null && newValue != null) {
+            tableView.sceneProperty().addListener((observable, oldScene, newScene) -> {
+                if (oldScene == null && newScene != null) {
                     Scene scene = tableView.getScene();
-                    scene.windowProperty().addListener((observable1, oldValue1, newValue1) -> {
-                        if (oldValue1 == null && newValue1 != null) {
-                            tableView.getScene().getWindow().setOnHidden(event -> {
-                                if (executorServiceRefresh != null) {
-                                    executorServiceRefresh.shutdown();
-                                    executorServiceRefresh = null;
-                                }
-                            });
+                    scene.windowProperty().addListener((observable1, oldWindow, newWindow) -> {
+                        if (oldWindow == null && newWindow != null) {
+                            newWindow.addEventHandler(WindowEvent.WINDOW_SHOWN, windowEvent -> populateList());
+                            newWindow.addEventHandler(WindowEvent.WINDOW_HIDDEN, windowEvent -> refreshTimerStop());
                         }
                     });
                 }
@@ -353,7 +348,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             if (parent != null) {
 
                 for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
-                    //ui_ctrlList.buildTableView();
+                    ui_ctrlList.populateList();
                 }
 
                 fxmlLoader.<UI_CtrlRecord>getController().setCtrlList(this);
@@ -393,9 +388,10 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 stage.setOnHidden(event -> {
                     if (state != MTable.STATE.NORMAL) {
                         table.setOnValidateFields(onValidateFields);
+                        populateList();
                     }
                     for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
-                        //ui_ctrlList.stopExecutorServiceRefresh();
+                        ui_ctrlList.refreshTimerStop();
                     }
                     if (table.getState() != MTable.STATE.NORMAL) {
                         table.cancel();
@@ -476,7 +472,6 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             table = buildTable();
         }
         if (table == null) {
-            System.out.println("ERROR ERROR ERROR");
             UI_Message.Error("UI_CtrlList Error", "Table not defined.", "build table with buildTable()");
         } else {
             buildTableView();
@@ -535,30 +530,81 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         if (!populatingList) {
 
+            System.out.print(".");
+
             populatingList = true;
+
+            if (refreshTimer != null) {
+                refreshTimer.pause();
+            }
 
             int focusedIndex = tableView.getSelectionModel().getFocusedIndex();
             int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
 
-            table.tableStatePush();
+            Task<Void> task = new Task<Void>() {
+                @Override
+                protected Void call() {
 
-            tableFind();
+                    ObservableList<MBaseData> observableList = FXCollections.observableArrayList();
 
-            observableList.clear();
 
-            while (!table.getEof()) {
-                MBaseData e = table.getData();
-                observableList.add(e);
-                table.next();
-            }
+                    try {
+                        table.tableStatePush();
+                        tableFind();
 
-            tableView.getFocusModel().focus(focusedIndex);
-            tableView.getSelectionModel().select(selectedIndex);
+                        while (!table.getEof()) {
+                            MBaseData e = table.getData();
+                            observableList.add(e);
+                            table.next();
+                        }
 
-            table.tableStatePull();
+                        table.tableStatePull();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-            populatingList = false;
+                    Platform.runLater(() -> {
+                        populatingList = false;
+                        tableView.setItems(observableList);
+                        tableView.getFocusModel().focus(focusedIndex);
+                        tableView.getSelectionModel().select(selectedIndex);
+                        if (refreshTimer != null) {
+                            refreshTimer.play();
+                        }
+                    });
+                    return null;
+                }
+            };
+            task.run();
         }
+    }
+
+    private void refreshTimerStart() {
+        if (refreshTimer == null) {
+            ++numTimers;
+            KeyFrame keyFrame = new KeyFrame(Duration.seconds(refreshLapse * numTimers), actionEvent -> populateList());
+            refreshTimer = new Timeline(keyFrame);
+            refreshTimer.setCycleCount(Timeline.INDEFINITE);
+            refreshTimer.play();
+        }
+    }
+
+    private void refreshTimerStop() {
+        if (refreshTimer != null) {
+            --numTimers;
+            refreshTimer.stop();
+            refreshTimer = null;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public int getRefreshLapse() {
+        return refreshLapse;
+    }
+
+    @SuppressWarnings("unused")
+    public void setRefreshLapse(int refreshLapse) {
+        this.refreshLapse = refreshLapse;
     }
 
     private void showWindow(Parent parent) {
@@ -583,16 +629,8 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         stage.show();
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("WeakerAccess")
     protected void tableFind() {
         table.aggregateFind();
-    }
-
-    public int getRefreshLapse() {
-        return refreshLapse;
-    }
-
-    public void setRefreshLapse(int refreshLapse) {
-        this.refreshLapse = refreshLapse;
     }
 }
