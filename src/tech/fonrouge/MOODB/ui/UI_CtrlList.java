@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> extends UI_Binding<T> {
+public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     public static UI_CtrlList currentCtrlList = null;
@@ -100,6 +100,11 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     }
 
     static public void showList(MTable table) {
+        showList(table, null);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    static public void showList(MTable table, Stage stage) {
         UI_CtrlList ui_ctrlList = null;
 
         try {
@@ -152,7 +157,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                     currentCtrlList = null;
                 }
                 if (parent != null) {
-                    ui_ctrlList.showWindow(parent);
+                    ui_ctrlList.showWindow(stage, parent);
                 }
             } else {
                 UI_Message.error("UI_CtrlList Error", "No FXML resource found.", "define FXML resource.");
@@ -606,26 +611,29 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         this.refreshLapse = refreshLapse;
     }
 
-    private void showWindow(Parent parent) {
+    private void showWindow(Stage stage, Parent parent) {
 
         initController(parent);
 
-        stage = new Stage();
+        if (stage == null) {
+            this.stage = new Stage();
+        } else {
+            this.stage = stage;
+        }
 
         Scene scene = new Scene(parent);
+        this.stage.setScene(scene);
+        this.stage.setTitle(table.getGenres());
 
         if (tableView != null) {
             tableView.setOnKeyPressed(event -> {
                 if (event.getCode() == KeyCode.ESCAPE) {
-                    stage.hide();
+                    this.stage.hide();
                 }
             });
         }
 
-        stage.setScene(scene);
-        stage.setTitle(table.getGenres());
-
-        stage.show();
+        this.stage.show();
     }
 
     @SuppressWarnings("WeakerAccess")
