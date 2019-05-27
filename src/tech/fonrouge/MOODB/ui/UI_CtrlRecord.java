@@ -14,11 +14,11 @@ import tech.fonrouge.MOODB.MTable;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
+public abstract class UI_CtrlRecord<T extends MTable, U extends MBaseData<T>> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     protected Parent parent;
-    private UI_CtrlList<T> ctrlList;
+    private UI_CtrlList<T, U> ctrlList;
 
     protected abstract void initData();
 
@@ -27,7 +27,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
     private void onActionButtonAccept(ActionEvent actionEvent) {
         Node source = (Node) actionEvent.getSource();
         MTable.STATE state = table.getState();
-        TableView<MBaseData> tableView = ctrlList.getTableView();
+        TableView<U> tableView = ctrlList.getTableView();
         int focusedIndex = tableView.getSelectionModel().getFocusedIndex();
         int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
         if (state != MTable.STATE.NORMAL) {
@@ -39,7 +39,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
                 Exception e = table.getException();
                 if (e != null) {
                     String errMsg = e.toString();
-                    UI_Message.Warning("Error", "Post Error", errMsg);
+                    UI_Message.warning("Error", "Post Error", errMsg);
                 }
             }
         }
@@ -48,7 +48,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
         }
     }
 
-    <U extends UI_CtrlList<T>> void setCtrlList(U ctrlList) {
+    <V extends UI_CtrlList<T, U>> void setCtrlList(V ctrlList) {
         this.ctrlList = ctrlList;
         this.table = ctrlList.table;
         this.parent = ctrlList.parent;

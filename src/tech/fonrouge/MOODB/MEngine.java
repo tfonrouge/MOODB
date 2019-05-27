@@ -228,8 +228,11 @@ public class MEngine {
                 collection = mDatabase.getCollection(table.getTableName());
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 e.printStackTrace();
-                UI_Message.Error("Database Error", "MongoDb Engine Error", e.getMessage());
+                UI_Message.error("Database Error", "MongoDb Engine Error", e.getMessage());
             }
+        } else {
+            mongoDatabase = mDatabase.mongoDatabase;
+            collection = mDatabase.getCollection(table.getTableName());
         }
     }
 

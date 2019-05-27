@@ -163,7 +163,7 @@ abstract public class MTable {
         return null;
     }
 
-    public abstract MBaseData getData();
+    public abstract <U extends MBaseData> U getData();
 
     /**
      * getDatabase
@@ -330,7 +330,7 @@ abstract public class MTable {
     public boolean insert() {
 
         if (tableState.state != STATE.NORMAL) {
-            UI_Message.Error("Table Insert Error", "Table previously on EDIT/INSERT State.", "check code logic.");
+            UI_Message.error("Table Insert Error", "Table previously on EDIT/INSERT State.", "check code logic.");
             return false;
         }
 

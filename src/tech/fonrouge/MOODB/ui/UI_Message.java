@@ -21,26 +21,27 @@ public class UI_Message {
         return MESSAGE_VALUE.CANCEL;
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public static void Error(String title, String headerText, String error) {
-
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+    public static void alert(Alert.AlertType alertType, String title, String header, String context) {
+        Alert alert = new Alert(alertType);
         alert.setTitle(title);
-
-        alert.setHeaderText(Wordwrap.wordwrap(headerText, 80));
-        alert.setContentText(error);
+        alert.setHeaderText(Wordwrap.wordwrap(header, 80));
+        alert.setContentText(context);
         alert.showAndWait();
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public static void Warning(String title, String headerText, String warning) {
+    @SuppressWarnings("unused")
+    public static void information(String title, String headerText, String context) {
+        alert(Alert.AlertType.INFORMATION, title, headerText, context);
+    }
 
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
+    @SuppressWarnings("unused")
+    public static void error(String title, String headerText, String error) {
+        alert(Alert.AlertType.ERROR, title, headerText, error);
+    }
 
-        alert.setHeaderText(Wordwrap.wordwrap(headerText, 80));
-        alert.setContentText(warning);
-        alert.showAndWait();
+    @SuppressWarnings("unused")
+    public static void warning(String title, String headerText, String warning) {
+        alert(Alert.AlertType.WARNING, title, headerText, warning);
     }
 
     @SuppressWarnings("unused")

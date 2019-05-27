@@ -37,14 +37,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
+public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     public static UI_CtrlList currentCtrlList = null;
     private static int numTimers = 0;
     @SuppressWarnings("unused")
     @FXML
-    protected TableView<MBaseData> tableView;
+    protected TableView<U> tableView;
     protected Stage stage;
     @SuppressWarnings("WeakerAccess")
     protected Parent parent;
@@ -61,7 +61,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             inputStream = fxmlPath.openStream();
         } catch (IOException e) {
             e.printStackTrace();
-            UI_Message.Error("UI_CtrlList Error", "FXML URL not valid.", e.toString());
+            UI_Message.error("UI_CtrlList Error", "FXML URL not valid.", e.toString());
         }
         if (inputStream != null) {
             XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
@@ -75,7 +75,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 }
             } catch (XMLStreamException e) {
                 e.printStackTrace();
-                UI_Message.Error("UI_CtrlList Error", "FXML not valid.", e.toString());
+                UI_Message.error("UI_CtrlList Error", "FXML not valid.", e.toString());
             }
         }
         return false;
@@ -110,7 +110,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             }
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
-            UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
+            UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
         }
 
         if (ui_ctrlList != null) {
@@ -132,7 +132,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                         return param.newInstance();
                     } catch (InstantiationException | IllegalAccessException e) {
                         e.printStackTrace();
-                        UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
+                        UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
                     }
                     return null;
                 });
@@ -147,7 +147,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                     parent = fxmlLoader.load();
                 } catch (Throwable e) {
                     e.printStackTrace();
-                    UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
+                    UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
                 } finally {
                     currentCtrlList = null;
                 }
@@ -155,19 +155,19 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                     ui_ctrlList.showWindow(parent);
                 }
             } else {
-                UI_Message.Error("UI_CtrlList Error", "No FXML resource found.", "define FXML resource.");
+                UI_Message.error("UI_CtrlList Error", "No FXML resource found.", "define FXML resource.");
             }
         } else {
-            UI_Message.Error("UI_CtrlList Error", "No controller found.", "define controller for table.");
+            UI_Message.error("UI_CtrlList Error", "No controller found.", "define controller for table.");
         }
     }
 
-    private TableColumn<MBaseData, ?> buildColumn(String fieldExpression) {
+    private TableColumn<U, ?> buildColumn(String fieldExpression) {
 
         if (fieldExpression.indexOf('.') > 0) {
             String[] fieldList = fieldExpression.split("\\.");
             if (fieldList.length > 1) {
-                TableColumn<MBaseData, String> column;
+                TableColumn<U, String> column;
                 column = new TableColumn<>();
                 column.setCellValueFactory(param -> {
 
@@ -231,7 +231,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         } else {
             MField mField = table.fieldByName(fieldExpression);
             if (mField != null) {
-                TableColumn<MBaseData, ?> column;
+                TableColumn<U, ?> column;
                 column = new TableColumn<>(mField.getLabel());
                 column.setCellValueFactory(new PropertyValueFactory<>(mField.getName()));
                 return column;
@@ -246,7 +246,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         for (String fieldExpression : getFieldColumnList()) {
 
-            TableColumn<MBaseData, ?> column = buildColumn(fieldExpression);
+            TableColumn<U, ?> column = buildColumn(fieldExpression);
             column.setId(fieldExpression);
 
             tableView.getColumns().add(column);
@@ -328,7 +328,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                         table.cancel();
                     }
                     e.printStackTrace();
-                    UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
+                    UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
                 }
                 return null;
             });
@@ -340,7 +340,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                     table.cancel();
                 }
                 e.printStackTrace();
-                UI_Message.Error("UI_CtrlList Error", "Warning", e.toString());
+                UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
             }
 
             currentCtrlList = null;
@@ -410,8 +410,17 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
             if (table.getState() != MTable.STATE.NORMAL) {
                 table.cancel();
             }
-            UI_Message.Error("UI_CtrlList Error", "Warning", "Define FXML file");
+            UI_Message.error("UI_CtrlList Error", "Warning", "Define FXML file");
         }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public boolean findSelectedDocument() {
+        U item = tableView.getSelectionModel().getSelectedItem();
+        if (item != null) {
+            return table.field__id.aggregateFind(item.get_id());
+        }
+        return false;
     }
 
     protected String getCtrlListFXMLPath() {
@@ -458,7 +467,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         return strings.toArray(new String[0]);
     }
 
-    TableView<MBaseData> getTableView() {
+    TableView<U> getTableView() {
         return tableView;
     }
 
@@ -468,11 +477,12 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     @FXML
     protected void initialize() {
+
         if (table == null) {
             table = buildTable();
         }
         if (table == null) {
-            UI_Message.Error("UI_CtrlList Error", "Table not defined.", "build table with buildTable()");
+            UI_Message.error("UI_CtrlList Error", "Table not defined.", "build table with buildTable()");
         } else {
             buildTableView();
         }
@@ -481,30 +491,23 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     @SuppressWarnings("WeakerAccess")
     public void onActionDeleteDocument() {
 
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
-
-        if (item != null) {
-            if (table.field__id.aggregateFind(item.get_id()) && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
-                if (!table.delete()) {
-                    if (table.getException() == null) {
-                        UI_Message.Error("UI_CtrlList Error", "Unknown error", "Delete error");
-                    } else {
-                        UI_Message.Error("UI_CtrlList Error", table.getException().getMessage(), "Delete error");
-                    }
+        if (findSelectedDocument() && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
+            if (!table.delete()) {
+                if (table.getException() == null) {
+                    UI_Message.error("UI_CtrlList Error", "Unknown error", "Delete error");
+                } else {
+                    UI_Message.error("UI_CtrlList Error", table.getException().getMessage(), "Delete error");
                 }
-                populateList();
             }
+            populateList();
         }
     }
 
     @SuppressWarnings("WeakerAccess")
     public void onActionEditDocument() {
 
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
-
-        if (item != null) {
-            Object id = item.get_id();
-            if (table.field__id.aggregateFind(id) && table.edit()) {
+        if (findSelectedDocument()) {
+            if (table.edit()) {
                 doInsertEdit();
             }
         }
@@ -519,8 +522,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     public void onActionViewDocument() {
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
-        if (item != null && table.field__id.aggregateFind(item.get_id())) {
+        if (findSelectedDocument()) {
             doInsertEdit();
         }
     }
@@ -543,14 +545,14 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 @Override
                 protected Void call() {
 
-                    ObservableList<MBaseData> observableList = FXCollections.observableArrayList();
+                    ObservableList<U> observableList = FXCollections.observableArrayList();
 
                     try {
                         table.tableStatePush();
                         tableFind();
 
                         while (!table.getEof()) {
-                            MBaseData e = table.getData();
+                            U e = table.getData();
                             observableList.add(e);
                             table.next();
                         }
