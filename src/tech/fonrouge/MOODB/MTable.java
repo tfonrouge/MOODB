@@ -521,11 +521,6 @@ abstract public class MTable {
         field__id.table.tableState.setFieldValue(field__id.index, value);
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public void setFieldFilters() {
-
-    }
-
     boolean setDocumentToTableState(Document document) {
         tableState.eof = document == null;
 
@@ -555,6 +550,11 @@ abstract public class MTable {
         }
 
         return !tableState.eof;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void setFieldFilters() {
+
     }
 
     /**

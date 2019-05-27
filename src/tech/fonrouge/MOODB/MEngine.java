@@ -210,7 +210,7 @@ public class MEngine {
         return table.setMongoCursor(aggregateFind(pipeline));
     }
 
-    private void initialize() {
+    public void initialize() {
         Class<?> mDatabaseClass = table.getMDatabaseClass();
 
         if (mDatabaseHashMap == null) {
@@ -224,13 +224,13 @@ public class MEngine {
                 Constructor<?> ctor = mDatabaseClass.getConstructor(MTable.class);
                 mDatabase = (MDatabase) ctor.newInstance(table);
                 mDatabaseHashMap.put(mDatabaseClass, mDatabase);
+                mongoDatabase = mDatabase.mongoDatabase;
+                collection = mDatabase.getCollection(table.getTableName());
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 e.printStackTrace();
                 UI_Message.Error("Database Error", "MongoDb Engine Error", e.getMessage());
             }
         }
-        mongoDatabase = mDatabase.mongoDatabase;
-        collection = mDatabase.getCollection(table.getTableName());
     }
 
     /**

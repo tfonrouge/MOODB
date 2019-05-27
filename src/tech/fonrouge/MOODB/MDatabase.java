@@ -36,19 +36,40 @@ public abstract class MDatabase {
         return table;
     }
 
-    final String getDatabaseURI() {
+    private String getDatabaseURI() {
         String uri = "mongodb://";
+        String userName = getUserName();
+        String password = getPassword();
+        String serverName = getServerName();
+        String authSource = getAuthSource();
+        int portNumber = getPortNumber();
 
-        if (getUserName().isEmpty()) {
-            uri += getServerName();
+        if (userName == null) {
+            userName = "";
+        }
+
+        if (password == null) {
+            password = "";
+        }
+
+        if (serverName == null) {
+            serverName = "";
+        }
+
+        if (authSource == null) {
+            authSource = "";
+        }
+
+        if (userName.isEmpty()) {
+            uri += serverName;
         } else {
-            uri += getUserName() + ":" + getPassword() + "@" + getServerName();
+            uri += userName + ":" + password + "@" + serverName;
         }
         if (getPortNumber() != 0) {
-            uri += ":" + getPortNumber();
+            uri += ":" + portNumber;
         }
-        if (!getAuthSource().isEmpty()) {
-            uri += "/?authSource=" + getAuthSource();
+        if (!authSource.isEmpty()) {
+            uri += "/?authSource=" + authSource;
         }
         return uri;
     }
