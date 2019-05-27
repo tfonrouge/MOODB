@@ -116,9 +116,7 @@ abstract public class MTable {
         }
 
         /* fill field values */
-        fieldList.forEach(mField -> {
-            mField.getFieldState().origValue = mField.getTypedValue();
-        });
+        fieldList.forEach(mField -> mField.getFieldState().origValue = mField.getTypedValue());
 
         tableState.state = STATE.EDIT;
 
@@ -163,7 +161,7 @@ abstract public class MTable {
         return null;
     }
 
-    public abstract <U extends MBaseData> U getData();
+    public abstract MBaseData getData();
 
     /**
      * getDatabase

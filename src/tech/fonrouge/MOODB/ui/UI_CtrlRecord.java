@@ -27,7 +27,7 @@ public abstract class UI_CtrlRecord<T extends MTable, U extends MBaseData<T>> ex
     private void onActionButtonAccept(ActionEvent actionEvent) {
         Node source = (Node) actionEvent.getSource();
         MTable.STATE state = table.getState();
-        TableView<U> tableView = ctrlList.getTableView();
+        TableView<? extends MBaseData> tableView = ctrlList.getTableView();
         int focusedIndex = tableView.getSelectionModel().getFocusedIndex();
         int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
         if (state != MTable.STATE.NORMAL) {

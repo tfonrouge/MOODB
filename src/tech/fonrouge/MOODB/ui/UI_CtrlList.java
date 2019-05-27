@@ -44,7 +44,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     private static int numTimers = 0;
     @SuppressWarnings("unused")
     @FXML
-    protected TableView<U> tableView;
+    protected TableView<MBaseData> tableView;
     protected Stage stage;
     @SuppressWarnings("WeakerAccess")
     protected Parent parent;
@@ -162,12 +162,12 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         }
     }
 
-    private TableColumn<U, ?> buildColumn(String fieldExpression) {
+    private TableColumn<MBaseData, ?> buildColumn(String fieldExpression) {
 
         if (fieldExpression.indexOf('.') > 0) {
             String[] fieldList = fieldExpression.split("\\.");
             if (fieldList.length > 1) {
-                TableColumn<U, String> column;
+                TableColumn<MBaseData, String> column;
                 column = new TableColumn<>();
                 column.setCellValueFactory(param -> {
 
@@ -231,7 +231,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         } else {
             MField mField = table.fieldByName(fieldExpression);
             if (mField != null) {
-                TableColumn<U, ?> column;
+                TableColumn<MBaseData, ?> column;
                 column = new TableColumn<>(mField.getLabel());
                 column.setCellValueFactory(new PropertyValueFactory<>(mField.getName()));
                 return column;
@@ -246,7 +246,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
         for (String fieldExpression : getFieldColumnList()) {
 
-            TableColumn<U, ?> column = buildColumn(fieldExpression);
+            TableColumn<MBaseData, ?> column = buildColumn(fieldExpression);
             column.setId(fieldExpression);
 
             tableView.getColumns().add(column);
@@ -416,7 +416,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
     @SuppressWarnings("WeakerAccess")
     public boolean findSelectedDocument() {
-        U item = tableView.getSelectionModel().getSelectedItem();
+        MBaseData item = tableView.getSelectionModel().getSelectedItem();
         if (item != null) {
             return table.field__id.aggregateFind(item.get_id());
         }
@@ -467,7 +467,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         return strings.toArray(new String[0]);
     }
 
-    TableView<U> getTableView() {
+    TableView<MBaseData> getTableView() {
         return tableView;
     }
 
@@ -545,14 +545,14 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                 @Override
                 protected Void call() {
 
-                    ObservableList<U> observableList = FXCollections.observableArrayList();
+                    ObservableList<MBaseData> observableList = FXCollections.observableArrayList();
 
                     try {
                         table.tableStatePush();
                         tableFind();
 
                         while (!table.getEof()) {
-                            U e = table.getData();
+                            MBaseData e = table.getData();
                             observableList.add(e);
                             table.next();
                         }
