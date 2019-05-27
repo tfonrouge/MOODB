@@ -7,7 +7,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import tech.fonrouge.MOODB.ui.UI_CtrlList;
 
-public abstract class TableBaseCtrlList<T extends TableBase> extends UI_CtrlList<T> {
+public abstract class TableBaseCtrlList<T extends TableBase, U extends TableBaseData<T>> extends UI_CtrlList<T, U> {
 
     @SuppressWarnings("unused")
     @FXML

@@ -6,7 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import test01.data.tableBase.TableBaseCtrlList;
 
-public class InvoiceItem_xInvoiceCtrlList extends TableBaseCtrlList<InvoiceItem_xInvoice> {
+public class InvoiceItem_xInvoiceCtrlList<T extends InvoiceItem_xInvoice> extends TableBaseCtrlList<T, InvoiceItem_xInvoiceData<T>> {
 
     public TableView<InvoiceItem_xInvoiceData> tableView_invoiceItem_xInvoice;
 

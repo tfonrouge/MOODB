@@ -2,7 +2,7 @@ package test01.data.invoice;
 
 import test01.data.tableBase.TableBaseCtrlList;
 
-public class InvoiceCtrlList extends TableBaseCtrlList<Invoice> {
+public class InvoiceCtrlList<T extends Invoice> extends TableBaseCtrlList<T, InvoiceData<T>> {
 
     @Override
     protected String[] getFieldColumnList() {
