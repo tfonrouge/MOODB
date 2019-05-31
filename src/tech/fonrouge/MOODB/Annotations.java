@@ -10,7 +10,6 @@ public class Annotations {
     @Target(ElementType.FIELD)
     public @interface AssignWith {
         String parentNode();
-
         String selectorId();
     }
 
