@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -305,9 +306,17 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 try {
                     if (UI_CtrlList.class.isAssignableFrom(param)) {
 
-                        ParameterizedType parameterizedType = (ParameterizedType) param.getGenericSuperclass();
+                        Type genericSuperclass = param.getGenericSuperclass();
 
-                        Class<?> tableClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+                        Class<?> tableClass;
+
+                        if (genericSuperclass instanceof ParameterizedType) {
+                            ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
+                            tableClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+                        } else {
+                            throw new Error("Cannot infer Table class for Controller " + param.getSimpleName());
+                        }
+
                         UI_CtrlList ui_ctrlList;
 
                         Constructor<?>[] constructors = tableClass.getConstructors();
