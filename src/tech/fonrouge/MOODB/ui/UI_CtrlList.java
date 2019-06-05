@@ -542,6 +542,11 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
     }
 
     @SuppressWarnings("WeakerAccess")
+    protected void onAfterPopulateList() {
+
+    }
+
+    @SuppressWarnings("WeakerAccess")
     protected void populateList() {
 
         if (!populatingList) {
@@ -584,6 +589,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                             refreshTimer.play();
                         }
                         populatingList = false;
+                        onAfterPopulateList();
                     });
                     return null;
                 }
