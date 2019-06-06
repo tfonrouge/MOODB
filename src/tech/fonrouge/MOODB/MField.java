@@ -288,7 +288,7 @@ public abstract class MField<T> {
     }
 
     public boolean isReadOnly() {
-        return calculated || autoInc || (newFinal && table.tableState.state == MTable.STATE.EDIT) || readOnly;
+        return calculated || autoInc || (table.tableState.state == MTable.STATE.EDIT && newFinal && getFieldState().origValue != null) || readOnly;
     }
 
     public void setReadOnly(boolean readOnly) {
@@ -316,11 +316,7 @@ public abstract class MField<T> {
             return false; //throw new RuntimeException("Attempt to setValue() to Table in Normal State.");
         }
 
-        if (autoInc) {
-            return false;
-        }
-
-        if (newFinal && table.tableState.state == MTable.STATE.EDIT) {
+        if (isReadOnly()) {
             return false;
         }
 
