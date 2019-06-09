@@ -38,14 +38,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
+public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     public static UI_CtrlList currentCtrlList = null;
     private static int numTimers = 0;
     @SuppressWarnings("unused")
     @FXML
-    protected TableView<MBaseData> tableView;
+    protected TableView<U> tableView;
     protected Stage stage;
     @SuppressWarnings("WeakerAccess")
     protected Parent parent;
@@ -168,12 +168,12 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         }
     }
 
-    private TableColumn<MBaseData, ?> buildColumn(String fieldExpression) {
+    private TableColumn<U, ?> buildColumn(String fieldExpression) {
 
         if (fieldExpression.indexOf('.') > 0) {
             String[] fieldList = fieldExpression.split("\\.");
             if (fieldList.length > 1) {
-                TableColumn<MBaseData, String> column;
+                TableColumn<U, String> column;
                 column = new TableColumn<>();
                 column.setCellValueFactory(param -> {
 
@@ -237,7 +237,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         } else {
             MField mField = table.fieldByName(fieldExpression);
             if (mField != null) {
-                TableColumn<MBaseData, ?> column;
+                TableColumn<U, ?> column;
                 column = new TableColumn<>(mField.getLabel());
                 column.setCellValueFactory(new PropertyValueFactory<>(mField.getName()));
                 return column;
@@ -252,7 +252,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
         for (String fieldExpression : getFieldColumnList()) {
 
-            TableColumn<MBaseData, ?> column = buildColumn(fieldExpression);
+            TableColumn<U, ?> column = buildColumn(fieldExpression);
             column.setId(fieldExpression);
 
             tableView.getColumns().add(column);
@@ -430,7 +430,7 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     public boolean findSelectedDocument() {
-        MBaseData item = tableView.getSelectionModel().getSelectedItem();
+        U item = tableView.getSelectionModel().getSelectedItem();
         if (item != null) {
             return table.field__id.aggregateFind(item.get_id());
         }
@@ -481,7 +481,12 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
         return strings.toArray(new String[0]);
     }
 
-    TableView<MBaseData> getTableView() {
+    @SuppressWarnings("unused")
+    protected ObservableList<? extends U> getItems() {
+        return tableView.getItems();
+    }
+
+    TableView<U> getTableView() {
         return tableView;
     }
 
@@ -564,14 +569,14 @@ public abstract class UI_CtrlList<T extends MTable> extends UI_Binding<T> {
                 @Override
                 protected Void call() {
 
-                    ObservableList<MBaseData> observableList = FXCollections.observableArrayList();
+                    ObservableList<U> observableList = FXCollections.observableArrayList();
 
                     try {
                         table.tableStatePush();
                         tableFind();
 
                         while (!table.getEof()) {
-                            MBaseData e = table.getData();
+                            U e = table.getData();
                             observableList.add(e);
                             table.next();
                         }

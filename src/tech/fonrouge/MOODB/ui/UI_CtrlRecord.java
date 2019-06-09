@@ -14,11 +14,11 @@ import tech.fonrouge.MOODB.MTable;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
+public abstract class UI_CtrlRecord<T extends MTable, U extends MBaseData<T>> extends UI_Binding<T> {
 
     @SuppressWarnings("WeakerAccess")
     protected Parent parent;
-    private UI_CtrlList<T> ctrlList;
+    private UI_CtrlList<T, U> ctrlList;
 
     protected abstract void initData();
 
@@ -48,7 +48,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_Binding<T> {
         }
     }
 
-    <V extends UI_CtrlList<T>> void setCtrlList(V ctrlList) {
+    <V extends UI_CtrlList<T, U>> void setCtrlList(V ctrlList) {
         this.ctrlList = ctrlList;
         this.table = ctrlList.table;
         this.parent = ctrlList.parent;
