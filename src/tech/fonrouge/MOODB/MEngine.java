@@ -259,6 +259,7 @@ public class MEngine {
      *
      * @return boolean if next is valid document
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean next() {
         if (table.tableState.mongoCursor != null) {
             if (table.tableState.mongoCursor.hasNext()) {
