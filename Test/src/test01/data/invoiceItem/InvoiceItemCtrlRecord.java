@@ -5,7 +5,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import tech.fonrouge.MOODB.ui.UI_CtrlRecord;
 
-public class InvoiceItemCtrlRecord<T extends InvoiceItem> extends UI_CtrlRecord<T> {
+public class InvoiceItemCtrlRecord extends UI_CtrlRecord<InvoiceItem, InvoiceItemData<InvoiceItem>> {
 
     public TextField textField_price;
     @FXML

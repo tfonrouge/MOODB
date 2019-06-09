@@ -6,7 +6,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import tech.fonrouge.MOODB.ui.UI_CtrlRecord;
 
-public class InvoiceCtrlRecord<T extends Invoice> extends UI_CtrlRecord<T> {
+public class InvoiceCtrlRecord extends UI_CtrlRecord<Invoice, InvoiceData<Invoice>> {
 
     public TextField textField_docNumber;
     public TextField textField_date;
