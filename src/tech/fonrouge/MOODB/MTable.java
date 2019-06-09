@@ -161,7 +161,7 @@ abstract public class MTable {
         return null;
     }
 
-    public abstract MBaseData getData();
+    public abstract <U extends MBaseData> U getData();
 
     /**
      * getDatabase

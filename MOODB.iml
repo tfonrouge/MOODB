@@ -7,7 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="org.mongodb:mongo-java-driver:3.8.1" level="project" />
+    <orderEntry type="library" name="org.mongodb:mongo-java-driver" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -17,6 +17,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="com.github.javaparser:javaparser-core-generators:3.5.11" level="project" />
+    <orderEntry type="library" name="com.github.javaparser:javaparser-core-generators" level="project" />
   </component>
 </module>
