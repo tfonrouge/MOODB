@@ -222,7 +222,7 @@ public abstract class MField<T> {
                 invalidCause = "Not Null value required on field";
                 return false;
             }
-            if (fieldType == MTable.FIELD_TYPE.STRING && notEmpty && value() != null && ((String) value()).isEmpty()) {
+            if (fieldType == MTable.FIELD_TYPE.STRING && notEmpty && (value() == null || ((String) value()).isEmpty())) {
                 invalidCause = "Not Empty string value required on field";
                 return false;
             }
