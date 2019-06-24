@@ -18,7 +18,7 @@ class FieldModel {
     boolean calculated;
     boolean newFinal;
     boolean validate;
-    boolean required;
+    boolean notNull;
     boolean autoInc;
     boolean notEmpty;
     private boolean valid = true;
@@ -40,8 +40,8 @@ class FieldModel {
             node1 = node.getAttributes().getNamedItem("validate");
             validate = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
-            node1 = node.getAttributes().getNamedItem("required");
-            required = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
+            node1 = node.getAttributes().getNamedItem("notNull");
+            notNull = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
             node1 = node.getAttributes().getNamedItem("autoInc");
             autoInc = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");

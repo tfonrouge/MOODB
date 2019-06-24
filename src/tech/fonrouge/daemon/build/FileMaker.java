@@ -442,8 +442,8 @@ class FileMaker {
             initializeString += "            onValidate = () -> onValidate_" + fieldModel.fieldName + "();\n";
         }
 
-        if (fieldModel.required) {
-            initializeString += "            required = true;\n";
+        if (fieldModel.notNull) {
+            initializeString += "            notNull = true;\n";
         }
 
         if (fieldModel.description != null) {

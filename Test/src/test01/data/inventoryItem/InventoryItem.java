@@ -13,7 +13,7 @@ public class InventoryItem extends TableBase {
     public final MFieldString field_itemId = new MFieldString(this, "itemId") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "Inventory Item Id";
         }
     };
@@ -22,7 +22,7 @@ public class InventoryItem extends TableBase {
     public final MFieldString field_name = new MFieldString(this, "name") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "name";
         }
     };
@@ -31,7 +31,7 @@ public class InventoryItem extends TableBase {
     public final MFieldString field_uom = new MFieldString(this, "uom") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "Unit of measure";
         }
     };
@@ -48,7 +48,7 @@ public class InventoryItem extends TableBase {
     public final MFieldDouble field_unitPrice = new MFieldDouble(this, "unitPrice") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "Unit price";
         }
     };
@@ -84,7 +84,7 @@ public class InventoryItem extends TableBase {
     public final MFieldBoolean field_taxable = new MFieldBoolean(this, "taxable") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
         }
     };
 

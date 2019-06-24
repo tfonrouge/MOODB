@@ -12,7 +12,7 @@ public class Invoice extends TableBase {
     public final MFieldDate field_date = new MFieldDate(this, "date") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
         }
     };
 
@@ -20,7 +20,7 @@ public class Invoice extends TableBase {
     public final MFieldInteger field_daysOfCredit = new MFieldInteger(this, "daysOfCredit") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
         }
     };
 
@@ -37,7 +37,7 @@ public class Invoice extends TableBase {
     public final MFieldBoolean field_reqShipment = new MFieldBoolean(this, "reqShipment") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
         }
     };
 
@@ -53,7 +53,7 @@ public class Invoice extends TableBase {
         @Override
         protected void initialize() {
             autoInc = true;
-            required = true;
+            notNull = true;
             description = "Invoice number";
         }
     };
@@ -62,7 +62,7 @@ public class Invoice extends TableBase {
     public final MFieldTableField<Customer> field_customer = new MFieldTableField<Customer>(this, "customer") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
         }
 
         @Override

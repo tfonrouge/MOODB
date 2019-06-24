@@ -24,7 +24,7 @@ public abstract class Base extends MTable {
     public final MFieldDate field_fecha = new MFieldDate(this, "fecha") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
         }
     };
 

@@ -13,7 +13,7 @@ public abstract class Entity extends TableBase {
     public final MFieldString field_name = new MFieldString(this, "name") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "Name";
         }
     };
@@ -22,7 +22,7 @@ public abstract class Entity extends TableBase {
     public final MFieldString field_taxId = new MFieldString(this, "taxId") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "Tax payer id";
         }
     };

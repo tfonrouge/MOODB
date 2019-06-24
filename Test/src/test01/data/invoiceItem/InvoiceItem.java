@@ -15,7 +15,7 @@ public class InvoiceItem extends TableBase {
     public final MFieldTableField<Invoice> field_invoice = new MFieldTableField<Invoice>(this, "invoice") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "Invoice";
         }
 
@@ -29,7 +29,7 @@ public class InvoiceItem extends TableBase {
     public final MFieldTableField<InventoryItem> field_invItem = new MFieldTableField<InventoryItem>(this, "invItem") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
         }
 
         @Override
@@ -42,7 +42,7 @@ public class InvoiceItem extends TableBase {
     public final MFieldDouble field_qty = new MFieldDouble(this, "qty") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "Quantity";
         }
     };
@@ -51,7 +51,7 @@ public class InvoiceItem extends TableBase {
     public final MFieldDouble field_unitPrice = new MFieldDouble(this, "unitPrice") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "Unit Price";
         }
     };

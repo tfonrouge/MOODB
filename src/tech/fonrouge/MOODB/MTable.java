@@ -364,11 +364,11 @@ abstract public class MTable {
                     tableState.setFieldValue(mField.index, this.masterSource._id());
                 } else {
                     Object value = mField.getNewValue();
-                    if (mField.fieldType == FIELD_TYPE.DATE && value == null && ((MFieldDate) mField).required) {
+                    if (mField.fieldType == FIELD_TYPE.DATE && value == null && ((MFieldDate) mField).notNull) {
                         value = new Date();
                     }
                     tableState.setFieldValue(mField.index, value);
-                    if (tableState.getFieldValue(mField) == null && (mField.required || mField.autoInc)) {
+                    if (tableState.getFieldValue(mField) == null && (mField.notNull || mField.autoInc)) {
                         tableState.setFieldValue(mField.index, mField.getEmptyValue());
                     }
                 }
@@ -525,7 +525,7 @@ abstract public class MTable {
         fieldList.forEach(mField -> {
             if (!mField.calculated) {
                 Object value = document == null ? null : document.getOrDefault(mField.name, null);
-                if (value == null && mField.required) {
+                if (value == null && mField.notNull) {
                     value = mField.getEmptyValue();
                 }
                 if (mField.fieldType == FIELD_TYPE.TABLE_FIELD) {

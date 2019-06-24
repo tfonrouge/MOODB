@@ -11,7 +11,7 @@ public abstract class Person extends TableBase {
     public final MFieldString field_name = new MFieldString(this, "name") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "Name";
         }
     };
@@ -20,7 +20,7 @@ public abstract class Person extends TableBase {
     public final MFieldString field_firstName = new MFieldString(this, "firstName") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "First name";
         }
     };
@@ -45,7 +45,7 @@ public abstract class Person extends TableBase {
     public final MFieldString field_gender = new MFieldString(this, "gender") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
 
             valueItems = new ValueItems<>();
             valueItems.put("?", "Undetermined");

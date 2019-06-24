@@ -11,7 +11,7 @@ public abstract class MField<T> {
     public final int index;
     public final MTable.FIELD_TYPE fieldType = getFieldType();
     final MTable table;
-    protected boolean required;
+    protected boolean notNull;
     protected boolean notEmpty;
     protected boolean calculated;
     protected boolean newFinal;
@@ -44,7 +44,7 @@ public abstract class MField<T> {
         newFinal = false;
         autoInc = false;
         readOnly = false;
-        required = false;
+        notNull = false;
         notEmpty = false;
         index = table.fieldList.size();
         table.fieldList.add(this);
@@ -218,7 +218,7 @@ public abstract class MField<T> {
     public boolean getValidStatus() {
         invalidCause = null;
         if (!calculated) {
-            if (required && value() == null && !autoInc) {
+            if (notNull && value() == null && !autoInc) {
                 invalidCause = "Not Null value required on field";
                 return false;
             }

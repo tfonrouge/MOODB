@@ -12,7 +12,7 @@ public class User extends Person {
     public final MFieldString field_userId = new MFieldString(this, "userId") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "User Id";
         }
     };
@@ -33,7 +33,7 @@ public class User extends Person {
     public final MFieldString field_password = new MFieldString(this, "password") {
         @Override
         protected void initialize() {
-            required = true;
+            notNull = true;
             description = "User password";
         }
     };
