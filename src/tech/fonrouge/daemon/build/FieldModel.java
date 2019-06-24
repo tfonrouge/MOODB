@@ -34,7 +34,7 @@ class FieldModel {
             node1 = node.getAttributes().getNamedItem("calculated");
             calculated = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
-            node1 = node.getAttributes().getNamedItem("newFinal");
+            node1 = node.getAttributes().getNamedItem("final");
             newFinal = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
             node1 = node.getAttributes().getNamedItem("validate");
