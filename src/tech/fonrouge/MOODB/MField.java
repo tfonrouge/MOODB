@@ -217,13 +217,15 @@ public abstract class MField<T> {
      */
     public boolean getValidStatus() {
         invalidCause = null;
-        if (!calculated && required && value() == null && !autoInc) {
-            invalidCause = "Not Null value required on field";
-            return false;
-        }
-        if (!calculated && fieldType == MTable.FIELD_TYPE.STRING && notEmpty && ((String) value()).isEmpty()) {
-            invalidCause = "Not Empty string value required on field";
-            return false;
+        if (!calculated) {
+            if (required && value() == null && !autoInc) {
+                invalidCause = "Not Null value required on field";
+                return false;
+            }
+            if (fieldType == MTable.FIELD_TYPE.STRING && notEmpty && value() != null && ((String) value()).isEmpty()) {
+                invalidCause = "Not Empty string value required on field";
+                return false;
+            }
         }
         if (onValidate == null) {
             return true;
