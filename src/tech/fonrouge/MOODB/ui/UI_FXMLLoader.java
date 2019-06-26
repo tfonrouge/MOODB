@@ -29,25 +29,9 @@ public class UI_FXMLLoader {
                 setControllerMember(parent, UI_CtrlList.currentCtrlList);
             }
             fxmlLoader.load();
+            UI_CtrlList.currentCtrlList.injectFieldValue(parent);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        String id = parent.getId();
-        if (id != null && !id.isEmpty()) {
-            injectFieldValue(UI_CtrlList.currentCtrlList, parent, id);
-        }
-    }
-
-    private static void injectFieldValue(UI_CtrlList ui_ctrlList, Parent parent, String id) {
-        Class<?> clazz = ui_ctrlList.getClass();
-        while (clazz != UI_CtrlList.class) {
-            for (Field field : clazz.getDeclaredFields()) {
-                if (field.getName().contentEquals(id) && field.getType().isAssignableFrom(parent.getClass())) {
-                    setFieldValue(field, ui_ctrlList, parent);
-                    return;
-                }
-            }
-            clazz = clazz.getSuperclass();
         }
     }
 
@@ -65,13 +49,13 @@ public class UI_FXMLLoader {
         }
     }
 
-    private static void setFieldValue(Field field, Object obj, Object value) {
+    private static void setFieldValue(Field field, Parent parent, UI_CtrlList ui_ctrlList) {
         boolean accesible = field.isAccessible();
         if (!accesible) {
             field.setAccessible(true);
         }
         try {
-            field.set(obj, value);
+            field.set(parent, ui_ctrlList);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } finally {

@@ -29,10 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,28 +97,52 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         return constructor;
     }
 
-    static public void showList(MTable table) {
-        showList(table, null);
+    @SuppressWarnings("unused")
+    static public UI_CtrlList ctrlList(MTable table) {
+        return ctrlList(table, null, null);
+    }
+
+    @SuppressWarnings("unused")
+    static public UI_CtrlList ctrlList(MTable table, String ctrlListFXMLPath) {
+        return ctrlList(table, ctrlListFXMLPath, null);
     }
 
     @SuppressWarnings("WeakerAccess")
-    static public void showList(MTable table, Stage stage) {
+    static public UI_CtrlList ctrlList(MTable table, String ctrlListFXMLPath, Stage stage) {
         UI_CtrlList ui_ctrlList = null;
+        Constructor<?> constructor;
 
-        try {
-            Constructor<?> constructor = getCtorClass(table.getClass());
-            if (constructor != null) {
+        if (ctrlListFXMLPath != null) {
+            String classPrefix = table.getClass().getName().substring(0, table.getClass().getName().lastIndexOf("."));
+            String ctrlName = classPrefix + "." + ctrlListFXMLPath.substring(0, 1).toUpperCase() + ctrlListFXMLPath.substring(1, ctrlListFXMLPath.lastIndexOf("."));
+            try {
+                constructor = Class.forName(ctrlName).getConstructor();
                 ui_ctrlList = (UI_CtrlList) constructor.newInstance();
-                ui_ctrlList.table = table;
+            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ignored) {
+
             }
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
-            UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
+        }
+
+        if (ui_ctrlList == null) {
+            try {
+                constructor = getCtorClass(table.getClass());
+                if (constructor != null) {
+                    ui_ctrlList = (UI_CtrlList) constructor.newInstance();
+                }
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                e.printStackTrace();
+                UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
+            }
         }
 
         if (ui_ctrlList != null) {
 
-            String ctrlListFXMLPath = ui_ctrlList.getCtrlListFXMLPath();
+            ui_ctrlList.table = table;
+
+            if (ctrlListFXMLPath == null) {
+                ctrlListFXMLPath = ui_ctrlList.getCtrlListFXMLPath();
+            }
+
             URL resource = ui_ctrlList.getClass().getResource(ctrlListFXMLPath);
 
             if (resource != null) {
@@ -158,7 +179,8 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                     currentCtrlList = null;
                 }
                 if (parent != null) {
-                    ui_ctrlList.showWindow(stage, parent);
+                    ui_ctrlList.buildStage(stage, parent);
+                    return ui_ctrlList;
                 }
             } else {
                 UI_Message.error("UI_CtrlList Error", "No FXML resource found.", "define FXML resource.");
@@ -166,6 +188,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         } else {
             UI_Message.error("UI_CtrlList Error", "No controller found.", "define controller for table.");
         }
+        return null;
     }
 
     private TableColumn<U, ?> buildColumn(String fieldExpression) {
@@ -260,6 +283,29 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         }
     }
 
+    private void buildStage(Stage stage, Parent parent) {
+
+        initController(parent);
+
+        if (stage == null) {
+            this.stage = new Stage();
+        } else {
+            this.stage = stage;
+        }
+
+        Scene scene = new Scene(parent);
+        this.stage.setScene(scene);
+        this.stage.setTitle(table.getGenres());
+
+        if (tableView != null) {
+            tableView.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    this.stage.hide();
+                }
+            });
+        }
+    }
+
     @SuppressWarnings("WeakerAccess")
     protected T buildTable() {
         return null;
@@ -288,6 +334,12 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                     });
                 }
             });
+        }
+    }
+
+    public void close() {
+        if (stage != null) {
+            stage.hide();
         }
     }
 
@@ -437,6 +489,20 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         return false;
     }
 
+    @SuppressWarnings("unused")
+    protected <V extends Parent> V fxmlLoadBindCtrlList(String url) {
+        V parent = null;
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(url));
+        fxmlLoader.setController(this);
+        try {
+            parent = fxmlLoader.load();
+            injectFieldValue(parent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return parent;
+    }
+
     protected String getCtrlListFXMLPath() {
         return "listView.fxml";
     }
@@ -486,8 +552,30 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         return tableView.getItems();
     }
 
+    public Stage getStage() {
+        return stage;
+    }
+
     TableView<U> getTableView() {
         return tableView;
+    }
+
+    void injectFieldValue(Parent parent) {
+        if (parent != null) {
+            String id = parent.getId();
+            if (id != null && !id.isEmpty()) {
+                Class<?> clazz = getClass();
+                while (clazz != UI_CtrlList.class) {
+                    for (Field field : clazz.getDeclaredFields()) {
+                        if (field.getName().contentEquals(id) && field.getType().isAssignableFrom(parent.getClass())) {
+                            setFieldValue(field, parent);
+                            return;
+                        }
+                    }
+                    clazz = clazz.getSuperclass();
+                }
+            }
+        }
     }
 
     protected void initController(Parent parent) {
@@ -631,29 +719,31 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         this.refreshLapse = refreshLapse;
     }
 
-    private void showWindow(Stage stage, Parent parent) {
-
-        initController(parent);
-
-        if (stage == null) {
-            this.stage = new Stage();
-        } else {
-            this.stage = stage;
+    private void setFieldValue(Field field, Object value) {
+        boolean accesible = field.isAccessible();
+        if (!accesible) {
+            field.setAccessible(true);
         }
-
-        Scene scene = new Scene(parent);
-        this.stage.setScene(scene);
-        this.stage.setTitle(table.getGenres());
-
-        if (tableView != null) {
-            tableView.setOnKeyPressed(event -> {
-                if (event.getCode() == KeyCode.ESCAPE) {
-                    this.stage.hide();
-                }
-            });
+        try {
+            field.set(this, value);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } finally {
+            field.setAccessible(accesible);
         }
+    }
 
-        this.stage.show();
+    public void show() {
+        if (stage != null) {
+            stage.show();
+        }
+    }
+
+    public void showModal() {
+        if (stage != null) {
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        }
     }
 
     @SuppressWarnings("WeakerAccess")
