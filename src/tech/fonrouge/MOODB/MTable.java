@@ -376,6 +376,8 @@ abstract public class MTable {
         });
         tableState.state = STATE.INSERT;
 
+        onAfterInsert();
+
         return true;
     }
 
@@ -384,6 +386,10 @@ abstract public class MTable {
     }
 
     protected void onAfterDelete() {
+
+    }
+
+    protected void onAfterInsert() {
 
     }
 
