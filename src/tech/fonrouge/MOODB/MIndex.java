@@ -126,6 +126,7 @@ public abstract class MIndex {
     private Document getMasterKeyFindExpression() {
 
         Document document = new Document();
+        final boolean[] usingMasterKeyField = {false};
 
         if (masterKeyDocument != null) {
             masterKeyDocument.forEach((key, value) -> {
@@ -134,12 +135,19 @@ public abstract class MIndex {
                 if (mField != null) {
                     if (table.getMasterSourceField() != null && table.getMasterSourceField().equals(mField)) {
                         o = table.getMasterSource()._id();
+                        usingMasterKeyField[0] = true;
                     } else {
                         o = mField.getDefaultValue();
                     }
                 }
                 document.append(key, o);
             });
+        }
+
+        if (table.getMasterSourceField() != null && !usingMasterKeyField[0]) {
+            document.append(table.getMasterSourceField().name, table.getMasterSource()._id());
+            System.out.println("! MIndex: empty masterKeyDocument on table with masterSource");
+            System.out.println("  " + table);
         }
         return document;
     }
