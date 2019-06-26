@@ -19,11 +19,11 @@ public abstract class MField<T> {
     protected String label;
     protected ValueItems<T> valueItems = null;
     protected Callable<T> calcValue = null;
-    protected Callable<Boolean> onValidate = null;
     protected boolean autoInc;
     protected boolean readOnly;
     String name;
     Callable<T> callableNewValue;
+    Callable<Boolean> callableOnValidate;
     Runnable runnableOnAfterChangeValue;
     private String invalidCause = null;
 
@@ -201,6 +201,10 @@ public abstract class MField<T> {
         callableNewValue = callable;
     }
 
+    final public void setCallableOnValidate(Callable<Boolean> callable) {
+        callableOnValidate = callable;
+    }
+
     final public void setRunnableOnAfterChangeValue(Runnable callable) {
         runnableOnAfterChangeValue = callable;
     }
@@ -227,12 +231,12 @@ public abstract class MField<T> {
                 return false;
             }
         }
-        if (onValidate == null) {
+        if (callableOnValidate == null) {
             return true;
         }
         boolean status = false;
         try {
-            status = onValidate.call();
+            status = callableOnValidate.call();
             if (!status) {
                 invalidCause = "invalid status";
             }

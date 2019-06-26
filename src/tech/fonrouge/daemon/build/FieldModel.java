@@ -12,12 +12,12 @@ class FieldModel {
     String label;
     String className;
     String newValue;
+    String onValidate;
     String defaultValue;
     String onAfterChangeValue;
     HashMap<String, String> keyValueItems;
     boolean calculated;
     boolean newFinal;
-    boolean validate;
     boolean notNull;
     boolean autoInc;
     boolean notEmpty;
@@ -36,9 +36,6 @@ class FieldModel {
 
             node1 = node.getAttributes().getNamedItem("final");
             newFinal = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
-
-            node1 = node.getAttributes().getNamedItem("validate");
-            validate = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
 
             node1 = node.getAttributes().getNamedItem("notNull");
             notNull = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
@@ -94,6 +91,13 @@ class FieldModel {
                         NodeList nodeNewValue = node1.getChildNodes();
                         if (nodeNewValue.getLength() > 0) {
                             newValue = nodeNewValue.item(0).getNodeValue();
+                        }
+                    }
+                    /* onValidate */
+                    if (node1.getNodeType() == Node.ELEMENT_NODE && node1.getLocalName().contentEquals("onValidate")) {
+                        NodeList nodeOnValidate = node1.getChildNodes();
+                        if (nodeOnValidate.getLength() > 0) {
+                            onValidate = nodeOnValidate.item(0).getNodeValue();
                         }
                     }
                     /* default value */
