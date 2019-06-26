@@ -17,13 +17,13 @@ public class Controller implements Initializable {
 
     public void onActionInvoices(ActionEvent actionEvent) {
 
-        UI_CtrlList.showList(new Invoice());
+        UI_CtrlList.ctrlList(new Invoice());
 
     }
 
     public void onActionInvoiceItems(ActionEvent actionEvent) {
 
-        UI_CtrlList.showList(new InvoiceItem());
+        UI_CtrlList.ctrlList(new InvoiceItem());
 
     }
 }
