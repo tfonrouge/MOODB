@@ -337,6 +337,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         }
     }
 
+    @SuppressWarnings("unused")
     public void close() {
         if (stage != null) {
             stage.hide();
@@ -552,6 +553,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         return tableView.getItems();
     }
 
+    @SuppressWarnings("unused")
     public Stage getStage() {
         return stage;
     }
@@ -735,13 +737,16 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
     public void show() {
         if (stage != null) {
+            stage.requestFocus();
             stage.show();
         }
     }
 
+    @SuppressWarnings("unused")
     public void showModal() {
         if (stage != null) {
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.requestFocus();
             stage.showAndWait();
         }
     }
