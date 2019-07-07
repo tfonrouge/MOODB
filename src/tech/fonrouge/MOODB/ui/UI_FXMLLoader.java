@@ -29,7 +29,9 @@ public class UI_FXMLLoader {
                 setControllerMember(parent, UI_CtrlList.currentCtrlList);
             }
             fxmlLoader.load();
-            UI_CtrlList.currentCtrlList.injectFieldValue(parent);
+            if (UI_CtrlList.currentCtrlList != null) {
+                UI_CtrlList.currentCtrlList.injectFieldValue(parent);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
