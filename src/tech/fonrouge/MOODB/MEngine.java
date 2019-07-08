@@ -33,52 +33,12 @@ public class MEngine {
         initialize();
     }
 
-    /**
-     * aggregateFind : go to the first document in scope
-     *
-     * @return success on aggregateFind
-     */
-    public boolean aggregateFind() {
-        MIndex mIndex = table.getIndex();
-        if (mIndex == null) {
-            Document masterSourceFilter = buildMasterSourceFilter();
-            if (masterSourceFilter != null) {
-                pipeline = new ArrayList<>();
-                pipeline.add(
-                        new Document().
-                                append("$match", masterSourceFilter));
-            } else {
-                pipeline = new ArrayList<>();
-            }
-        } else {
-            return mIndex.aggregateFind();
-        }
-        return table.setMongoCursor(aggregateFind(pipeline));
-    }
-
-    /**
-     * aggregateFind
-     *
-     * @param documentList bson list for aggregateFind function
-     * @return iterable
-     */
-    public MongoCursor<Document> aggregateFind(List<Document> documentList) {
-        for (int i = 0; i < table.fieldList.size(); i++) {
-            if (table.fieldList.get(i).fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
-                MFieldTableField mFieldTableField = (MFieldTableField) table.fieldList.get(i);
-                if (!mFieldTableField.calculated && mFieldTableField.isLookupDocument()) {
-                    documentList.addAll(getLookupStage(mFieldTableField.name));
-                }
-            }
-        }
-        return collection.aggregate(documentList).iterator();
-    }
-
     private Document buildMasterSourceFilter() {
         final Document[] document = {null};
         if (table.getMasterSource() != null) {
             document[0] = new Document(table.getMasterSourceField().name, table.getMasterSource()._id());
         }
+        /* TODO: remove field filters structure and use field default values */
         table.setFieldFilters();
         table.fieldList.forEach(mField -> {
             if (!mField.isCalculated() && mField.getFieldState().filterValue != null) {
@@ -128,6 +88,47 @@ public class MEngine {
         session.commitTransaction();
         session.close();
         return result;
+    }
+
+    /**
+     * find : go to the first document in scope
+     *
+     * @return success on find
+     */
+    public boolean find() {
+        MIndex mIndex = table.getIndex();
+        if (mIndex == null) {
+            Document masterSourceFilter = buildMasterSourceFilter();
+            if (masterSourceFilter != null) {
+                pipeline = new ArrayList<>();
+                pipeline.add(
+                        new Document().
+                                append("$match", masterSourceFilter));
+            } else {
+                pipeline = new ArrayList<>();
+            }
+        } else {
+            return mIndex.find();
+        }
+        return table.setMongoCursor(find(pipeline));
+    }
+
+    /**
+     * find
+     *
+     * @param documentList bson list for find function
+     * @return iterable
+     */
+    public MongoCursor<Document> find(List<Document> documentList) {
+        for (int i = 0; i < table.fieldList.size(); i++) {
+            if (table.fieldList.get(i).fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
+                MFieldTableField mFieldTableField = (MFieldTableField) table.fieldList.get(i);
+                if (!mFieldTableField.calculated && mFieldTableField.isLookupDocument()) {
+                    documentList.addAll(getLookupStage(mFieldTableField.name));
+                }
+            }
+        }
+        return collection.aggregate(documentList).iterator();
     }
 
     private List<Document> getLookupStage(String fieldName) {
@@ -207,7 +208,7 @@ public class MEngine {
         pipeline.add(
                 new Document().
                         append("$limit", 1));
-        return table.setMongoCursor(aggregateFind(pipeline));
+        return table.setMongoCursor(find(pipeline));
     }
 
     public void initialize() {

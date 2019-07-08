@@ -52,6 +52,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     private int refreshLapse = 3;
     private boolean populatingList = false;
     private Timeline refreshTimer;
+    private Runnable listFindMethod = () -> table.find();
 
     private static boolean fxmlHasFXController(URL fxmlPath) {
         InputStream inputStream = null;
@@ -485,7 +486,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     public boolean findSelectedDocument() {
         U item = tableView.getSelectionModel().getSelectedItem();
         if (item != null) {
-            return table.field__id.aggregateFind(item.get_id());
+            return table.field__id.find(item.get_id());
         }
         return false;
     }
@@ -663,7 +664,8 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
                     try {
                         table.tableStatePush();
-                        tableFind();
+
+                        listFindMethod.run();
 
                         while (!table.getEof()) {
                             U e = table.getData();
@@ -751,8 +753,13 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
-    protected void tableFind() {
-        table.aggregateFind();
+    @SuppressWarnings("unused")
+    public Runnable getListFindMethod() {
+        return listFindMethod;
+    }
+
+    @SuppressWarnings("unused")
+    public void setListFindMethod(Runnable listFindMethod) {
+        this.listFindMethod = listFindMethod;
     }
 }

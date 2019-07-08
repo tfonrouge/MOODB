@@ -98,7 +98,7 @@ public class MainCtrl {
     private void populateList() {
         Inventario inventario = new Inventario();
 
-        inventario.aggregateFind();
+        inventario.find();
 
         while (!inventario.getEof()) {
             InventarioData data = inventario.getData();

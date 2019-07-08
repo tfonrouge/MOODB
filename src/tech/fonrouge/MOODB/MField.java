@@ -55,6 +55,34 @@ public abstract class MField<T> {
         initialize();
     }
 
+    public boolean find() {
+        ArrayList<Document> pipeline = new ArrayList<>();
+        pipeline.add(
+                new Document().
+                        append("$sort", new Document().
+                                append(name, 1))
+        );
+        return table.setMongoCursor(table.engine.find(pipeline));
+    }
+
+    /**
+     * find
+     *
+     * @param keyValue
+     * @return
+     */
+    public boolean find(Object keyValue) {
+        ArrayList<Document> pipeline = new ArrayList<>();
+        pipeline.add(
+                new Document().
+                        append("$match", new Document().
+                                append(name, keyValue)));
+        pipeline.add(
+                new Document().
+                        append("$limit", 1));
+        return table.setMongoCursor(table.engine.find(pipeline));
+    }
+
     public MTable getTable() {
         return table;
     }
@@ -64,34 +92,6 @@ public abstract class MField<T> {
      */
     protected void initialize() {
 
-    }
-
-    public boolean aggregateFind() {
-        ArrayList<Document> pipeline = new ArrayList<>();
-        pipeline.add(
-                new Document().
-                        append("$sort", new Document().
-                                append(name, 1))
-        );
-        return table.setMongoCursor(table.engine.aggregateFind(pipeline));
-    }
-
-    /**
-     * aggregateFind
-     *
-     * @param keyValue
-     * @return
-     */
-    public boolean aggregateFind(Object keyValue) {
-        ArrayList<Document> pipeline = new ArrayList<>();
-        pipeline.add(
-                new Document().
-                        append("$match", new Document().
-                                append(name, keyValue)));
-        pipeline.add(
-                new Document().
-                        append("$limit", 1));
-        return table.setMongoCursor(table.engine.aggregateFind(pipeline));
     }
 
     public abstract T getAsValue(Object anyValue);
@@ -164,7 +164,7 @@ public abstract class MField<T> {
                 new Document().
                         append("$project", new Document().
                                 append("folio", 1)));
-        MongoCursor<Document> mongoCursor = table.engine.aggregateFind(pipeline);
+        MongoCursor<Document> mongoCursor = table.engine.find(pipeline);
         if (mongoCursor.hasNext()) {
             Document d = mongoCursor.next();
             value = d.get(name, getEmptyValue());

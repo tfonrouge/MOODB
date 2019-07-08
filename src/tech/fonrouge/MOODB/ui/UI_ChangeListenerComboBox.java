@@ -28,7 +28,7 @@ class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T, ComboBox<T>> {
             MTable mTable = mField.getTable().getLinkedField().linkedTable();
             mTable.tableStatePush();
 
-            if (mField != null && mTable.aggregateFind()) {
+            if (mField != null && mTable.find()) {
                 while (!mTable.getEof()) {
                     T value = mField.value();
                     observableList.add(value);

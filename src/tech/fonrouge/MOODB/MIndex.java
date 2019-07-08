@@ -38,19 +38,6 @@ public abstract class MIndex {
         buildIndex();
     }
 
-    public boolean aggregateFind(Object... objects) {
-        Document document = getMasterKeyFindExpression();
-        getKeyFieldFindExpression(document, objects);
-        ArrayList<Document> pipeline = new ArrayList<>();
-        if (document.size() > 0) {
-            pipeline.add(new Document().append("$match", document));
-        }
-        if (keyDocument != null && keyDocument.size() > 0) {
-            pipeline.add(new Document().append("$sort", keyDocument));
-        }
-        return table.setMongoCursor(table.engine.aggregateFind(pipeline));
-    }
-
     void buildIndex() {
         IndexOptions indexOptions;
 
@@ -87,6 +74,19 @@ public abstract class MIndex {
         if (buildIndex[0]) {
             table.engine.collection.createIndex(doc, indexOptions);
         }
+    }
+
+    public boolean find(Object... objects) {
+        Document document = getMasterKeyFindExpression();
+        getKeyFieldFindExpression(document, objects);
+        ArrayList<Document> pipeline = new ArrayList<>();
+        if (document.size() > 0) {
+            pipeline.add(new Document().append("$match", document));
+        }
+        if (keyDocument != null && keyDocument.size() > 0) {
+            pipeline.add(new Document().append("$sort", keyDocument));
+        }
+        return table.setMongoCursor(table.engine.find(pipeline));
     }
 
     private Document getDocumentField(String s) {

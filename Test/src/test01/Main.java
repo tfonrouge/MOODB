@@ -38,12 +38,12 @@ public class Main extends Application {
         Invoice invoice = new Invoice();
         InvoiceItem_xInvoice invoiceItemXInvoice = new InvoiceItem_xInvoice(invoice);
 
-        if (invoice.aggregateFind()) {
+        if (invoice.find()) {
             while (!invoice.getEof()) {
                 System.out.println("Invoice #" + invoice.field_docNumber.value());
                 System.out.println("    Customer: " + invoice.field_customer.syncedTable().field_name.value());
                 System.out.println("        DATE: " + invoice.field_date.value());
-                if (invoiceItemXInvoice.aggregateFind()) {
+                if (invoiceItemXInvoice.find()) {
                     int row = 0;
                     while (!invoiceItemXInvoice.getEof()) {
                         System.out.println("    * #" +
@@ -199,7 +199,7 @@ public class Main extends Application {
         User user = new User();
         Customer customer = new Customer();
 
-        if (!user.field_name.aggregateFind("Teo")) {
+        if (!user.field_name.find("Teo")) {
             createUser(user);
         }
 
@@ -220,7 +220,7 @@ public class Main extends Application {
             createInventory(inventoryItem);
         }
 
-        if (!customer.aggregateFind()) {
+        if (!customer.find()) {
             System.out.println("Error, no customer found.");
             return;
         }
@@ -234,7 +234,7 @@ public class Main extends Application {
 
         Invoice invoice = new Invoice();
 
-        inventoryItem.field_name.aggregateFind();
+        inventoryItem.field_name.find();
 
         String[] strings = {"Mouse", "Keyboard", "Monitor", "Motherboard", "UTP Cable", "Intel CPU"};
 
@@ -248,7 +248,7 @@ public class Main extends Application {
                         InvoiceItem_xInvoice invoiceItem = new InvoiceItem_xInvoice(invoice);
                         for (int j = 0; j < 3; j++) {
                             if (invoiceItem.insert()) {
-                                inventoryItem.field_name.aggregateFind(strings[random.nextInt(strings.length)]);
+                                inventoryItem.field_name.find(strings[random.nextInt(strings.length)]);
                                 invoiceItem.field_invItem.setValue(inventoryItem);
                                 invoiceItem.field_qty.setValue((double) (random.nextInt(10) + 1));
                                 invoiceItem.field_unitPrice.setValue(inventoryItem.field_unitPrice.value());

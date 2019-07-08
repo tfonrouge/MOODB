@@ -49,8 +49,9 @@ abstract public class MTable {
         return field__id.getTypedValue();
     }
 
-    public boolean aggregateFind() {
-        return engine.aggregateFind();
+    @SuppressWarnings("unused")
+    public boolean aggregate(List<Document> documentList) {
+        return setMongoCursor(engine.collection.aggregate(documentList).iterator());
     }
 
     /**
@@ -143,6 +144,10 @@ abstract public class MTable {
             }
         }
         return null;
+    }
+
+    public boolean find() {
+        return engine.find();
     }
 
     @SuppressWarnings("unused")
@@ -668,5 +673,4 @@ abstract public class MTable {
         EDIT,
         INSERT
     }
-
 }
