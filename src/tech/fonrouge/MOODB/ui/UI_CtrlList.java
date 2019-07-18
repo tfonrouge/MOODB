@@ -40,7 +40,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
     @SuppressWarnings("WeakerAccess")
     public static UI_CtrlList currentCtrlList = null;
-    static Method autosizeColumnMethod = null;
+    private static Method autosizeColumnMethod = null;
     private static int numTimers = 0;
     @SuppressWarnings("unused")
     @FXML
@@ -766,6 +766,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         this.listFindMethod = listFindMethod;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void autosizeColumns() {
         if (autosizeColumnMethod == null) {
             try {
@@ -781,7 +782,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                     if (autosizeColumnMethod != null) {
                         autosizeColumnMethod.invoke(tableView.getSkin(), column, -1);
                     }
-                } catch (IllegalAccessException | InvocationTargetException e) {
+                } catch (IllegalAccessException | InvocationTargetException | NullPointerException e) {
                     e.printStackTrace();
                 }
             }
