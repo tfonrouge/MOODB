@@ -3,6 +3,9 @@ package tech.fonrouge.MOODB;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
 
     /**
@@ -37,12 +40,38 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
     }
 
     private T initializeTableField() {
-        T t = buildTableField();
-        t.setLinkedField(this);
+        T t = null;
+        Class<?> clazz = getTableClass();
+        try {
+            Constructor<?> ctor = clazz.getDeclaredConstructors()[0];
+            if (ctor.getParameterCount() == 0) {
+                t = (T) ctor.newInstance();
+            } else if (table.getMasterSource() != null) {
+                Class<?> clazzParam = ctor.getParameterTypes()[0];
+                MFieldTableField mFieldTableField = null;
+                for (MField mField : table.getMasterSource().fieldList) {
+                    if (mFieldTableField == null &&
+                            mField.fieldType == MTable.FIELD_TYPE.TABLE_FIELD &&
+                            clazzParam.isAssignableFrom(((MFieldTableField) mField).getTableClass())) {
+                        mFieldTableField = (MFieldTableField) mField;
+                    }
+                }
+                if (mFieldTableField != null) {
+                    Object a = null;
+                    ctor.newInstance(a);
+                    t = (T) ctor.newInstance(mFieldTableField.linkedTable());
+                }
+            }
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        if (t != null) {
+            t.setLinkedField(this);
+        }
         return t;
     }
 
-    protected abstract T buildTableField();
+    protected abstract Class<T> getTableClass();
 
     @Override
     public ObjectId getEmptyValue() {

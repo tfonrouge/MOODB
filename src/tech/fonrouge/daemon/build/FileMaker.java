@@ -482,11 +482,11 @@ class FileMaker {
                     append("\n").
                     append("        @Override\n").
                     append("        protected ").
+                    append("Class<" + fieldModel.className + ">").
+                    append(" getTableClass() {\n").
+                    append("            return ").
                     append(fieldModel.className).
-                    append(" buildTableField() {\n").
-                    append("            return new ").
-                    append(fieldModel.className).
-                    append("();\n").
+                    append(".class;\n").
                     append("        }\n");
         }
 

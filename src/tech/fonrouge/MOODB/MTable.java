@@ -32,6 +32,7 @@ abstract public class MTable {
     private MFieldTableField masterSourceField;
     private Callable<Boolean> onValidateFields;
     private MIndex index;
+    private boolean postResult;
 
     public MTable() {
         initialize();
@@ -40,6 +41,10 @@ abstract public class MTable {
     public MTable(MTable masterSource) {
         this.masterSource = masterSource;
         initialize();
+    }
+
+    public boolean isPostResult() {
+        return postResult;
     }
 
     /**
@@ -197,6 +202,11 @@ abstract public class MTable {
      */
     public Exception getException() {
         return tableState.exception;
+    }
+
+    @SuppressWarnings("unused")
+    public void setException(Exception e) {
+        tableState.exception = e;
     }
 
     /**
@@ -432,11 +442,18 @@ abstract public class MTable {
      */
     public boolean post() {
 
+        postResult = false;
+
         if (tableState.state == STATE.NORMAL) {
             throw new RuntimeException("Table Not in EDIT/INSERT State.");
         }
 
         tableState.exception = null;
+
+        if (!onValidate()) {
+            tableState.exception = new RuntimeException("onValidate() not true.");
+            return false;
+        }
 
         HashMap<String, String> invalidFieldList = getInvalidFieldList();
         if (invalidFieldList.size() > 0) {
@@ -451,7 +468,6 @@ abstract public class MTable {
         List<MFieldTableField> refList = new ArrayList<>();
 
         if (onBeforePost()) {
-            boolean result;
             switch (tableState.state) {
                 case EDIT:
                     fieldList.forEach(mField -> {
@@ -462,7 +478,7 @@ abstract public class MTable {
                             document.put(mField.getName(), mField.value());
                         }
                     });
-                    result = document.size() == 0 || engine.update(document);
+                    postResult = document.size() == 0 || engine.update(document);
                     break;
                 case INSERT:
                     fieldList.forEach(mField -> {
@@ -477,12 +493,12 @@ abstract public class MTable {
                             }
                         }
                     });
-                    result = engine.insert(document);
+                    postResult = engine.insert(document);
                     break;
                 default:
-                    result = false;
+                    postResult = false;
             }
-            if (!result) {
+            if (!postResult) {
                 return false;
             }
         }
@@ -523,6 +539,10 @@ abstract public class MTable {
      * @return
      */
     protected boolean onBeforePost() {
+        return true;
+    }
+
+    public boolean onValidate() {
         return true;
     }
 

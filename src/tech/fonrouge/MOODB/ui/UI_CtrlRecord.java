@@ -31,6 +31,12 @@ public abstract class UI_CtrlRecord<T extends MTable, U extends MBaseData<T>> ex
         int focusedIndex = tableView.getSelectionModel().getFocusedIndex();
         int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
         if (state != MTable.STATE.NORMAL) {
+            if (!table.onValidate()) {
+                Exception e = table.getException();
+                String errMsg = e != null ? e.toString() : "unknown error.";
+                new Alert(Alert.AlertType.WARNING, "Not valid state in onValidate(): " + errMsg).showAndWait();
+                return;
+            }
             if (!testValidFields()) {
                 return;
             }

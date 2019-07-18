@@ -1,5 +1,6 @@
 package tech.fonrouge.MOODB.ui;
 
+import com.sun.javafx.scene.control.skin.TableViewSkin;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -39,6 +40,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
     @SuppressWarnings("WeakerAccess")
     public static UI_CtrlList currentCtrlList = null;
+    static Method autosizeColumnMethod = null;
     private static int numTimers = 0;
     @SuppressWarnings("unused")
     @FXML
@@ -472,7 +474,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                     }
                 });
 
-                stage.show();
+                stage.showAndWait();
             }
         } else {
             if (table.getState() != MTable.STATE.NORMAL) {
@@ -686,6 +688,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                             refreshTimer.play();
                         }
                         populatingList = false;
+                        autosizeColumns();
                         onAfterPopulateList();
                     });
                     return null;
@@ -761,5 +764,27 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     @SuppressWarnings("unused")
     public void setListFindMethod(Runnable listFindMethod) {
         this.listFindMethod = listFindMethod;
+    }
+
+    public void autosizeColumns() {
+        if (autosizeColumnMethod == null) {
+            try {
+                autosizeColumnMethod = TableViewSkin.class.getDeclaredMethod("resizeColumnToFitContent", TableColumn.class, int.class);
+                autosizeColumnMethod.setAccessible(true);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+        if (autosizeColumnMethod != null) {
+            for (TableColumn<U, ?> column : tableView.getColumns()) {
+                try {
+                    if (autosizeColumnMethod != null) {
+                        autosizeColumnMethod.invoke(tableView.getSkin(), column, -1);
+                    }
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
