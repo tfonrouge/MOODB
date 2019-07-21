@@ -126,6 +126,8 @@ abstract public class MTable {
 
         tableState.state = STATE.EDIT;
 
+        onAfterEdit();
+
         return true;
     }
 
@@ -401,6 +403,10 @@ abstract public class MTable {
     }
 
     protected void onAfterDelete() {
+
+    }
+
+    protected void onAfterEdit() {
 
     }
 
