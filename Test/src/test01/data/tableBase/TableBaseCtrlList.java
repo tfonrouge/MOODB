@@ -31,8 +31,9 @@ public abstract class TableBaseCtrlList<T extends TableBase, U extends TableBase
     }
 
     @Override
-    protected void initController(Parent parent) {
-        super.initController(parent);
+    protected void initController() {
+
+        super.initController();
 
         menuItem_close.setAccelerator(new KeyCodeCombination(KeyCode.ESCAPE));
         menuItem_insert.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));

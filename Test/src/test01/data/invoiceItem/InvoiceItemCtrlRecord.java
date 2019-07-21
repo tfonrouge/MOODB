@@ -14,11 +14,6 @@ public class InvoiceItemCtrlRecord extends UI_CtrlRecord<InvoiceItem> {
     private TextField spinner_qty;
 
     @Override
-    protected void initData() {
-
-    }
-
-    @Override
     protected String getCtrlFXMLPath() {
         return "/test01/data/invoiceItem/record.fxml";
     }

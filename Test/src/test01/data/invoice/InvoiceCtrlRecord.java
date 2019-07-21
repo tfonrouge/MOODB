@@ -17,11 +17,6 @@ public class InvoiceCtrlRecord extends UI_CtrlRecord<Invoice> {
     public TextField textField_customer_address;
 
     @Override
-    protected void initData() {
-
-    }
-
-    @Override
     protected String getCtrlFXMLPath() {
         return "/test01/data/invoice/record.fxml";
     }

@@ -12,11 +12,6 @@ public class InvoiceItem_xInvoiceCtrlRecord extends UI_CtrlRecord<InvoiceItem_xI
     public TextField textField_unitPrice;
 
     @Override
-    protected void initData() {
-
-    }
-
-    @Override
     protected String getCtrlFXMLPath() {
         return null;
     }
