@@ -11,9 +11,4 @@ public class InvoiceItemCtrlList extends TableBaseCtrlList<InvoiceItem, InvoiceI
     protected String[] getFieldColumnList() {
         return new String[]{"rowNumber", "invoice.docNumber", "invoice.customer", "invItem.name", "qty", "unitPrice"};
     }
-
-    @Override
-    protected String getCtrlRecordFXMLPath() {
-        return "/test01/data/invoiceItem/record.fxml";
-    }
 }

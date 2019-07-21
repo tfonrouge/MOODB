@@ -15,11 +15,6 @@ public class InvoiceItem_xInvoiceCtrlList<T extends InvoiceItem_xInvoice> extend
         return new String[]{"rowNumber", "invoice.customer", "invItem.name", "qty", "unitPrice"};
     }
 
-    @Override
-    protected String getCtrlRecordFXMLPath() {
-        return "/test01/data/invoiceItem/xInvoice/record.fxml";
-    }
-
     @FXML
     public void onActionButton(ActionEvent actionEvent) {
         Button o = (Button) actionEvent.getSource();

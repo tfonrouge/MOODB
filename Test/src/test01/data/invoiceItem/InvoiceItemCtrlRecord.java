@@ -5,7 +5,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import tech.fonrouge.MOODB.ui.UI_CtrlRecord;
 
-public class InvoiceItemCtrlRecord extends UI_CtrlRecord<InvoiceItem, InvoiceItemData<InvoiceItem>> {
+public class InvoiceItemCtrlRecord extends UI_CtrlRecord<InvoiceItem> {
 
     public TextField textField_price;
     @FXML
@@ -16,5 +16,10 @@ public class InvoiceItemCtrlRecord extends UI_CtrlRecord<InvoiceItem, InvoiceIte
     @Override
     protected void initData() {
 
+    }
+
+    @Override
+    protected String getCtrlFXMLPath() {
+        return "/test01/data/invoiceItem/record.fxml";
     }
 }

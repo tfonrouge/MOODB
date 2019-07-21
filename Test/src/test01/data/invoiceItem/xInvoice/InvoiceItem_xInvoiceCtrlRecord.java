@@ -4,7 +4,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import tech.fonrouge.MOODB.ui.UI_CtrlRecord;
 
-public class InvoiceItem_xInvoiceCtrlRecord extends UI_CtrlRecord<InvoiceItem_xInvoice, InvoiceItem_xInvoiceData<InvoiceItem_xInvoice>> {
+public class InvoiceItem_xInvoiceCtrlRecord extends UI_CtrlRecord<InvoiceItem_xInvoice> {
 
     public TextField textField_invoice_docNumber;
     public ComboBox<Object> comboBox_invItem_name;
@@ -14,5 +14,10 @@ public class InvoiceItem_xInvoiceCtrlRecord extends UI_CtrlRecord<InvoiceItem_xI
     @Override
     protected void initData() {
 
+    }
+
+    @Override
+    protected String getCtrlFXMLPath() {
+        return null;
     }
 }

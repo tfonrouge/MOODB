@@ -26,7 +26,7 @@ public abstract class TableBaseCtrlList<T extends TableBase, U extends TableBase
     private MenuItem menuItem_delete;
 
     @Override
-    protected String getCtrlListFXMLPath() {
+    protected String getCtrlFXMLPath() {
         return "/test01/ui/baseList.fxml";
     }
 
