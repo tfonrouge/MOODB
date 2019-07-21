@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -237,6 +238,23 @@ class FileMaker {
         for (IndexModel indexModel : indexModels) {
 
             StringBuilder builder = new StringBuilder();
+            String locale;
+            String strength;
+
+            if (indexModel.getLocale() == null) {
+                locale = "null";
+            } else {
+                locale = "\"" + indexModel.getLocale() + "\"";
+            }
+
+            if (indexModel.getStrength() == null) {
+                strength = "null";
+            } else {
+                strength = String.valueOf(indexModel.getStrength());
+                if (indexModel.getLocale() == null) {
+                    locale = Locale.getDefault().getLanguage();
+                }
+            }
             builder.
                     append("new MIndex(").
                     append("this, \"").
@@ -249,6 +267,10 @@ class FileMaker {
                     append(indexModel.isUnique()).
                     append(", ").
                     append(indexModel.isSparse()).
+                    append(", ").
+                    append(locale).
+                    append(", ").
+                    append(strength).
                     append(") {\n").
                     append("        @Override\n").
                     append("        protected void initialize() {\n");

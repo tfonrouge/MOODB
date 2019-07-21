@@ -108,6 +108,8 @@
         <xs:attribute name="partialFilter" type="xs:string"/>
         <xs:attribute name="unique" type="xs:boolean"/>
         <xs:attribute name="sparse" type="xs:boolean"/>
+        <xs:attribute name="locale" type="xs:string"/>
+        <xs:attribute name="strength" type="xs:integer"/>
     </xs:complexType>
     <xs:complexType name="FieldFilterType">
         <xs:simpleContent>

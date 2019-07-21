@@ -12,6 +12,8 @@ public class IndexModel {
     private String masterKeyField;
     private boolean unique;
     private boolean sparse;
+    private String locale;
+    private Integer strength;
     private ArrayList<IndexFieldItem> indexFieldItems = new ArrayList<>();
 
     IndexModel(Node node) {
@@ -33,6 +35,12 @@ public class IndexModel {
 
         node1 = nodeMap.getNamedItem("sparse");
         sparse = node1 != null && node1.getNodeValue().equalsIgnoreCase("true");
+
+        node1 = nodeMap.getNamedItem("locale");
+        locale = node1 == null ? null : node1.getNodeValue();
+
+        node1 = nodeMap.getNamedItem("strength");
+        strength = node1 == null ? null : Integer.valueOf(node1.getNodeValue());
 
         NodeList nodeList = node.getChildNodes();
 
@@ -88,6 +96,14 @@ public class IndexModel {
 
     public boolean isSparse() {
         return sparse;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public Integer getStrength() {
+        return strength;
     }
 
     class IndexFieldItem {

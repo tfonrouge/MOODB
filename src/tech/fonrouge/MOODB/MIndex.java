@@ -1,6 +1,8 @@
 package tech.fonrouge.MOODB;
 
 import com.mongodb.client.ListIndexesIterable;
+import com.mongodb.client.model.Collation;
+import com.mongodb.client.model.CollationStrength;
 import com.mongodb.client.model.IndexOptions;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -13,15 +15,19 @@ public abstract class MIndex {
     private String name;
     private boolean unique;
     private boolean sparse;
+    private String locale;
+    private Integer strength;
     private MTable table;
     private Document masterKeyDocument;
     private Document keyDocument;
 
-    public MIndex(MTable table, String name, String masterKeyField, String keyField, boolean unique, boolean sparse) {
+    public MIndex(MTable table, String name, String masterKeyField, String keyField, boolean unique, boolean sparse, String locale, Integer strength) {
         this.table = table;
         this.name = name;
         this.unique = unique;
         this.sparse = sparse;
+        this.locale = locale;
+        this.strength = strength;
 
         masterKeyDocument = getDocumentField(masterKeyField);
         keyDocument = getDocumentField(keyField);
@@ -58,6 +64,15 @@ public abstract class MIndex {
 
         indexOptions.sparse(sparse);
 
+        if (locale != null) {
+            Collation.Builder builder = Collation.builder().locale(locale);
+            if (strength != null) {
+                builder.collationStrength(CollationStrength.fromInt(strength));
+            }
+            Collation collation = builder.build();
+            indexOptions.collation(collation);
+        }
+
         if (partialFilter != null) {
             indexOptions.partialFilterExpression(partialFilter);
         }
@@ -76,6 +91,7 @@ public abstract class MIndex {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public boolean find(Object... objects) {
         Document document = getMasterKeyFindExpression();
         getKeyFieldFindExpression(document, objects);
