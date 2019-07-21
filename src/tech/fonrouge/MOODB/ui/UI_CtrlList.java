@@ -24,19 +24,14 @@ import javafx.util.Duration;
 import org.bson.Document;
 import tech.fonrouge.MOODB.*;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.*;
-import java.net.URL;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
-public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> extends UI_Binding<T> {
+public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> extends UI_CtrlBase<T> {
 
     @SuppressWarnings("WeakerAccess")
     public static UI_CtrlList currentCtrlList = null;
@@ -46,8 +41,6 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     @FXML
     protected TableView<U> tableView;
     protected Stage stage;
-    @SuppressWarnings("WeakerAccess")
-    protected Parent parent;
     /**
      * refresh lapse for tableView in seconds
      */
@@ -55,50 +48,6 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     private boolean populatingList = false;
     private Timeline refreshTimer;
     private Runnable listFindMethod = () -> table.find();
-
-    private static boolean fxmlHasFXController(URL fxmlPath) {
-        InputStream inputStream = null;
-        try {
-            inputStream = fxmlPath.openStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-            UI_Message.error("UI_CtrlList Error", "FXML URL not valid.", e.toString());
-        }
-        if (inputStream != null) {
-            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-            try {
-                XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(inputStream);
-                while (xmlStreamReader.hasNext()) {
-                    int next = xmlStreamReader.next();
-                    if (next == XMLStreamConstants.START_ELEMENT) {
-                        return xmlStreamReader.getAttributeValue(xmlStreamReader.getNamespaceURI("fx"), "controller") != null;
-                    }
-                }
-            } catch (XMLStreamException e) {
-                e.printStackTrace();
-                UI_Message.error("UI_CtrlList Error", "FXML not valid.", e.toString());
-            }
-        }
-        return false;
-    }
-
-    static private Constructor<?> getCtorClass(Class<?> tableClass) {
-        Constructor<?> constructor;
-        String className;
-
-        if (tableClass.equals(MTable.class)) {
-            return null;
-        }
-
-        className = tableClass.getName() + "CtrlList";
-
-        try {
-            constructor = Class.forName(className).getConstructor();
-        } catch (ClassNotFoundException | NoSuchMethodException e) {
-            return getCtorClass(tableClass.getSuperclass());
-        }
-        return constructor;
-    }
 
     @SuppressWarnings("unused")
     static public UI_CtrlList ctrlList(MTable table) {
@@ -112,85 +61,48 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
     @SuppressWarnings("WeakerAccess")
     static public UI_CtrlList ctrlList(MTable table, String ctrlListFXMLPath, Stage stage) {
-        UI_CtrlList ui_ctrlList = null;
-        Constructor<?> constructor;
 
-        if (ctrlListFXMLPath != null) {
-            String classPrefix = table.getClass().getName().substring(0, table.getClass().getName().lastIndexOf("."));
-            String ctrlName = classPrefix + "." + ctrlListFXMLPath.substring(0, 1).toUpperCase() + ctrlListFXMLPath.substring(1, ctrlListFXMLPath.lastIndexOf("."));
-            try {
-                constructor = Class.forName(ctrlName).getConstructor();
-                ui_ctrlList = (UI_CtrlList) constructor.newInstance();
-            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ignored) {
-
-            }
-        }
-
-        if (ui_ctrlList == null) {
-            try {
-                constructor = getCtorClass(table.getClass());
-                if (constructor != null) {
-                    ui_ctrlList = (UI_CtrlList) constructor.newInstance();
-                }
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                e.printStackTrace();
-                UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
-            }
-        }
+        UI_CtrlList ui_ctrlList = (UI_CtrlList) UI_CtrlList.getUIController(table, ctrlListFXMLPath, "CtrlList");
 
         if (ui_ctrlList != null) {
 
-            ui_ctrlList.table = table;
+            Class<?> uiCtrlListClass = ui_ctrlList.getClass();
 
-            if (ctrlListFXMLPath == null) {
-                ctrlListFXMLPath = ui_ctrlList.getCtrlListFXMLPath();
-            }
-
-            URL resource = ui_ctrlList.getClass().getResource(ctrlListFXMLPath);
-
-            if (resource != null) {
-                boolean hasController = fxmlHasFXController(resource);
-                FXMLLoader fxmlLoader = new FXMLLoader(resource);
-                Class<?> uiCtrlListClass = ui_ctrlList.getClass();
-
-                UI_CtrlList finalUi_ctrlList = ui_ctrlList;
-                fxmlLoader.setControllerFactory(param -> {
-                    try {
-                        if (param.isAssignableFrom(uiCtrlListClass)) {
-                            return finalUi_ctrlList;
-                        }
-                        return param.newInstance();
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
-                        UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
-                    }
-                    return null;
-                });
-
-                if (!hasController) {
-                    fxmlLoader.setController(ui_ctrlList);
-                }
-
-                Parent parent = null;
+            UI_CtrlList finalUi_ctrlList = ui_ctrlList;
+            ui_ctrlList.fxmlLoader.setControllerFactory(param -> {
                 try {
-                    currentCtrlList = ui_ctrlList;
-                    parent = fxmlLoader.load();
-                } catch (Throwable e) {
+                    if (param.isAssignableFrom(uiCtrlListClass)) {
+                        return finalUi_ctrlList;
+                    }
+                    return param.newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                     UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
-                } finally {
-                    currentCtrlList = null;
                 }
-                if (parent != null) {
-                    ui_ctrlList.buildStage(stage, parent);
-                    return ui_ctrlList;
-                }
+                return null;
+            });
+
+            if (ui_ctrlList.fxmlHasController) {
+                ui_ctrlList = (UI_CtrlList) ui_ctrlList.getFXMLLoaderController();
             } else {
-                UI_Message.error("UI_CtrlList Error", "No FXML resource found.", "define FXML resource.");
+                ui_ctrlList.fxmlLoader.setController(ui_ctrlList);
             }
-        } else {
-            UI_Message.error("UI_CtrlList Error", "No controller found.", "define controller for table.");
+
+            try {
+                currentCtrlList = ui_ctrlList;
+                ui_ctrlList.parent = ui_ctrlList.fxmlLoader.load();
+            } catch (Throwable e) {
+                e.printStackTrace();
+                UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
+            } finally {
+                currentCtrlList = null;
+            }
+            if (ui_ctrlList.parent != null) {
+                ui_ctrlList.buildStage(stage);
+                return ui_ctrlList;
+            }
         }
+
         return null;
     }
 
@@ -286,7 +198,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         }
     }
 
-    private void buildStage(Stage stage, Parent parent) {
+    private void buildStage(Stage stage) {
 
         initController(parent);
 
@@ -348,143 +260,6 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     }
 
     @SuppressWarnings("WeakerAccess")
-    protected void doInsertEdit() {
-
-        URL resource = getCtrlRecordResourceURL();
-
-        if (resource != null) {
-
-            FXMLLoader fxmlLoader = new FXMLLoader(resource);
-
-            List<UI_CtrlList> localCtrlListStack = new ArrayList<>();
-
-            fxmlLoader.setControllerFactory(param -> {
-                try {
-                    if (UI_CtrlList.class.isAssignableFrom(param)) {
-
-                        Type genericSuperclass = param.getGenericSuperclass();
-
-                        Class<?> tableClass;
-
-                        if (genericSuperclass instanceof ParameterizedType) {
-                            ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
-                            tableClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-                        } else {
-                            throw new Error("Cannot infer Table class for Controller " + param.getSimpleName());
-                        }
-
-                        UI_CtrlList ui_ctrlList;
-
-                        Constructor<?>[] constructors = tableClass.getConstructors();
-                        MTable childTable;
-                        if (constructors.length == 0 || constructors[0].getParameterTypes().length == 0) {
-                            childTable = (MTable) tableClass.newInstance();
-                        } else {
-                            Constructor<?> ctor = tableClass.getConstructor(table.getClass());
-                            childTable = (MTable) ctor.newInstance(table);
-                        }
-                        Constructor<?> constructor = param.getConstructor();
-                        ui_ctrlList = (UI_CtrlList) constructor.newInstance();
-                        ui_ctrlList.table = childTable;
-
-                        currentCtrlList = ui_ctrlList;
-                        localCtrlListStack.add(ui_ctrlList);
-
-                        return ui_ctrlList;
-                    }
-                    return param.newInstance();
-                } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                    if (table.getState() != MTable.STATE.NORMAL) {
-                        table.cancel();
-                    }
-                    e.printStackTrace();
-                    UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
-                }
-                return null;
-            });
-
-            try {
-                parent = fxmlLoader.load();
-            } catch (Throwable e) {
-                if (table.getState() != MTable.STATE.NORMAL) {
-                    table.cancel();
-                }
-                e.printStackTrace();
-                UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
-            }
-
-            currentCtrlList = null;
-
-            if (parent != null) {
-
-                for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
-                    ui_ctrlList.populateList();
-                }
-
-                fxmlLoader.<UI_CtrlRecord>getController().setCtrlList(this);
-
-                Stage stage = new Stage();
-                Scene scene = new Scene(parent);
-
-                stage.setScene(scene);
-                stage.initModality(Modality.APPLICATION_MODAL);
-
-                String title;
-
-                MTable.STATE state = table.getState();
-
-                Callable<Boolean> onValidateFields = table.getOnValidateFields();
-
-                if (state != MTable.STATE.NORMAL) {
-                    table.setOnValidateFields(() -> fxmlLoader.<UI_CtrlRecord>getController().testValidFields());
-                }
-
-                switch (state) {
-                    case NORMAL:
-                        title = "Mostrar Detalle";
-                        break;
-                    case EDIT:
-                        title = "Modificar";
-                        break;
-                    case INSERT:
-                        title = "Agregar";
-                        break;
-                    default:
-                        title = "?";
-                }
-
-                stage.setTitle(title + ": " + table.getGenre());
-
-                stage.setOnHidden(event -> {
-                    if (state != MTable.STATE.NORMAL) {
-                        table.setOnValidateFields(onValidateFields);
-                        populateList();
-                    }
-                    for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
-                        ui_ctrlList.refreshTimerStop();
-                    }
-                    if (table.getState() != MTable.STATE.NORMAL) {
-                        table.cancel();
-                    }
-                });
-
-                scene.setOnKeyPressed(event -> {
-                    if (event.getCode() == KeyCode.ESCAPE) {
-                        stage.close();
-                    }
-                });
-
-                stage.showAndWait();
-            }
-        } else {
-            if (table.getState() != MTable.STATE.NORMAL) {
-                table.cancel();
-            }
-            UI_Message.error("UI_CtrlList Error", "Warning", "Define FXML file");
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
     public boolean findSelectedDocument() {
         U item = tableView.getSelectionModel().getSelectedItem();
         if (item != null) {
@@ -507,42 +282,6 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         return parent;
     }
 
-    protected String getCtrlListFXMLPath() {
-        return "listView.fxml";
-    }
-
-    protected String getCtrlRecordFXMLPath() {
-        return "recordView.fxml";
-    }
-
-    private URL getCtrlRecordResourceURL() {
-
-        Class<?> tableClass = table.getClass();
-
-        while (!tableClass.equals(MTable.class)) {
-
-            String uiCtrlRecordClassName = tableClass.getName() + "CtrlRecord";
-
-            Class<?> uiCtrlRecordClass = null;
-
-            try {
-                uiCtrlRecordClass = Class.forName(uiCtrlRecordClassName);
-            } catch (ClassNotFoundException ignored) {
-
-            }
-
-            if (uiCtrlRecordClass != null) {
-                URL resource = tableClass.getResource(getCtrlRecordFXMLPath());
-                if (resource != null) {
-                    return resource;
-                }
-            }
-            tableClass = tableClass.getSuperclass();
-        }
-
-        return null;
-    }
-
     protected String[] getFieldColumnList() {
         List<String> strings = new ArrayList<>();
 
@@ -559,10 +298,6 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     @SuppressWarnings("unused")
     public Stage getStage() {
         return stage;
-    }
-
-    TableView<U> getTableView() {
-        return tableView;
     }
 
     void injectFieldValue(Parent parent) {
@@ -620,7 +355,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
         if (findSelectedDocument()) {
             if (table.edit()) {
-                doInsertEdit();
+                UI_CtrlRecord.ctrlRecord(table, null).showAndWait();
             }
         }
     }
@@ -628,14 +363,14 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     @SuppressWarnings("WeakerAccess")
     public void onActionInsertDocument() {
         if (table.insert()) {
-            doInsertEdit();
+            UI_CtrlRecord.ctrlRecord(table, null).showAndWait();
         }
     }
 
     @SuppressWarnings("WeakerAccess")
     public void onActionViewDocument() {
         if (findSelectedDocument()) {
-            doInsertEdit();
+            UI_CtrlRecord.ctrlRecord(table, null).showAndWait();
         }
     }
 
@@ -708,7 +443,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         }
     }
 
-    private void refreshTimerStop() {
+    void refreshTimerStop() {
         if (refreshTimer != null) {
             --numTimers;
             refreshTimer.stop();

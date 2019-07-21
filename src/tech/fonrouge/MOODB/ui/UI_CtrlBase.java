@@ -1,23 +1,137 @@
 package tech.fonrouge.MOODB.ui;
 
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import tech.fonrouge.MOODB.Annotations.AssignWith;
 import tech.fonrouge.MOODB.Annotations.NoBindNode;
 import tech.fonrouge.MOODB.*;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class UI_Binding<T extends MTable> {
+public abstract class UI_CtrlBase<T extends MTable> {
 
     @SuppressWarnings("WeakerAccess")
     protected final HashMap<String, Node> nodeHashMap = new HashMap<>();
-
+    Parent parent;
     T table;
+    @SuppressWarnings("WeakerAccess")
+    URL fxmlResourcePath;
+    FXMLLoader fxmlLoader;
+    boolean fxmlHasController = false;
+
+    private static Constructor<?> getCtorClass(Class<?> tableClass, String suffix) {
+        Constructor<?> constructor;
+        String className;
+
+        if (tableClass.equals(MTable.class)) {
+            return null;
+        }
+
+        className = tableClass.getName() + suffix;
+
+        try {
+            constructor = Class.forName(className).getConstructor();
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            return getCtorClass(tableClass.getSuperclass(), suffix);
+        }
+        return constructor;
+    }
+
+    static UI_CtrlBase getUIController(MTable table, String ctrlFXMLPath, String suffix) {
+
+        UI_CtrlBase ui_ctrl = null;
+        Constructor<?> constructor;
+
+        if (ctrlFXMLPath != null) {
+            String classPrefix = table.getClass().getName().substring(0, table.getClass().getName().lastIndexOf("."));
+            String ctrlName = classPrefix + "." + ctrlFXMLPath.substring(0, 1).toUpperCase() + ctrlFXMLPath.substring(1, ctrlFXMLPath.lastIndexOf("."));
+            try {
+                constructor = Class.forName(ctrlName).getConstructor();
+                ui_ctrl = (UI_CtrlBase) constructor.newInstance();
+            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ignored) {
+
+            }
+        } else {
+            try {
+                constructor = getCtorClass(table.getClass(), suffix);
+                if (constructor != null) {
+                    ui_ctrl = (UI_CtrlBase) constructor.newInstance();
+                }
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                e.printStackTrace();
+                UI_Message.error("UI Controller Error", "Warning", e.toString());
+            }
+        }
+
+        if (ui_ctrl != null) {
+            if (ctrlFXMLPath == null) {
+                ctrlFXMLPath = ui_ctrl.getCtrlFXMLPath();
+                URL resource = ui_ctrl.getClass().getResource(ctrlFXMLPath);
+                if (resource != null) {
+                    ui_ctrl.table = table;
+                    ui_ctrl.fxmlResourcePath = resource;
+                    ui_ctrl.fxmlHasController = fxmlHasFXController(resource);
+                    ui_ctrl.fxmlLoader = new FXMLLoader(resource);
+                    return ui_ctrl;
+                } else {
+                    UI_Message.error("UI Controller Error", "No FXML resource found.", "define FXML resource.");
+                }
+            }
+        } else {
+            UI_Message.error("UI Controller Error", "No controller found.", "define controller for table.");
+        }
+
+        return null;
+    }
+
+    private static boolean fxmlHasFXController(URL fxmlPath) {
+        InputStream inputStream = null;
+        try {
+            inputStream = fxmlPath.openStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+            UI_Message.error("UI_CtrlList Error", "FXML URL not valid.", e.toString());
+        }
+        if (inputStream != null) {
+            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+            try {
+                XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(inputStream);
+                while (xmlStreamReader.hasNext()) {
+                    int next = xmlStreamReader.next();
+                    if (next == XMLStreamConstants.START_ELEMENT) {
+                        return xmlStreamReader.getAttributeValue(xmlStreamReader.getNamespaceURI("fx"), "controller") != null;
+                    }
+                }
+            } catch (XMLStreamException e) {
+                e.printStackTrace();
+                UI_Message.error("UI_CtrlList Error", "FXML not valid.", e.toString());
+            }
+        }
+        return false;
+    }
+
+    UI_CtrlBase getFXMLLoaderController() {
+        UI_CtrlBase ui_ctrlBase = fxmlLoader.getController();
+        ui_ctrlBase.parent = parent;
+        ui_ctrlBase.table = table;
+        return ui_ctrlBase;
+    }
+
+    protected abstract String getCtrlFXMLPath();
 
     private void assignFieldWith(Field declaredField, AssignWith assignWith) {
         Field parentField = null;
@@ -185,7 +299,7 @@ public class UI_Binding<T extends MTable> {
                 }
             }
         }
-        if (!clazz.equals(UI_Binding.class)) {
+        if (!clazz.equals(UI_CtrlBase.class)) {
             return getBindControlMethod(clazz.getSuperclass(), clazzArg);
         }
         return null;
@@ -241,4 +355,5 @@ public class UI_Binding<T extends MTable> {
     private void registerControl(Node node, MField mField) {
         nodeHashMap.put(mField.getName(), node);
     }
+
 }
