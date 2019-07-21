@@ -3,7 +3,9 @@ package tech.fonrouge.MOODB.ui;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import tech.fonrouge.MOODB.Annotations.AssignWith;
 import tech.fonrouge.MOODB.Annotations.NoBindNode;
 import tech.fonrouge.MOODB.*;
@@ -26,6 +28,8 @@ public abstract class UI_CtrlBase<T extends MTable> {
 
     @SuppressWarnings("WeakerAccess")
     protected final HashMap<String, Node> nodeHashMap = new HashMap<>();
+    protected Stage stage;
+    protected Scene scene;
     Parent parent;
     T table;
     @SuppressWarnings("WeakerAccess")
@@ -329,6 +333,19 @@ public abstract class UI_CtrlBase<T extends MTable> {
             }
         }
         return null;
+    }
+
+    protected void initController() {
+
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    protected void initStage() {
+        stage = new Stage();
+        scene = new Scene(parent);
+        stage.setScene(scene);
+        stage.setTitle(table.getGenres());
+        initController();
     }
 
     private boolean invokeMethod(Method method, Object... objects) {

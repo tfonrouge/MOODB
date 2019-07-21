@@ -40,7 +40,6 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     @SuppressWarnings("unused")
     @FXML
     protected TableView<U> tableView;
-    protected Stage stage;
     /**
      * refresh lapse for tableView in seconds
      */
@@ -51,16 +50,11 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
     @SuppressWarnings("unused")
     static public UI_CtrlList ctrlList(MTable table) {
-        return ctrlList(table, null, null);
+        return ctrlList(table, null);
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "WeakerAccess"})
     static public UI_CtrlList ctrlList(MTable table, String ctrlListFXMLPath) {
-        return ctrlList(table, ctrlListFXMLPath, null);
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    static public UI_CtrlList ctrlList(MTable table, String ctrlListFXMLPath, Stage stage) {
 
         UI_CtrlList ui_ctrlList = (UI_CtrlList) UI_CtrlList.getUIController(table, ctrlListFXMLPath, "CtrlList");
 
@@ -98,7 +92,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                 currentCtrlList = null;
             }
             if (ui_ctrlList.parent != null) {
-                ui_ctrlList.buildStage(stage);
+                ui_ctrlList.initStage();
                 return ui_ctrlList;
             }
         }
@@ -195,29 +189,6 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
             tableView.getColumns().add(column);
 
-        }
-    }
-
-    private void buildStage(Stage stage) {
-
-        initController(parent);
-
-        if (stage == null) {
-            this.stage = new Stage();
-        } else {
-            this.stage = stage;
-        }
-
-        Scene scene = new Scene(parent);
-        this.stage.setScene(scene);
-        this.stage.setTitle(table.getGenres());
-
-        if (tableView != null) {
-            tableView.setOnKeyPressed(event -> {
-                if (event.getCode() == KeyCode.ESCAPE) {
-                    this.stage.hide();
-                }
-            });
         }
     }
 
@@ -318,8 +289,17 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         }
     }
 
-    protected void initController(Parent parent) {
+    protected void initController() {
 
+        super.initController();
+
+        if (tableView != null) {
+            tableView.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    this.stage.hide();
+                }
+            });
+        }
     }
 
     @FXML

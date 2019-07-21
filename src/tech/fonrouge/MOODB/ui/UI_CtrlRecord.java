@@ -3,11 +3,9 @@ package tech.fonrouge.MOODB.ui;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import tech.fonrouge.MOODB.Annotations.NoAutoBinding;
 import tech.fonrouge.MOODB.MField;
 import tech.fonrouge.MOODB.MTable;
@@ -23,9 +21,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
-
-    @SuppressWarnings("WeakerAccess")
-    protected Stage stage;
 
     @SuppressWarnings("WeakerAccess")
     public static UI_CtrlRecord ctrlRecord(MTable table, String ctrlRecordFXMLPath) {
@@ -98,34 +93,31 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
                 for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
                     ui_ctrlList.populateList();
                 }
+
                 if (ui_ctrlRecord.fxmlHasController) {
                     ui_ctrlRecord = (UI_CtrlRecord) ui_ctrlRecord.getFXMLLoaderController();
                 } else {
                     ui_ctrlRecord.fxmlLoader.setController(ui_ctrlRecord);
                 }
+
                 NoAutoBinding noAutoBinding = ui_ctrlRecord.getClass().getAnnotation(NoAutoBinding.class);
                 if (noAutoBinding == null) {
                     ui_ctrlRecord.bindControls();
                 }
-                ui_ctrlRecord.initData();
 
-                ui_ctrlRecord.stage = new Stage();
-                Scene scene = new Scene(ui_ctrlRecord.parent);
+                ui_ctrlRecord.initStage();
 
-                ui_ctrlRecord.stage.setScene(scene);
                 ui_ctrlRecord.stage.initModality(Modality.APPLICATION_MODAL);
-
-                String title;
 
                 MTable.STATE state = table.getState();
 
                 Callable<Boolean> onValidateFields = table.getOnValidateFields();
 
                 if (state != MTable.STATE.NORMAL) {
-                    UI_CtrlRecord finalUi_ctrlRecord = ui_ctrlRecord;
-                    table.setOnValidateFields(() -> finalUi_ctrlRecord.fxmlLoader.<UI_CtrlRecord>getController().testValidFields());
+                    table.setOnValidateFields(ui_ctrlRecord::testValidFields);
                 }
 
+                String title;
                 switch (state) {
                     case NORMAL:
                         title = "Mostrar Detalle";
@@ -156,7 +148,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
                 });
 
                 UI_CtrlRecord finalUi_ctrlRecord1 = ui_ctrlRecord;
-                scene.setOnKeyPressed(event -> {
+                ui_ctrlRecord.scene.setOnKeyPressed(event -> {
                     if (event.getCode() == KeyCode.ESCAPE) {
                         finalUi_ctrlRecord1.stage.close();
                     }
@@ -170,8 +162,6 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
         }
         return ui_ctrlRecord;
     }
-
-    protected abstract void initData();
 
     @SuppressWarnings("unused")
     @FXML
