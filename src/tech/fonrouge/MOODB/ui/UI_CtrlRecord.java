@@ -76,8 +76,15 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
                 return null;
             });
 
+            if (!ui_ctrlRecord.fxmlHasController) {
+                ui_ctrlRecord.fxmlLoader.setController(ui_ctrlRecord);
+            }
+
             try {
                 ui_ctrlRecord.parent = ui_ctrlRecord.fxmlLoader.load();
+                if (ui_ctrlRecord.fxmlHasController) {
+                    ui_ctrlRecord = (UI_CtrlRecord) ui_ctrlRecord.getFXMLLoaderController();
+                }
             } catch (Throwable e) {
                 if (table.getState() != MTable.STATE.NORMAL) {
                     table.cancel();
@@ -92,12 +99,6 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
 
                 for (UI_CtrlList ui_ctrlList : localCtrlListStack) {
                     ui_ctrlList.populateList();
-                }
-
-                if (ui_ctrlRecord.fxmlHasController) {
-                    ui_ctrlRecord = (UI_CtrlRecord) ui_ctrlRecord.getFXMLLoaderController();
-                } else {
-                    ui_ctrlRecord.fxmlLoader.setController(ui_ctrlRecord);
                 }
 
                 NoAutoBinding noAutoBinding = ui_ctrlRecord.getClass().getAnnotation(NoAutoBinding.class);
@@ -165,7 +166,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
 
     @SuppressWarnings("unused")
     @FXML
-    private void onActionButtonAccept(ActionEvent actionEvent) {
+    protected void onActionButtonAccept(ActionEvent actionEvent) {
         Node source = (Node) actionEvent.getSource();
         MTable.STATE state = table.getState();
         if (state != MTable.STATE.NORMAL) {

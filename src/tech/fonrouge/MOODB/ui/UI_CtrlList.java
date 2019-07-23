@@ -47,6 +47,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     private boolean populatingList = false;
     private Timeline refreshTimer;
     private Runnable listFindMethod = () -> table.find();
+    private boolean columnsAutosized = false;
 
     @SuppressWarnings("unused")
     static public UI_CtrlList ctrlList(MTable table) {
@@ -76,21 +77,23 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                 return null;
             });
 
-            if (ui_ctrlList.fxmlHasController) {
-                ui_ctrlList = (UI_CtrlList) ui_ctrlList.getFXMLLoaderController();
-            } else {
+            if (!ui_ctrlList.fxmlHasController) {
                 ui_ctrlList.fxmlLoader.setController(ui_ctrlList);
             }
 
             try {
                 currentCtrlList = ui_ctrlList;
                 ui_ctrlList.parent = ui_ctrlList.fxmlLoader.load();
+                if (ui_ctrlList.fxmlHasController) {
+                    ui_ctrlList = (UI_CtrlList) ui_ctrlList.getFXMLLoaderController();
+                }
             } catch (Throwable e) {
                 e.printStackTrace();
                 UI_Message.error("UI_CtrlList Error", "Warning", e.toString());
             } finally {
                 currentCtrlList = null;
             }
+
             if (ui_ctrlList.parent != null) {
                 ui_ctrlList.initStage();
                 return ui_ctrlList;
@@ -293,6 +296,15 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
         super.initController();
 
+        if (autosizeColumnMethod == null) {
+            try {
+                autosizeColumnMethod = TableViewSkin.class.getDeclaredMethod("resizeColumnToFitContent", TableColumn.class, int.class);
+                autosizeColumnMethod.setAccessible(true);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+
         if (tableView != null) {
             tableView.setOnKeyPressed(event -> {
                 if (event.getCode() == KeyCode.ESCAPE) {
@@ -403,7 +415,10 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                             refreshTimer.play();
                         }
                         populatingList = false;
-                        autosizeColumns();
+                        if (tableView.getItems().size() > 0 && !columnsAutosized) {
+                            columnsAutosized = true;
+                            autosizeColumns();
+                        }
                         onAfterPopulateList();
                     });
                     return null;
@@ -483,24 +498,16 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
     @SuppressWarnings("WeakerAccess")
     public void autosizeColumns() {
-        if (autosizeColumnMethod == null) {
-            try {
-                autosizeColumnMethod = TableViewSkin.class.getDeclaredMethod("resizeColumnToFitContent", TableColumn.class, int.class);
-                autosizeColumnMethod.setAccessible(true);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
         if (autosizeColumnMethod != null) {
+            //System.out.println("::: " + table + " : " + tableView);
             for (TableColumn<U, ?> column : tableView.getColumns()) {
                 try {
-                    if (autosizeColumnMethod != null) {
-                        autosizeColumnMethod.invoke(tableView.getSkin(), column, -1);
-                    }
+                    autosizeColumnMethod.invoke(tableView.getSkin(), column, -1);
                 } catch (IllegalAccessException | InvocationTargetException | NullPointerException e) {
                     e.printStackTrace();
                 }
             }
+            autosizeColumnMethod = null;
         }
     }
 }

@@ -84,16 +84,16 @@ public abstract class UI_CtrlBase<T extends MTable> {
         if (ui_ctrl != null) {
             if (ctrlFXMLPath == null) {
                 ctrlFXMLPath = ui_ctrl.getCtrlFXMLPath();
-                URL resource = ui_ctrl.getClass().getResource(ctrlFXMLPath);
-                if (resource != null) {
-                    ui_ctrl.table = table;
-                    ui_ctrl.fxmlResourcePath = resource;
-                    ui_ctrl.fxmlHasController = fxmlHasFXController(resource);
-                    ui_ctrl.fxmlLoader = new FXMLLoader(resource);
-                    return ui_ctrl;
-                } else {
-                    UI_Message.error("UI Controller Error", "No FXML resource found.", "define FXML resource.");
-                }
+            }
+            URL resource = ui_ctrl.getClass().getResource(ctrlFXMLPath);
+            if (resource != null) {
+                ui_ctrl.table = table;
+                ui_ctrl.fxmlResourcePath = resource;
+                ui_ctrl.fxmlHasController = fxmlHasFXController(resource);
+                ui_ctrl.fxmlLoader = new FXMLLoader(resource);
+                return ui_ctrl;
+            } else {
+                UI_Message.error("UI Controller Error", "No FXML resource found.", "define FXML resource.");
             }
         } else {
             UI_Message.error("UI Controller Error", "No controller found.", "define controller for table.");
