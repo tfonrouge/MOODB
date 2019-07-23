@@ -21,16 +21,19 @@ import static com.mongodb.client.model.Filters.eq;
 public class MEngine {
 
     private static HashMap<Class, MDatabase> mDatabaseHashMap;
-
     MongoCollection<Document> collection;
     MDatabase mDatabase;
     private MTable table;
     private ArrayList<Document> pipeline;
     private MongoDatabase mongoDatabase;
-
     MEngine(MTable oTable) {
         table = oTable;
         initialize();
+    }
+
+    @SuppressWarnings("unused")
+    public MongoCollection<Document> getCollection() {
+        return collection;
     }
 
     private Document buildMasterSourceFilter() {
@@ -95,6 +98,7 @@ public class MEngine {
      *
      * @return success on find
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean find() {
         MIndex mIndex = table.getIndex();
         if (mIndex == null) {
@@ -119,6 +123,7 @@ public class MEngine {
      * @param documentList bson list for find function
      * @return iterable
      */
+    @SuppressWarnings("WeakerAccess")
     public MongoCursor<Document> find(List<Document> documentList) {
         for (int i = 0; i < table.fieldList.size(); i++) {
             if (table.fieldList.get(i).fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
@@ -260,7 +265,6 @@ public class MEngine {
      *
      * @return boolean if next is valid document
      */
-    @SuppressWarnings("WeakerAccess")
     public boolean next() {
         if (table.tableState.mongoCursor != null) {
             if (table.tableState.mongoCursor.hasNext()) {
