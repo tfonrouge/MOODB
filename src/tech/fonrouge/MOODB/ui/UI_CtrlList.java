@@ -293,7 +293,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         if (tableView != null) {
             tableView.setOnKeyPressed(event -> {
                 if (event.getCode() == KeyCode.ESCAPE) {
-                    this.stage.hide();
+                    stage.hide();
                 }
             });
         }
