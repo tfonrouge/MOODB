@@ -128,6 +128,11 @@ public abstract class UI_CtrlBase<T extends MTable> {
         return false;
     }
 
+    @SuppressWarnings("unused")
+    public Stage getStage() {
+        return stage;
+    }
+
     UI_CtrlBase getFXMLLoaderController() {
         UI_CtrlBase ui_ctrlBase = fxmlLoader.getController();
         ui_ctrlBase.parent = parent;

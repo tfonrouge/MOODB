@@ -22,6 +22,11 @@ import java.util.concurrent.Callable;
 
 public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
 
+    @SuppressWarnings("unused")
+    public static UI_CtrlRecord ctrlRecord(MTable table) {
+        return ctrlRecord(table, null);
+    }
+
     @SuppressWarnings("WeakerAccess")
     public static UI_CtrlRecord ctrlRecord(MTable table, String ctrlRecordFXMLPath) {
 

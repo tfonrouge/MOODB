@@ -18,7 +18,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.bson.Document;
@@ -269,11 +268,6 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         return tableView.getItems();
     }
 
-    @SuppressWarnings("unused")
-    public Stage getStage() {
-        return stage;
-    }
-
     void injectFieldValue(Parent parent) {
         if (parent != null) {
             String id = parent.getId();
@@ -295,15 +289,6 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     protected void initController() {
 
         super.initController();
-
-        if (autosizeColumnMethod == null) {
-            try {
-                autosizeColumnMethod = TableViewSkin.class.getDeclaredMethod("resizeColumnToFitContent", TableColumn.class, int.class);
-                autosizeColumnMethod.setAccessible(true);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
 
         if (tableView != null) {
             tableView.setOnKeyPressed(event -> {
@@ -414,11 +399,19 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                         if (refreshTimer != null) {
                             refreshTimer.play();
                         }
-                        populatingList = false;
                         if (tableView.getItems().size() > 0 && !columnsAutosized) {
                             columnsAutosized = true;
+                            if (autosizeColumnMethod == null) {
+                                try {
+                                    autosizeColumnMethod = TableViewSkin.class.getDeclaredMethod("resizeColumnToFitContent", TableColumn.class, int.class);
+                                    autosizeColumnMethod.setAccessible(true);
+                                } catch (NoSuchMethodException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                             autosizeColumns();
                         }
+                        populatingList = false;
                         onAfterPopulateList();
                     });
                     return null;
@@ -498,8 +491,9 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
 
     @SuppressWarnings("WeakerAccess")
     public void autosizeColumns() {
+
         if (autosizeColumnMethod != null) {
-            //System.out.println("::: " + table + " : " + tableView);
+            //System.err.println("::: " + table + " : " + tableView);
             for (TableColumn<U, ?> column : tableView.getColumns()) {
                 try {
                     autosizeColumnMethod.invoke(tableView.getSkin(), column, -1);
@@ -507,7 +501,6 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                     e.printStackTrace();
                 }
             }
-            autosizeColumnMethod = null;
         }
     }
 }
