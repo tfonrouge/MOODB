@@ -39,6 +39,20 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
         return (T) getFieldState().linkedTable; // TODO: solve this unchecked cast
     }
 
+    private MFieldTableField<?> findMasterSourceField(Class<?> clazzParam, MTable table) {
+        MFieldTableField<?> mFieldTableField = null;
+
+        for (MField mField : table.fieldList) {
+            if (mFieldTableField == null &&
+                    mField.fieldType == MTable.FIELD_TYPE.TABLE_FIELD &&
+                    clazzParam.isAssignableFrom(((MFieldTableField) mField).getTableClass())) {
+                mFieldTableField = (MFieldTableField) mField;
+            }
+        }
+
+        return mFieldTableField;
+    }
+
     private T initializeTableField() {
         T t = null;
         Class<?> clazz = getTableClass();
@@ -46,15 +60,14 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
             Constructor<?> ctor = clazz.getDeclaredConstructors()[0];
             if (ctor.getParameterCount() == 0) {
                 t = (T) ctor.newInstance();
-            } else if (table.getMasterSource() != null) {
+            } else {
                 Class<?> clazzParam = ctor.getParameterTypes()[0];
                 MFieldTableField mFieldTableField = null;
-                for (MField mField : table.getMasterSource().fieldList) {
-                    if (mFieldTableField == null &&
-                            mField.fieldType == MTable.FIELD_TYPE.TABLE_FIELD &&
-                            clazzParam.isAssignableFrom(((MFieldTableField) mField).getTableClass())) {
-                        mFieldTableField = (MFieldTableField) mField;
-                    }
+                if (table.getMasterSource() != null) {
+                    mFieldTableField = findMasterSourceField(clazzParam, table.getMasterSource());
+                }
+                if (mFieldTableField == null) {
+                    mFieldTableField = findMasterSourceField(clazzParam, table);
                 }
                 if (mFieldTableField != null) {
                     Object a = null;
@@ -65,7 +78,9 @@ public abstract class MFieldTableField<T extends MTable> extends MFieldObject {
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        if (t != null) {
+        if (t == null) {
+            throw new RuntimeException("Error creating table(" + table + ") for table field(" + name + ") ");
+        } else {
             t.setLinkedField(this);
         }
         return t;
