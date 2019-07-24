@@ -1,11 +1,10 @@
 package test01.data.tableBase;
 
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
-import tech.fonrouge.MOODB.ui.UI_CtrlList;
+import tech.fonrouge.ui.UI_CtrlList;
 
 public abstract class TableBaseCtrlList<T extends TableBase, U extends TableBaseData<T>> extends UI_CtrlList<T, U> {
 

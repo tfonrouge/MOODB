@@ -3,7 +3,7 @@ package test01.data.invoiceItem;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import tech.fonrouge.MOODB.ui.UI_CtrlRecord;
+import tech.fonrouge.ui.UI_CtrlRecord;
 
 public class InvoiceItemCtrlRecord extends UI_CtrlRecord<InvoiceItem> {
 

@@ -2,7 +2,7 @@ package test01.data.invoiceItem.xInvoice;
 
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import tech.fonrouge.MOODB.ui.UI_CtrlRecord;
+import tech.fonrouge.ui.UI_CtrlRecord;
 
 public class InvoiceItem_xInvoiceCtrlRecord extends UI_CtrlRecord<InvoiceItem_xInvoice> {
 

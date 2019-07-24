@@ -4,7 +4,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
-import tech.fonrouge.MOODB.ui.UI_CtrlRecord;
+import tech.fonrouge.ui.UI_CtrlRecord;
 
 public class InvoiceCtrlRecord extends UI_CtrlRecord<Invoice> {
 
