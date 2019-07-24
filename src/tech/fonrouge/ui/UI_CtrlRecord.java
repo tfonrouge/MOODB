@@ -1,4 +1,4 @@
-package tech.fonrouge.MOODB.ui;
+package tech.fonrouge.ui;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -6,7 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
-import tech.fonrouge.MOODB.Annotations.NoAutoBinding;
+import tech.fonrouge.ui.Annotations.NoAutoBinding;
 import tech.fonrouge.MOODB.MField;
 import tech.fonrouge.MOODB.MTable;
 

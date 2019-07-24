@@ -4,7 +4,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
-import tech.fonrouge.MOODB.ui.UI_Message;
+import tech.fonrouge.ui.UI_Message;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package tech.fonrouge.MOODB;
+package tech.fonrouge.ui;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -37,5 +37,11 @@ public class Annotations {
     @SuppressWarnings("WeakerAccess")
     public @interface NoBindNode {
 
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface BindField {
+        String fieldName();
     }
 }

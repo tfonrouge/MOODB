@@ -36,6 +36,7 @@
         <xs:all minOccurs="0">
             <xs:element name="newValue" type="newValueType" minOccurs="0"/>
             <xs:element name="onValidate" type="onValidateType" minOccurs="0"/>
+            <xs:element name="onBeforeChangeValue" type="xs:string" minOccurs="0"/>
             <xs:element name="onAfterChangeValue" type="xs:string" minOccurs="0"/>
             <xs:element name="validValues" type="validValuesType" minOccurs="0"/>
         </xs:all>

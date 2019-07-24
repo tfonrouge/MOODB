@@ -7,7 +7,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import tech.fonrouge.MOODB.ui.UI_Message;
+import tech.fonrouge.ui.UI_Message;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

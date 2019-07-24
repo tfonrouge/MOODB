@@ -1,4 +1,4 @@
-package tech.fonrouge.MOODB.ui;
+package tech.fonrouge.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -6,9 +6,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import tech.fonrouge.MOODB.Annotations.AssignWith;
-import tech.fonrouge.MOODB.Annotations.NoBindNode;
 import tech.fonrouge.MOODB.*;
+import tech.fonrouge.ui.Annotations.AssignWith;
+import tech.fonrouge.ui.Annotations.NoBindNode;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -24,14 +24,16 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import static tech.fonrouge.ui.Annotations.BindField;
+
 public abstract class UI_CtrlBase<T extends MTable> {
 
     @SuppressWarnings("WeakerAccess")
     protected final HashMap<String, Node> nodeHashMap = new HashMap<>();
+    public T table = null;
     protected Stage stage;
     protected Scene scene;
     Parent parent;
-    T table;
     @SuppressWarnings("WeakerAccess")
     URL fxmlResourcePath;
     FXMLLoader fxmlLoader;
@@ -240,34 +242,68 @@ public abstract class UI_CtrlBase<T extends MTable> {
                 assignFieldWith(declaredField, assignWith);
             }
 
-            NoBindNode annotation = declaredField.getAnnotation(NoBindNode.class);
+            NoBindNode noBindNode = declaredField.getAnnotation(NoBindNode.class);
 
             Node node = findNodeByField(declaredField);
 
-            if (node != null && annotation == null) {
-                MField mField = getTableField(declaredField);
+            if (node != null && noBindNode == null) {
 
-                if (mField != null) {
+                Field fieldMField = null;
+                try {
+                    fieldMField = node.getClass().getDeclaredField("mField");
+                } catch (NoSuchFieldException ignored) {
 
-                    Method method;
-                    Boolean invoquedOk = null;
+                }
+                BindField bindField = declaredField.getAnnotation(BindField.class);
+                if (fieldMField == null || !fieldMField.getType().isAssignableFrom(MField.class)) {
 
-                    if (mField.fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
-                        String name = declaredField.getName();
-                        String subFieldName = name.substring(name.indexOf(mField.getName()) + mField.getName().length());
-                        if (!subFieldName.isEmpty()) {
-                            method = getBindControlMethod(getClass(), node.getClass(), mField.getClass().getSuperclass(), String.class);
-                            invoquedOk = invokeMethod(method, node, mField, subFieldName.substring(1));
+                    MField mField;
+
+                    if (bindField == null) {
+                        mField = getTableField(declaredField);
+                    } else {
+                        if (bindField.fieldName().contains(".")) {
+                            mField = table.fieldByName(bindField.fieldName().substring(0, bindField.fieldName().indexOf(".")));
+                        } else {
+                            mField = table.fieldByName(bindField.fieldName());
+                        }
+                    }
+
+                    if (mField != null) {
+
+                        Method method;
+                        Boolean invoquedOk = null;
+
+                        if (mField.fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
+                            String subFieldName;
+                            if (bindField == null) {
+                                String name = declaredField.getName();
+                                subFieldName = name.substring(name.indexOf(mField.getName()) + mField.getName().length());
+                            } else {
+                                subFieldName = bindField.fieldName().substring(bindField.fieldName().indexOf("."));
+                            }
+                            if (!subFieldName.isEmpty()) {
+                                method = getBindControlMethod(getClass(), node.getClass(), mField.getClass().getSuperclass(), String.class);
+                                invoquedOk = invokeMethod(method, node, mField, subFieldName.substring(1));
+                            }
+                        } else {
+                            method = getBindControlMethod(getClass(), node.getClass(), mField.getClass().getSuperclass());
+                            invoquedOk = invokeMethod(method, node, mField);
+                        }
+                        if (invoquedOk != null && invoquedOk) {
+                            registerControl(node, mField);
                         }
                     } else {
-                        method = getBindControlMethod(getClass(), node.getClass(), mField.getClass().getSuperclass());
-                        invoquedOk = invokeMethod(method, node, mField);
-                    }
-                    if (invoquedOk != null && invoquedOk) {
-                        registerControl(node, mField);
+                        UI_Message.warning("UI Controller", "Table field not found", "Control: " + declaredField.toString());
                     }
                 } else {
-                    UI_Message.warning("UI Controller", "Table field not found", "Control: " + declaredField.toString());
+                    if (bindField != null) {
+                        MField<Integer> mField = table.fieldByName(bindField.fieldName());
+                        if (mField != null) {
+                            UITextFieldInteger uiTextFieldInteger = (UITextFieldInteger) node;
+                            uiTextFieldInteger.setMField(mField);
+                        }
+                    }
                 }
             }
         }

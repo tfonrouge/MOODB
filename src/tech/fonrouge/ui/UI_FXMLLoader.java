@@ -1,8 +1,8 @@
-package tech.fonrouge.MOODB.ui;
+package tech.fonrouge.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import tech.fonrouge.MOODB.Annotations.BindCtrlList;
+import tech.fonrouge.ui.Annotations.BindCtrlList;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

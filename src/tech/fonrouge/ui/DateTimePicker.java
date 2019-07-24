@@ -1,4 +1,4 @@
-package tech.fonrouge;
+package tech.fonrouge.ui;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

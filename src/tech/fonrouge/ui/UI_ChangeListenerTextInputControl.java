@@ -1,4 +1,4 @@
-package tech.fonrouge.MOODB.ui;
+package tech.fonrouge.ui;
 
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;

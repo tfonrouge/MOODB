@@ -21,10 +21,13 @@ public abstract class MField<T> {
     protected Callable<T> calcValue = null;
     protected boolean autoInc;
     protected boolean readOnly;
+
+    protected Runnable onAfterChangeValue;
+    protected OnBeforeChangeValue<T> onBeforeChangeValue;
+    protected Callable<T> onNewValue;
+    protected Callable<Boolean> onValidate;
+
     String name;
-    Callable<T> callableNewValue;
-    Callable<Boolean> callableOnValidate;
-    Runnable runnableOnAfterChangeValue;
     private String invalidCause = null;
 
     MField(MTable owner, String name) {
@@ -187,26 +190,14 @@ public abstract class MField<T> {
      * @return
      */
     final protected T getNewValue() {
-        if (callableNewValue != null) {
+        if (onNewValue != null) {
             try {
-                return callableNewValue.call();
+                return onNewValue.call();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         return null;
-    }
-
-    final public void setCallableNewValue(Callable<T> callable) {
-        callableNewValue = callable;
-    }
-
-    final public void setCallableOnValidate(Callable<Boolean> callable) {
-        callableOnValidate = callable;
-    }
-
-    final public void setRunnableOnAfterChangeValue(Runnable callable) {
-        runnableOnAfterChangeValue = callable;
     }
 
     /**
@@ -231,12 +222,12 @@ public abstract class MField<T> {
                 return false;
             }
         }
-        if (callableOnValidate == null) {
+        if (onValidate == null) {
             return true;
         }
         boolean status = false;
         try {
-            status = callableOnValidate.call();
+            status = onValidate.call();
             if (!status) {
                 invalidCause = "invalid status";
             }
@@ -326,6 +317,14 @@ public abstract class MField<T> {
             return false;
         }
 
+        if (onBeforeChangeValue != null) {
+            boolean result = onBeforeChangeValue.testValue(value);
+            if (!result) {
+                getFieldState().updateUI();
+                return false;
+            }
+        }
+
         if (value != null && valueItems != null) {
             if (!valueItems.containsKey(value)) {
                 if (value.equals(getEmptyValue())) {
@@ -338,9 +337,9 @@ public abstract class MField<T> {
 
         //this.fieldState.value = value;
         if (table.tableState.setFieldValue(index, value)) {
-            if (runnableOnAfterChangeValue != null) {
+            if (onAfterChangeValue != null) {
                 try {
-                    runnableOnAfterChangeValue.run();
+                    onAfterChangeValue.run();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -404,5 +403,9 @@ public abstract class MField<T> {
         s += "[name=" + name + "]";
         s += "=" + (value == null ? "null" : value.toString());
         return s;
+    }
+
+    protected interface OnBeforeChangeValue<U> {
+        boolean testValue(U value);
     }
 }

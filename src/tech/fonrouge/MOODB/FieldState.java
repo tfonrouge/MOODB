@@ -1,7 +1,7 @@
 package tech.fonrouge.MOODB;
 
 import org.bson.Document;
-import tech.fonrouge.MOODB.ui.UI_ChangeListener0;
+import tech.fonrouge.ui.UI_ChangeListener0;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +53,10 @@ public class FieldState<T> {
                 ui_changeListener0.refreshNode();
             }
         });
+
+        if (currentChangeListener != null) {
+            currentChangeListener.refreshNode();
+        }
     }
 
     public void setCurrentChangeListener(UI_ChangeListener0 changeListener0) {

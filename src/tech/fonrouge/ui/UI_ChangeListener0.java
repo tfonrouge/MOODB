@@ -1,4 +1,4 @@
-package tech.fonrouge.MOODB.ui;
+package tech.fonrouge.ui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;

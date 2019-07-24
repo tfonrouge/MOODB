@@ -1,4 +1,4 @@
-package tech.fonrouge.MOODB.ui;
+package tech.fonrouge.ui;
 
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import javafx.animation.KeyFrame;
