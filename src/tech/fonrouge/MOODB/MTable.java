@@ -4,7 +4,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
-import tech.fonrouge.ui.UI_Message;
+import tech.fonrouge.ui.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -355,11 +355,16 @@ abstract public class MTable {
     public boolean insert() {
 
         if (tableState.state != STATE.NORMAL) {
-            UI_Message.error("Table Insert Error", "Table previously on EDIT/INSERT State.", "check code logic.");
+            Toast.showError("Table Insert Error: Table previously on EDIT/INSERT State. Check code logic.");
             return false;
         }
 
+        messageWarning = null;
+
         if (!onBeforeInsert()) {
+            if (messageWarning != null) {
+                Toast.showWarning(messageWarning);
+            }
             return false;
         }
 
@@ -383,7 +388,10 @@ abstract public class MTable {
             masterSource.refreshFieldNodes.run();
         }
 
-        fieldList.forEach(mField -> tableState.setFieldValue(mField.index, null));
+        fieldList.forEach(mField -> {
+            mField.setMessageWarning(null);
+            tableState.setFieldValue(mField.index, null);
+        });
 
         /* fill field values */
         fieldList.forEach(mField -> {
