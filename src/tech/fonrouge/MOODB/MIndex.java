@@ -123,7 +123,7 @@ public abstract class MIndex {
                         document.append(indexField, index);
                     }
                 } else {
-                    document.append(field, 1);
+                    document.append(field.trim(), 1);
                 }
             }
         }
