@@ -16,6 +16,11 @@ class UI_ChangeListenerSpinnerInteger extends UI_ChangeListener0<Integer, Spinne
     }
 
     @Override
+    void propertyAddListener() {
+        property.addListener(this);
+    }
+
+    @Override
     public void changed(ObservableValue<? extends Integer> observable, Integer oldValue, Integer newValue) {
         setmFieldValue(newValue);
     }
@@ -29,7 +34,6 @@ class UI_ChangeListenerSpinnerInteger extends UI_ChangeListener0<Integer, Spinne
         }
         property = spinner.getValueFactory().valueProperty();
         property.setValue(mField.value());
-        property.addListener(this);
     }
 
     @Override

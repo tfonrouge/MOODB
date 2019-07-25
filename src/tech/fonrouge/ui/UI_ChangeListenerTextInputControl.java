@@ -15,6 +15,11 @@ class UI_ChangeListenerTextInputControl<T> extends UI_ChangeListener0<T, TextInp
     }
 
     @Override
+    void propertyAddListener() {
+        property.addListener(this);
+    }
+
+    @Override
     public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
         setmFieldValueAsString(newValue);
     }
@@ -24,7 +29,6 @@ class UI_ChangeListenerTextInputControl<T> extends UI_ChangeListener0<T, TextInp
         node.setPromptText(mField.getDescription());
         property = node.textProperty();
         property.setValue(mField.valueAsString());
-        property.addListener(this);
     }
 
     @Override

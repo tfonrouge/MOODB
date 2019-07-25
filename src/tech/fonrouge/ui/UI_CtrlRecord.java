@@ -120,6 +120,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
 
                 if (state != MTable.STATE.NORMAL) {
                     table.setOnValidateFields(ui_ctrlRecord::testValidFields);
+                    table.setOnRefreshFieldNodes(ui_ctrlRecord::refreshFieldNodeStates);
                 }
 
                 String title;
@@ -208,6 +209,12 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
         if (stage != null) {
             stage.showAndWait();
         }
+    }
+
+    private void refreshFieldNodeStates() {
+        uiChangeListener0s.forEach(ui_changeListener0 -> {
+            ui_changeListener0.refreshNode(true);
+        });
     }
 
     @SuppressWarnings("WeakerAccess")

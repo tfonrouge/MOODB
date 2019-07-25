@@ -17,6 +17,11 @@ class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T, ComboBox<T>> {
         super(comboBox, mField);
     }
 
+    @Override
+    void propertyAddListener() {
+        property.addListener(this);
+    }
+
     private ObservableList<T> getObservableArrayList() {
         ObservableList<T> observableList = FXCollections.observableArrayList();
         if (mField.getTable().getLinkedField() == null) {
@@ -45,7 +50,6 @@ class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T, ComboBox<T>> {
         comboBox.setItems(getObservableArrayList());
         property = comboBox.valueProperty();
         property.setValue(mField.value());
-        property.addListener(this);
     }
 
     @Override

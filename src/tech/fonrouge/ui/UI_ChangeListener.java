@@ -41,8 +41,10 @@ public abstract class UI_ChangeListener<T, N extends Node> extends UI_ChangeList
 
     @Override
     public void update(T value) {
-        if (mField.getTable().getLinkedField() != null && !value.equals(mField.getTable().getLinkedField().linkedTable()._id())) {
-            mField.getTable().getLinkedField().syncedTable();
+        if (value != null) {
+            if (mField.getTable().getLinkedField() != null && !value.equals(mField.getTable().getLinkedField().linkedTable()._id())) {
+                mField.getTable().getLinkedField().syncedTable();
+            }
         }
         if (!mField.valueEquals(propertyGetValue())) {
             propertySetValue(mField.value());

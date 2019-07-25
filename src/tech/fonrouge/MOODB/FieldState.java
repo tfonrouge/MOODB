@@ -47,15 +47,15 @@ public class FieldState<T> {
         changeListenerList = new ArrayList<>();
     }
 
-    void updateUI() {
+    public void updateUI(boolean fullUpdate) {
         changeListenerList.forEach(ui_changeListener0 -> {
             if (!ui_changeListener0.equals(currentChangeListener)) {
-                ui_changeListener0.refreshNode();
+                ui_changeListener0.refreshNode(fullUpdate);
             }
         });
 
         if (currentChangeListener != null) {
-            currentChangeListener.refreshNode();
+            currentChangeListener.refreshNode(fullUpdate);
         }
     }
 

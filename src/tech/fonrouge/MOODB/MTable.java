@@ -34,6 +34,7 @@ abstract public class MTable {
     private MIndex index;
     private boolean postResult;
     private String messageWarning;
+    private Runnable refreshFieldNodes;
 
     public MTable() {
         initialize();
@@ -379,6 +380,7 @@ abstract public class MTable {
             if (!(masterSource.post() && masterSource.edit())) {
                 return false;
             }
+            masterSource.refreshFieldNodes.run();
         }
 
         fieldList.forEach(mField -> tableState.setFieldValue(mField.index, null));
@@ -688,6 +690,11 @@ abstract public class MTable {
             }
         }
         throw new RuntimeException("index name not exist.");
+    }
+
+    public void setOnRefreshFieldNodes(Runnable refreshFieldNodes) {
+
+        this.refreshFieldNodes = refreshFieldNodes;
     }
 
     public enum FIELD_TYPE {

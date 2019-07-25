@@ -15,6 +15,11 @@ class UI_ChangeListenerCheckBox extends UI_ChangeListener0<Boolean, CheckBox, Bo
     }
 
     @Override
+    void propertyAddListener() {
+        property.addListener(this);
+    }
+
+    @Override
     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
         setmFieldValue(newValue);
     }
@@ -23,7 +28,6 @@ class UI_ChangeListenerCheckBox extends UI_ChangeListener0<Boolean, CheckBox, Bo
     void initialize(CheckBox checkBox) {
         property = checkBox.selectedProperty();
         property.setValue(mField.value());
-        property.addListener(this);
     }
 
     @Override

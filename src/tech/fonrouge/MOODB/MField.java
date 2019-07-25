@@ -319,7 +319,7 @@ public abstract class MField<T> {
         if (onBeforeChangeValue != null) {
             boolean result = onBeforeChangeValue.testValue(value);
             if (!result) {
-                getFieldState().updateUI();
+                getFieldState().updateUI(false);
                 return false;
             }
         }
@@ -345,7 +345,7 @@ public abstract class MField<T> {
             }
         }
 
-        getFieldState().updateUI();
+        getFieldState().updateUI(false);
 
         return true;
     }

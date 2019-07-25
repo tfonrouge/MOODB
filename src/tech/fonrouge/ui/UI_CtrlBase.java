@@ -21,14 +21,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import static tech.fonrouge.ui.Annotations.BindField;
 
 public abstract class UI_CtrlBase<T extends MTable> {
 
-    @SuppressWarnings("WeakerAccess")
+    protected final List<UI_ChangeListener0> uiChangeListener0s = new ArrayList<>();
     protected final HashMap<String, Node> nodeHashMap = new HashMap<>();
     public T table = null;
     protected Stage stage;
@@ -188,47 +190,47 @@ public abstract class UI_CtrlBase<T extends MTable> {
 
     @SuppressWarnings("unused")
     protected <U extends MTable> void bindControl(TextField textField, MFieldTableField<U> fieldTableField, String detailField) {
-        new UI_ChangeListenerTextInputControl<>(textField, fieldTableField.syncedTable().fieldByName(detailField));
+        uiChangeListener0s.add(new UI_ChangeListenerTextInputControl<>(textField, fieldTableField.syncedTable().fieldByName(detailField)));
     }
 
     @SuppressWarnings("unused")
     final protected <U extends MTable> void bindControl(ComboBox<Object> comboBox, MFieldTableField<U> fieldTableField, String detailField) {
-        new UI_ChangeListenerComboBox<>(comboBox, fieldTableField.syncedTable().fieldByName(detailField));
+        uiChangeListener0s.add(new UI_ChangeListenerComboBox<>(comboBox, fieldTableField.syncedTable().fieldByName(detailField)));
     }
 
     @SuppressWarnings("unused")
     final protected void bindControl(ComboBox<String> comboBox, MFieldString fieldString) {
-        new UI_ChangeListenerComboBox<>(comboBox, fieldString);
+        uiChangeListener0s.add(new UI_ChangeListenerComboBox<>(comboBox, fieldString));
     }
 
     @SuppressWarnings("unused")
     final protected void bindControl(TextInputControl textInputControl, MFieldString mFieldString) {
-        new UI_ChangeListenerTextInputControl<>(textInputControl, mFieldString);
+        uiChangeListener0s.add(new UI_ChangeListenerTextInputControl<>(textInputControl, mFieldString));
     }
 
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldInteger fieldInteger) {
-        new UI_ChangeListenerTextInputControl<>(textField, fieldInteger);
+        uiChangeListener0s.add(new UI_ChangeListenerTextInputControl<>(textField, fieldInteger));
     }
 
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldDouble fieldDouble) {
-        new UI_ChangeListenerTextInputControl<>(textField, fieldDouble);
+        uiChangeListener0s.add(new UI_ChangeListenerTextInputControl<>(textField, fieldDouble));
     }
 
     @SuppressWarnings("unused")
     final protected void bindControl(TextField textField, MFieldDate mFieldDate) {
-        new UI_ChangeListenerTextInputControl<>(textField, mFieldDate);
+        uiChangeListener0s.add(new UI_ChangeListenerTextInputControl<>(textField, mFieldDate));
     }
 
     @SuppressWarnings("unused")
     public void bindControl(Spinner<Integer> integerSpinner, MFieldInteger fieldInteger) {
-        new UI_ChangeListenerSpinnerInteger(integerSpinner, fieldInteger);
+        uiChangeListener0s.add(new UI_ChangeListenerSpinnerInteger(integerSpinner, fieldInteger));
     }
 
     @SuppressWarnings("unused")
     final protected void bindControl(CheckBox checkBox, MFieldBoolean mFieldBoolean) {
-        new UI_ChangeListenerCheckBox(checkBox, mFieldBoolean);
+        uiChangeListener0s.add(new UI_ChangeListenerCheckBox(checkBox, mFieldBoolean));
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -413,5 +415,4 @@ public abstract class UI_CtrlBase<T extends MTable> {
     private void registerControl(Node node, MField mField) {
         nodeHashMap.put(mField.getName(), node);
     }
-
 }

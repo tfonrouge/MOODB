@@ -13,7 +13,8 @@ public abstract class UI_ChangeListener0<T, N extends Node, U> implements Change
     UI_ChangeListener0(N node, MField<T> mField) {
         this.node = node;
         this.mField = mField;
-        initialize(this.node);
+        initialize(node);
+        propertyAddListener();
         set_UI_state(node);
         addChangeListener(mField);
         if (mField.getTable().getLinkedField() != null) {
@@ -36,9 +37,15 @@ public abstract class UI_ChangeListener0<T, N extends Node, U> implements Change
         return mField;
     }
 
+    abstract void propertyAddListener();
+
     abstract void initialize(N node);
 
-    public void refreshNode() {
+    public void refreshNode(boolean fullUpdate) {
+        if (fullUpdate) {
+            initialize(node);
+            set_UI_state(node);
+        }
         update(mField.value());
     }
 
