@@ -21,13 +21,12 @@ public abstract class MField<T> {
     protected Callable<T> calcValue = null;
     protected boolean autoInc;
     protected boolean readOnly;
-
     protected Runnable onAfterChangeValue;
     protected OnBeforeChangeValue<T> onBeforeChangeValue;
     protected Callable<T> onNewValue;
     protected Callable<Boolean> onValidate;
-
     String name;
+    private String messageWarning;
     private String invalidCause = null;
 
     MField(MTable owner, String name) {
@@ -403,6 +402,14 @@ public abstract class MField<T> {
         s += "[name=" + name + "]";
         s += "=" + (value == null ? "null" : value.toString());
         return s;
+    }
+
+    public String getMessageWarning() {
+        return messageWarning;
+    }
+
+    public void setMessageWarning(String messageWarning) {
+        this.messageWarning = messageWarning;
     }
 
     protected interface OnBeforeChangeValue<U> {

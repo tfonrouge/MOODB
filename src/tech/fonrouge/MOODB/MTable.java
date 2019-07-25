@@ -33,6 +33,7 @@ abstract public class MTable {
     private Callable<Boolean> onValidateFields;
     private MIndex index;
     private boolean postResult;
+    private String messageWarning;
 
     public MTable() {
         initialize();
@@ -41,6 +42,14 @@ abstract public class MTable {
     public MTable(MTable masterSource) {
         this.masterSource = masterSource;
         initialize();
+    }
+
+    public String getMessageWarning() {
+        return messageWarning;
+    }
+
+    public void setMessageWarning(String messageWarning) {
+        this.messageWarning = messageWarning;
     }
 
     public boolean isPostResult() {

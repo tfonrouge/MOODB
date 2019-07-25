@@ -3,12 +3,11 @@ package tech.fonrouge.ui;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
-import tech.fonrouge.ui.Annotations.NoAutoBinding;
 import tech.fonrouge.MOODB.MField;
 import tech.fonrouge.MOODB.MTable;
+import tech.fonrouge.ui.Annotations.NoAutoBinding;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -177,8 +176,14 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
         if (state != MTable.STATE.NORMAL) {
             if (!table.onValidate()) {
                 Exception e = table.getException();
-                String errMsg = e != null ? e.toString() : "unknown error.";
-                new Alert(Alert.AlertType.WARNING, "Not valid state in onValidate(): " + errMsg).showAndWait();
+                String msgWarning;
+                if (table.getMessageWarning() == null) {
+                    msgWarning = "Not valid state in onValidate(): ";
+                    msgWarning += e != null ? e.toString() : "unknown error.";
+                } else {
+                    msgWarning = table.getMessageWarning();
+                }
+                Toast.showWarning(msgWarning);
                 return;
             }
             if (!testValidFields()) {
@@ -217,7 +222,11 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
                         mField[0] = mField1;
                     }
                 });
-                new Alert(Alert.AlertType.WARNING, i.getValue() + ": '" + mField[0].getLabel() + "'").showAndWait();
+                if (mField[0].getMessageWarning() == null) {
+                    Toast.showWarning(i.getValue() + ": '" + mField[0].getLabel() + "'");
+                } else {
+                    Toast.showWarning(mField[0].getMessageWarning());
+                }
                 Node node = nodeHashMap.get(i.getKey());
                 if (node != null) {
                     node.requestFocus();
