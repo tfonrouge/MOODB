@@ -355,7 +355,7 @@ abstract public class MTable {
     public boolean insert() {
 
         if (tableState.state != STATE.NORMAL) {
-            Toast.showError("Table Insert Error: Table previously on EDIT/INSERT State. Check code logic.");
+            Toast.INSTANCE.showError("Table Insert Error: Table previously on EDIT/INSERT State. Check code logic.");
             return false;
         }
 
@@ -363,7 +363,7 @@ abstract public class MTable {
 
         if (!onBeforeInsert()) {
             if (messageWarning != null) {
-                Toast.showWarning(messageWarning);
+                Toast.INSTANCE.showWarning(messageWarning);
             }
             return false;
         }

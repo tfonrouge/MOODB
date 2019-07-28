@@ -46,17 +46,22 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     private boolean populatingList = false;
     private Timeline refreshTimer;
     private Runnable listFindMethod = () -> table.find();
-    private boolean columnsAutosized = false;
+    private boolean columnsAutoSized = false;
 
     @SuppressWarnings("unused")
     static public UI_CtrlList ctrlList(MTable table) {
-        return ctrlList(table, null);
+        return ctrlList(table, null, null);
+    }
+
+    @SuppressWarnings("unused")
+    static public UI_CtrlList ctrlList(MTable table, UI_CtrlList ui_ctrlList) {
+        return ctrlList(table, ui_ctrlList, null);
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
-    static public UI_CtrlList ctrlList(MTable table, String ctrlListFXMLPath) {
+    static public UI_CtrlList ctrlList(MTable table, UI_CtrlList ui_ctrlList, String ctrlListFXMLPath) {
 
-        UI_CtrlList ui_ctrlList = (UI_CtrlList) UI_CtrlList.getUIController(table, ctrlListFXMLPath, "CtrlList");
+        ui_ctrlList = (UI_CtrlList) UI_CtrlList.getUIController(table, ui_ctrlList, ctrlListFXMLPath, "CtrlList");
 
         if (ui_ctrlList != null) {
 
@@ -242,7 +247,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     }
 
     @SuppressWarnings("unused")
-    protected <V extends Parent> V fxmlLoadBindCtrlList(String url) {
+    public <V extends Parent> V fxmlLoadBindCtrlList(String url) {
         V parent = null;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(url));
         fxmlLoader.setController(this);
@@ -399,8 +404,8 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                         if (refreshTimer != null) {
                             refreshTimer.play();
                         }
-                        if (tableView.getItems().size() > 0 && !columnsAutosized) {
-                            columnsAutosized = true;
+                        if (tableView.getItems().size() > 0 && !columnsAutoSized) {
+                            columnsAutoSized = true;
                             if (autosizeColumnMethod == null) {
                                 try {
                                     autosizeColumnMethod = TableViewSkin.class.getDeclaredMethod("resizeColumnToFitContent", TableColumn.class, int.class);

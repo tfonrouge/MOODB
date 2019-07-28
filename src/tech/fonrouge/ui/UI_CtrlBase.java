@@ -30,9 +30,10 @@ import static tech.fonrouge.ui.Annotations.BindField;
 
 public abstract class UI_CtrlBase<T extends MTable> {
 
-    protected final List<UI_ChangeListener0> uiChangeListener0s = new ArrayList<>();
-    protected final HashMap<String, Node> nodeHashMap = new HashMap<>();
-    public T table = null;
+    final List<UI_ChangeListener0> uiChangeListener0s = new ArrayList<>();
+    @SuppressWarnings("WeakerAccess")
+    final protected HashMap<String, Node> nodeHashMap = new HashMap<>();
+    protected T table;
     protected Stage stage;
     protected Scene scene;
     Parent parent;
@@ -40,6 +41,10 @@ public abstract class UI_CtrlBase<T extends MTable> {
     URL fxmlResourcePath;
     FXMLLoader fxmlLoader;
     boolean fxmlHasController = false;
+
+    public T getTable() {
+        return table;
+    }
 
     private static Constructor<?> getCtorClass(Class<?> tableClass, String suffix) {
         Constructor<?> constructor;
@@ -59,43 +64,45 @@ public abstract class UI_CtrlBase<T extends MTable> {
         return constructor;
     }
 
-    static UI_CtrlBase getUIController(MTable table, String ctrlFXMLPath, String suffix) {
+    static UI_CtrlBase getUIController(MTable table, UI_CtrlBase ui_ctrlBase, String ctrlFXMLPath, String suffix) {
 
-        UI_CtrlBase ui_ctrl = null;
-        Constructor<?> constructor;
+        if (ui_ctrlBase == null) {
 
-        if (ctrlFXMLPath != null) {
-            String classPrefix = table.getClass().getName().substring(0, table.getClass().getName().lastIndexOf("."));
-            String ctrlName = classPrefix + "." + ctrlFXMLPath.substring(0, 1).toUpperCase() + ctrlFXMLPath.substring(1, ctrlFXMLPath.lastIndexOf("."));
-            try {
-                constructor = Class.forName(ctrlName).getConstructor();
-                ui_ctrl = (UI_CtrlBase) constructor.newInstance();
-            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ignored) {
+            Constructor<?> constructor;
 
-            }
-        } else {
-            try {
-                constructor = getCtorClass(table.getClass(), suffix);
-                if (constructor != null) {
-                    ui_ctrl = (UI_CtrlBase) constructor.newInstance();
+            if (ctrlFXMLPath != null) {
+                String classPrefix = table.getClass().getName().substring(0, table.getClass().getName().lastIndexOf("."));
+                String ctrlName = classPrefix + "." + ctrlFXMLPath.substring(0, 1).toUpperCase() + ctrlFXMLPath.substring(1, ctrlFXMLPath.lastIndexOf("."));
+                try {
+                    constructor = Class.forName(ctrlName).getConstructor();
+                    ui_ctrlBase = (UI_CtrlBase) constructor.newInstance();
+                } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ignored) {
+
                 }
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                e.printStackTrace();
-                UI_Message.error("UI Controller Error", "Warning", e.toString());
+            } else {
+                try {
+                    constructor = getCtorClass(table.getClass(), suffix);
+                    if (constructor != null) {
+                        ui_ctrlBase = (UI_CtrlBase) constructor.newInstance();
+                    }
+                } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                    e.printStackTrace();
+                    UI_Message.error("UI Controller Error", "Warning", e.toString());
+                }
             }
         }
 
-        if (ui_ctrl != null) {
+        if (ui_ctrlBase != null) {
             if (ctrlFXMLPath == null) {
-                ctrlFXMLPath = ui_ctrl.getCtrlFXMLPath();
+                ctrlFXMLPath = ui_ctrlBase.getCtrlFXMLPath();
             }
-            URL resource = ui_ctrl.getClass().getResource(ctrlFXMLPath);
+            URL resource = ui_ctrlBase.getClass().getResource(ctrlFXMLPath);
             if (resource != null) {
-                ui_ctrl.table = table;
-                ui_ctrl.fxmlResourcePath = resource;
-                ui_ctrl.fxmlHasController = fxmlHasFXController(resource);
-                ui_ctrl.fxmlLoader = new FXMLLoader(resource);
-                return ui_ctrl;
+                ui_ctrlBase.table = table;
+                ui_ctrlBase.fxmlResourcePath = resource;
+                ui_ctrlBase.fxmlHasController = fxmlHasFXController(resource);
+                ui_ctrlBase.fxmlLoader = new FXMLLoader(resource);
+                return ui_ctrlBase;
             } else {
                 UI_Message.error("UI Controller Error", "No FXML resource found.", "define FXML resource.");
             }
@@ -350,10 +357,6 @@ public abstract class UI_CtrlBase<T extends MTable> {
             return getBindControlMethod(clazz.getSuperclass(), clazzArg);
         }
         return null;
-    }
-
-    public T getTable() {
-        return table;
     }
 
     private MField getTableField(Field field) {

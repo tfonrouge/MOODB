@@ -23,13 +23,19 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
 
     @SuppressWarnings("unused")
     public static UI_CtrlRecord ctrlRecord(MTable table) {
-        return ctrlRecord(table, null);
+        return ctrlRecord(table, null, null);
     }
 
     @SuppressWarnings("WeakerAccess")
-    public static UI_CtrlRecord ctrlRecord(MTable table, String ctrlRecordFXMLPath) {
+    public static UI_CtrlRecord ctrlRecord(MTable table, UI_CtrlRecord ui_ctrlRecord) {
+        return ctrlRecord(table, ui_ctrlRecord, null);
+    }
 
-        UI_CtrlRecord ui_ctrlRecord = (UI_CtrlRecord) UI_CtrlRecord.getUIController(table, ctrlRecordFXMLPath, "CtrlRecord");
+    @SuppressWarnings("WeakerAccess")
+    public static UI_CtrlRecord ctrlRecord(MTable table, UI_CtrlRecord ui_ctrlRecord, String ctrlRecordFXMLPath) {
+
+
+        ui_ctrlRecord = (UI_CtrlRecord) UI_CtrlRecord.getUIController(table, ui_ctrlRecord, ctrlRecordFXMLPath, "CtrlRecord");
 
         if (ui_ctrlRecord != null) {
 
@@ -184,7 +190,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
                 } else {
                     msgWarning = table.getMessageWarning();
                 }
-                Toast.showWarning(msgWarning);
+                Toast.INSTANCE.showWarning(msgWarning);
                 return;
             }
             if (!testValidFields()) {
@@ -212,9 +218,7 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
     }
 
     private void refreshFieldNodeStates() {
-        uiChangeListener0s.forEach(ui_changeListener0 -> {
-            ui_changeListener0.refreshNode(true);
-        });
+        uiChangeListener0s.forEach(ui_changeListener0 -> ui_changeListener0.refreshNode(true));
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -230,9 +234,9 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
                     }
                 });
                 if (mField[0].getMessageWarning() == null) {
-                    Toast.showWarning(i.getValue() + ": '" + mField[0].getLabel() + "'");
+                    Toast.INSTANCE.showWarning(i.getValue() + ": '" + mField[0].getLabel() + "'");
                 } else {
-                    Toast.showWarning(mField[0].getMessageWarning());
+                    Toast.INSTANCE.showWarning(mField[0].getMessageWarning());
                 }
                 Node node = nodeHashMap.get(i.getKey());
                 if (node != null) {
