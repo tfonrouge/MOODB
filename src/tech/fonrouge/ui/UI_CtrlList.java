@@ -338,6 +338,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         if (findSelectedDocument()) {
             if (table.edit()) {
                 UI_CtrlRecord.ctrlRecord(table, null).showAndWait();
+                populateList();
             }
         }
     }
@@ -346,13 +347,14 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     public void onActionInsertDocument() {
         if (table.insert()) {
             UI_CtrlRecord.ctrlRecord(table, null).showAndWait();
+            populateList();
         }
     }
 
     @SuppressWarnings("WeakerAccess")
     public void onActionViewDocument() {
         if (findSelectedDocument()) {
-            UI_CtrlRecord.ctrlRecord(table, null).showAndWait();
+            UI_CtrlRecord.ctrlRecord(table, null).show();
         }
     }
 

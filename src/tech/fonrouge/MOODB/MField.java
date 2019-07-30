@@ -2,6 +2,7 @@ package tech.fonrouge.MOODB;
 
 import com.mongodb.client.MongoCursor;
 import org.bson.Document;
+import tech.fonrouge.ui.Toast;
 
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
@@ -28,6 +29,7 @@ public abstract class MField<T> {
     String name;
     private String messageWarning;
     private String invalidCause = null;
+    private MIndex fieldIndex = null;
 
     MField(MTable owner, String name) {
 
@@ -82,6 +84,10 @@ public abstract class MField<T> {
         pipeline.add(
                 new Document().
                         append("$limit", 1));
+        MongoCursor<Document> cursor;
+        if (fieldIndex != null) {
+            return fieldIndex.find(keyValue);
+        }
         return table.setMongoCursor(table.engine.find(pipeline));
     }
 
@@ -150,30 +156,6 @@ public abstract class MField<T> {
      */
     public ValueItems<T> getValueItems() {
         return valueItems;
-    }
-
-    public T getMaxValue() {
-        T value;
-        ArrayList<Document> pipeline = new ArrayList<>();
-        pipeline.add(
-                new Document().
-                        append("$sort", new Document().
-                                append(name, -1)));
-        pipeline.add(
-                new Document().
-                        append("$limit", 1));
-        pipeline.add(
-                new Document().
-                        append("$project", new Document().
-                                append("folio", 1)));
-        MongoCursor<Document> mongoCursor = table.engine.find(pipeline);
-        if (mongoCursor.hasNext()) {
-            Document d = mongoCursor.next();
-            value = d.get(name, getEmptyValue());
-        } else {
-            value = getEmptyValue();
-        }
-        return value;
     }
 
     /**
@@ -319,6 +301,9 @@ public abstract class MField<T> {
         if (onBeforeChangeValue != null) {
             boolean result = onBeforeChangeValue.testValue(value);
             if (!result) {
+                if (messageWarning != null) {
+                    Toast.INSTANCE.showWarning(messageWarning);
+                }
                 getFieldState().updateUI(false);
                 return false;
             }
@@ -410,6 +395,16 @@ public abstract class MField<T> {
 
     public void setMessageWarning(String messageWarning) {
         this.messageWarning = messageWarning;
+    }
+
+    @SuppressWarnings("unused")
+    public MIndex getFieldIndex() {
+        return fieldIndex;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void setFieldIndex(MIndex fieldIndex) {
+        this.fieldIndex = fieldIndex;
     }
 
     protected interface OnBeforeChangeValue<U> {

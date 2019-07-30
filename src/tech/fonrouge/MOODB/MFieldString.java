@@ -10,6 +10,7 @@ public class MFieldString extends MField<String> {
         super(owner, name);
     }
 
+    @SuppressWarnings("unused")
     public boolean findPartial(String key, boolean ignoreCase) {
         boolean result = false;
 

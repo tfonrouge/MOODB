@@ -1,6 +1,7 @@
 package tech.fonrouge.MOODB;
 
 import com.mongodb.client.ListIndexesIterable;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationStrength;
 import com.mongodb.client.model.IndexOptions;
@@ -8,6 +9,8 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Scanner;
 
 public abstract class MIndex {
@@ -15,19 +18,29 @@ public abstract class MIndex {
     private String name;
     private boolean unique;
     private boolean sparse;
-    private String locale;
-    private Integer strength;
     private MTable table;
     private Document masterKeyDocument;
     private Document keyDocument;
+    private Collation collation;
 
     public MIndex(MTable table, String name, String masterKeyField, String keyField, boolean unique, boolean sparse, String locale, Integer strength) {
         this.table = table;
         this.name = name;
         this.unique = unique;
         this.sparse = sparse;
-        this.locale = locale;
-        this.strength = strength;
+
+        if (locale != null || strength != null) {
+            Collation.Builder builder = Collation.builder();
+            if (locale == null) {
+                locale = Locale.getDefault().getLanguage();
+            }
+            builder.locale(locale);
+            if (strength == null) {
+                strength = 3; /* default level */
+            }
+            builder.collationStrength(CollationStrength.fromInt(strength));
+            collation = builder.build();
+        }
 
         masterKeyDocument = getDocumentField(masterKeyField);
         keyDocument = getDocumentField(keyField);
@@ -42,6 +55,11 @@ public abstract class MIndex {
 
         initialize();
         buildIndex();
+    }
+
+    @SuppressWarnings("unused")
+    public Collation getCollation() {
+        return collation;
     }
 
     void buildIndex() {
@@ -64,12 +82,7 @@ public abstract class MIndex {
 
         indexOptions.sparse(sparse);
 
-        if (locale != null) {
-            Collation.Builder builder = Collation.builder().locale(locale);
-            if (strength != null) {
-                builder.collationStrength(CollationStrength.fromInt(strength));
-            }
-            Collation collation = builder.build();
+        if (collation != null) {
             indexOptions.collation(collation);
         }
 
@@ -89,6 +102,21 @@ public abstract class MIndex {
         if (buildIndex[0]) {
             table.engine.collection.createIndex(doc, indexOptions);
         }
+
+        if (keyDocument != null) {
+            keyDocument.forEach(doc::append);
+            if (keyDocument.size() == 1) {
+                MField<?> mField = null;
+                for (Map.Entry<String, Object> entry : keyDocument.entrySet()) {
+                    String key = entry.getKey();
+                    mField = table.fieldByName(key);
+                }
+                if (mField != null && mField.fieldType == MTable.FIELD_TYPE.STRING) {
+                    MFieldString mFieldString = (MFieldString) mField;
+                    mFieldString.setFieldIndex(this);
+                }
+            }
+        }
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -102,7 +130,13 @@ public abstract class MIndex {
         if (keyDocument != null && keyDocument.size() > 0) {
             pipeline.add(new Document().append("$sort", keyDocument));
         }
-        return table.setMongoCursor(table.engine.find(pipeline));
+        MongoCursor<Document> cursor;
+        if (collation != null) {
+            cursor = table.engine.find(pipeline, collation);
+        } else {
+            cursor = table.engine.find(pipeline);
+        }
+        return table.setMongoCursor(cursor);
     }
 
     private Document getDocumentField(String s) {

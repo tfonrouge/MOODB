@@ -47,12 +47,15 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
 
                         Type genericSuperclass = param.getGenericSuperclass();
 
-                        Class<?> tableClass;
+                        Class<?> tableClass = null;
 
-                        if (genericSuperclass instanceof ParameterizedType) {
+                        if (param.getTypeParameters().length > 0) {
+                            tableClass = (Class<?>) param.getTypeParameters()[0].getBounds()[0];
+                        } else if (genericSuperclass instanceof ParameterizedType) {
                             ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
                             tableClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-                        } else {
+                        }
+                        if (tableClass == null) {
                             throw new Error("Cannot infer Table class for Controller " + param.getSimpleName());
                         }
 
@@ -207,6 +210,13 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
         }
         if (source != null) {
             source.getScene().getWindow().hide();
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void show() {
+        if (stage != null) {
+            stage.show();
         }
     }
 

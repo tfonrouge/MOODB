@@ -5,6 +5,7 @@ import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Collation;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import tech.fonrouge.ui.UI_Message;
@@ -26,6 +27,7 @@ public class MEngine {
     private MTable table;
     private ArrayList<Document> pipeline;
     private MongoDatabase mongoDatabase;
+
     MEngine(MTable oTable) {
         table = oTable;
         initialize();
@@ -98,7 +100,6 @@ public class MEngine {
      *
      * @return success on find
      */
-    @SuppressWarnings("WeakerAccess")
     public boolean find() {
         MIndex mIndex = table.getIndex();
         if (mIndex == null) {
@@ -117,14 +118,17 @@ public class MEngine {
         return table.setMongoCursor(find(pipeline));
     }
 
+    public MongoCursor<Document> find(List<Document> documentList) {
+        return find(documentList, null);
+    }
+
     /**
      * find
      *
      * @param documentList bson list for find function
      * @return iterable
      */
-    @SuppressWarnings("WeakerAccess")
-    public MongoCursor<Document> find(List<Document> documentList) {
+    public MongoCursor<Document> find(List<Document> documentList, Collation collation) {
         for (int i = 0; i < table.fieldList.size(); i++) {
             if (table.fieldList.get(i).fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
                 MFieldTableField mFieldTableField = (MFieldTableField) table.fieldList.get(i);
@@ -132,6 +136,9 @@ public class MEngine {
                     documentList.addAll(getLookupStage(mFieldTableField.name));
                 }
             }
+        }
+        if (collation != null) {
+            return collection.aggregate(documentList).collation(collation).iterator();
         }
         return collection.aggregate(documentList).iterator();
     }
