@@ -352,13 +352,6 @@ abstract public class MTable {
 
         tableState.messageWarning = null;
 
-        if (!onBeforeInsert()) {
-            if (tableState.messageWarning != null) {
-                Toast.INSTANCE.showWarning(tableState.messageWarning);
-            }
-            return false;
-        }
-
         MTable masterSource = getMasterSource();
 
         if (masterSource != null && masterSource.getState() == STATE.INSERT) {
@@ -401,6 +394,14 @@ abstract public class MTable {
                 }
             }
         });
+
+        if (!onBeforeInsert()) {
+            if (tableState.messageWarning != null) {
+                Toast.INSTANCE.showWarning(tableState.messageWarning);
+            }
+            return false;
+        }
+
         tableState.state = STATE.INSERT;
 
         onAfterInsert();
