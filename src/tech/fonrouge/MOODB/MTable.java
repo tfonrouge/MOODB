@@ -33,7 +33,6 @@ abstract public class MTable {
     private Callable<Boolean> onValidateFields;
     private MIndex index;
     private boolean postResult;
-    private String messageWarning;
     private Runnable refreshFieldNodes;
 
     public MTable() {
@@ -46,11 +45,11 @@ abstract public class MTable {
     }
 
     public String getMessageWarning() {
-        return messageWarning;
+        return tableState.messageWarning;
     }
 
     public void setMessageWarning(String messageWarning) {
-        this.messageWarning = messageWarning;
+        tableState.messageWarning = messageWarning;
     }
 
     public boolean isPostResult() {
@@ -108,6 +107,12 @@ abstract public class MTable {
                 onAfterDelete();
                 return true;
             }
+            return false;
+        }
+        if (tableState.messageWarning != null) {
+            Toast.INSTANCE.showWarning(tableState.messageWarning);
+        } else {
+            Toast.INSTANCE.showWarning("Delete cancelled in onBeforeDelete()");
         }
         return false;
     }
@@ -205,20 +210,6 @@ abstract public class MTable {
      */
     public boolean getEof() {
         return tableState.eof;
-    }
-
-    /**
-     * getException
-     *
-     * @return exception object from last i/o operation
-     */
-    public Exception getException() {
-        return tableState.exception;
-    }
-
-    @SuppressWarnings("unused")
-    public void setException(Exception e) {
-        tableState.exception = e;
     }
 
     /**
@@ -359,11 +350,11 @@ abstract public class MTable {
             return false;
         }
 
-        messageWarning = null;
+        tableState.messageWarning = null;
 
         if (!onBeforeInsert()) {
-            if (messageWarning != null) {
-                Toast.INSTANCE.showWarning(messageWarning);
+            if (tableState.messageWarning != null) {
+                Toast.INSTANCE.showWarning(tableState.messageWarning);
             }
             return false;
         }
@@ -470,19 +461,20 @@ abstract public class MTable {
         postResult = false;
 
         if (tableState.state == STATE.NORMAL) {
-            throw new RuntimeException("Table Not in EDIT/INSERT State.");
+            tableState.messageWarning = "Table Not in EDIT/INSERT State.";
+            return false;
         }
 
-        tableState.exception = null;
+        tableState.messageWarning = null;
 
         if (!onValidate()) {
-            tableState.exception = new RuntimeException("onValidate() not true.");
+            tableState.messageWarning = "onValidate() not true.";
             return false;
         }
 
         HashMap<String, String> invalidFieldList = getInvalidFieldList();
         if (invalidFieldList.size() > 0) {
-            tableState.exception = new RuntimeException("Invalid field value: " + invalidFieldList.toString());
+            tableState.messageWarning = "Invalid field value: " + invalidFieldList.toString();
             return false;
         }
 
@@ -651,7 +643,7 @@ abstract public class MTable {
         ++tableStateIndex;
         tableState = new TableState(tableState);
 
-        tableState.exception = null;
+        tableState.messageWarning = null;
         tableState.mongoCursor = null;
         tableState.linkedField = null;
         tableState.state = STATE.NORMAL;

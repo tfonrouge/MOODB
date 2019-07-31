@@ -185,11 +185,11 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
         MTable.STATE state = table.getState();
         if (state != MTable.STATE.NORMAL) {
             if (!table.onValidate()) {
-                Exception e = table.getException();
+                String e = table.getMessageWarning();
                 String msgWarning;
                 if (table.getMessageWarning() == null) {
                     msgWarning = "Not valid state in onValidate(): ";
-                    msgWarning += e != null ? e.toString() : "unknown error.";
+                    msgWarning += e != null ? e : "unknown error.";
                 } else {
                     msgWarning = table.getMessageWarning();
                 }
@@ -201,10 +201,9 @@ public abstract class UI_CtrlRecord<T extends MTable> extends UI_CtrlBase<T> {
             }
             if (!table.post()) {
                 table.cancel();
-                Exception e = table.getException();
+                String e = table.getMessageWarning();
                 if (e != null) {
-                    String errMsg = e.toString();
-                    UI_Message.warning("Error", "Post Error", errMsg);
+                    UI_Message.warning("Error", "Post Error", e);
                 }
             }
         }

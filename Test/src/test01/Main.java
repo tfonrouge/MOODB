@@ -189,7 +189,7 @@ public class Main extends Application {
             user.field_password.setValue("drowssap");
             user.field_userId.setValue("9999");
             if (!user.post()) {
-                System.out.println("Error: " + user.getException().getLocalizedMessage());
+                System.out.println("Error: " + user.getMessageWarning());
                 user.cancel();
             }
         }
@@ -253,13 +253,13 @@ public class Main extends Application {
                                 invoiceItem.field_qty.setValue((double) (random.nextInt(10) + 1));
                                 invoiceItem.field_unitPrice.setValue(inventoryItem.field_unitPrice.value());
                                 if (!invoiceItem.post()) {
-                                    System.out.println(invoiceItem.getException().getLocalizedMessage());
+                                    System.out.println(invoiceItem.getMessageWarning());
                                     invoiceItem.cancel();
                                 }
                             }
                         }
                     } else {
-                        System.out.println(invoice.getException().getLocalizedMessage());
+                        System.out.println(invoice.getMessageWarning());
                         invoice.cancel();
                     }
                 }

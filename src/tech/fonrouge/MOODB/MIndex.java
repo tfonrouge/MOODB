@@ -22,6 +22,7 @@ public abstract class MIndex {
     private Document masterKeyDocument;
     private Document keyDocument;
     private Collation collation;
+    private Integer keySortValue;
 
     public MIndex(MTable table, String name, String masterKeyField, String keyField, boolean unique, boolean sparse, String locale, Integer strength) {
         this.table = table;
@@ -55,6 +56,11 @@ public abstract class MIndex {
 
         initialize();
         buildIndex();
+    }
+
+    public MIndex keySort(int value) {
+        keySortValue = value;
+        return this;
     }
 
     @SuppressWarnings("unused")
@@ -111,9 +117,8 @@ public abstract class MIndex {
                     String key = entry.getKey();
                     mField = table.fieldByName(key);
                 }
-                if (mField != null && mField.fieldType == MTable.FIELD_TYPE.STRING) {
-                    MFieldString mFieldString = (MFieldString) mField;
-                    mFieldString.setFieldIndex(this);
+                if (mField != null) {
+                    mField.setFieldIndex(this);
                 }
             }
         }
@@ -128,8 +133,17 @@ public abstract class MIndex {
             pipeline.add(new Document().append("$match", document));
         }
         if (keyDocument != null && keyDocument.size() > 0) {
-            pipeline.add(new Document().append("$sort", keyDocument));
+            if (keySortValue == null) {
+                pipeline.add(new Document().append("$sort", keyDocument));
+            } else {
+                Document keyDoc = new Document();
+                keyDocument.forEach((key, value) -> keyDoc.append(key, keySortValue));
+                pipeline.add(new Document().append("$sort", keyDoc));
+            }
         }
+
+        keySortValue = null;
+
         MongoCursor<Document> cursor;
         if (collation != null) {
             cursor = table.engine.find(pipeline, collation);

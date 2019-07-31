@@ -14,6 +14,7 @@ public class Inventario extends Base {
     public final MFieldString field_nombre = new MFieldString(this, "nombre") {
         @Override
         protected void initialize() {
+            notEmpty = true;
             description = "Nombre";
         }
     };
@@ -25,6 +26,7 @@ public class Inventario extends Base {
     public final MFieldString field_udem = new MFieldString(this, "udem") {
         @Override
         protected void initialize() {
+            notNull = true;
         }
     };
 
@@ -35,6 +37,7 @@ public class Inventario extends Base {
     public final MFieldString field_tipo = new MFieldString(this, "tipo") {
         @Override
         protected void initialize() {
+            notNull = true;
 
             valueItems = new ValueItems<>();
             valueItems.put("S", "Servicio");
@@ -65,7 +68,7 @@ public class Inventario extends Base {
     public final MFieldDouble field_existencia = new MFieldDouble(this, "existencia") {
         @Override
         protected void initialize() {
-
+            onNewValue = () -> 0.0;
         }
     };
 
@@ -76,7 +79,8 @@ public class Inventario extends Base {
     public final MFieldString field_status = new MFieldString(this, "status") {
         @Override
         protected void initialize() {
-
+            notNull = true;
+            onNewValue = () -> "1";
         }
     };
 

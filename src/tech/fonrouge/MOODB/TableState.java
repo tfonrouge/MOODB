@@ -11,7 +11,8 @@ public class TableState {
     MTable.STATE state = MTable.STATE.NORMAL;
     MongoCursor<Document> mongoCursor;
     boolean eof = true;
-    Exception exception;
+    String messageWarning;
+
     MFieldTableField<? extends MTable> linkedField;
 
     List<FieldState> fieldStateList;
@@ -27,7 +28,7 @@ public class TableState {
         state = tableState.state;
         mongoCursor = tableState.mongoCursor;
         eof = tableState.eof;
-        exception = tableState.exception;
+        messageWarning = tableState.messageWarning;
         linkedField = tableState.linkedField;
         fieldStateList = new ArrayList<>();
         tableState.fieldStateList.forEach(fieldState -> fieldStateList.add(fieldState.cloneThis()));

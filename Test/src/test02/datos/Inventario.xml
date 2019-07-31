@@ -7,9 +7,9 @@
 
     <oons:Fields>
 
-        <oons:FieldString name="nombre" description="Nombre" required="true"/>
-        <oons:FieldString name="udem" required="true"/>
-        <oons:FieldString name="tipo" required="true">
+        <oons:FieldString name="nombre" description="Nombre" notEmpty="true"/>
+        <oons:FieldString name="udem" notNull="true"/>
+        <oons:FieldString name="tipo" notNull="true">
             <oons:validValues>
                 <oons:value label="Grupo">"G"</oons:value>
                 <oons:value label="Articulo">"A"</oons:value>
@@ -28,7 +28,7 @@
             <oons:newValue>0.0</oons:newValue>
         </oons:FieldDouble>
 
-        <oons:FieldString name="status" required="true">
+        <oons:FieldString name="status" notNull="true">
             <oons:newValue>"1"</oons:newValue>
         </oons:FieldString>
 

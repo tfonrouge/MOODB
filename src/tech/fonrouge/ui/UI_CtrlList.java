@@ -45,7 +45,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     private int refreshLapse = 3;
     private boolean populatingList = false;
     private Timeline refreshTimer;
-    private Runnable listFindMethod = () -> table.find();
+    private Runnable findMethod = () -> table.find();
     private boolean columnsAutoSized = false;
 
     @SuppressWarnings("unused")
@@ -321,13 +321,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     public void onActionDeleteDocument() {
 
         if (findSelectedDocument() && UI_Message.ConfirmYesNo("Confirme:", "Desea eliminar registro de " + table.getGenre() + " seleccionado ?") == UI_Message.MESSAGE_VALUE.OK) {
-            if (!table.delete()) {
-                if (table.getException() == null) {
-                    UI_Message.error("UI_CtrlList Error", "Unknown error", "Delete error");
-                } else {
-                    UI_Message.error("UI_CtrlList Error", table.getException().getMessage(), "Delete error");
-                }
-            }
+            table.delete();
             populateList();
         }
     }
@@ -386,7 +380,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
                     try {
                         table.tableStatePush();
 
-                        listFindMethod.run();
+                        findMethod.run();
 
                         while (!table.getEof()) {
                             U e = table.getData();
@@ -487,13 +481,13 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     }
 
     @SuppressWarnings("unused")
-    public Runnable getListFindMethod() {
-        return listFindMethod;
+    public Runnable getFindMethod() {
+        return findMethod;
     }
 
     @SuppressWarnings("unused")
-    public void setListFindMethod(Runnable listFindMethod) {
-        this.listFindMethod = listFindMethod;
+    public void setFindMethod(Runnable findMethod) {
+        this.findMethod = findMethod;
     }
 
     @SuppressWarnings("WeakerAccess")

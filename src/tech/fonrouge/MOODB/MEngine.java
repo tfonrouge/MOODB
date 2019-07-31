@@ -85,13 +85,18 @@ public class MEngine {
             if (detailCursor.hasNext()) {
                 session.abortTransaction();
                 session.close();
-                table.tableState.exception = new RuntimeException("Delete error: Document has child references...");
+                table.setMessageWarning("Delete error: Document has child references...");
                 return false;
             }
         }
-        boolean result = collection.deleteOne(session, new Document().append("_id", _id)).getDeletedCount() == 1;
-        session.commitTransaction();
-        session.close();
+        boolean result = false;
+        try {
+            result = collection.deleteOne(session, new Document().append("_id", _id)).getDeletedCount() == 1;
+            session.commitTransaction();
+            session.close();
+        } catch (Exception e) {
+            table.setMessageWarning(e.getLocalizedMessage());
+        }
         return result;
     }
 
@@ -261,7 +266,7 @@ public class MEngine {
             Object a = document.get("_id");
             table.set_id(a);
         } catch (Exception e) {
-            table.tableState.exception = e;
+            table.tableState.messageWarning = e.getLocalizedMessage();
             return false;
         }
         return true;
@@ -293,7 +298,7 @@ public class MEngine {
             Bson bson = new Document("$set", document);
             collection.updateOne(eq("_id", table._id()), bson);
         } catch (Exception e) {
-            table.tableState.exception = e;
+            table.tableState.messageWarning = e.getLocalizedMessage();
             return false;
         }
         return true;
