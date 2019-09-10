@@ -451,8 +451,8 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
     }
 
     private void setFieldValue(Field field, Object value) {
-        boolean accesible = field.isAccessible();
-        if (!accesible) {
+        boolean accessible = field.isAccessible();
+        if (!accessible) {
             field.setAccessible(true);
         }
         try {
@@ -460,7 +460,7 @@ public abstract class UI_CtrlList<T extends MTable, U extends MBaseData<T>> exte
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } finally {
-            field.setAccessible(accesible);
+            field.setAccessible(accessible);
         }
     }
 
