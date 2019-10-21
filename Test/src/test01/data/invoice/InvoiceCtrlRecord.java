@@ -4,9 +4,9 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
-import tech.fonrouge.ui.UI_CtrlRecord;
+import test01.data.tableBase.TableBaseCtrlRecord;
 
-public class InvoiceCtrlRecord extends UI_CtrlRecord<Invoice> {
+public class InvoiceCtrlRecord<T extends Invoice, U extends InvoiceData<T>> extends TableBaseCtrlRecord<T, U> {
 
     public TextField textField_docNumber;
     public TextField textField_date;
@@ -15,9 +15,5 @@ public class InvoiceCtrlRecord extends UI_CtrlRecord<Invoice> {
     public Spinner<Integer> spinner_daysOfCredit;
     public CheckBox checkBox_reqShipment;
     public TextField textField_customer_address;
-
-    @Override
-    protected String getCtrlFXMLPath() {
-        return "/test01/data/invoice/record.fxml";
-    }
+    public TextField textField_deliveryCost;
 }

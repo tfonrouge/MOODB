@@ -7,12 +7,13 @@
 
     <oons:Fields>
 
-        <oons:FieldInteger name="docNumber" description="Invoice number" required="true" autoInc="true"/>
-        <oons:FieldTableField name="customer" class="Customer" required="true"/>
-        <oons:FieldDate name="date" required="true"/>
-        <oons:FieldInteger name="daysOfCredit" required="true"/>
+        <oons:FieldInteger name="docNumber" description="Invoice number" autoInc="true"/>
+        <oons:FieldTableField name="customer" class="Customer" notNull="true"/>
+        <oons:FieldDate name="date" notNull="true"/>
+        <oons:FieldInteger name="daysOfCredit" notNull="true"/>
         <oons:FieldLong name="itemsCount" calculated="true"/>
-        <oons:FieldBoolean name="reqShipment" required="true"/>
+        <oons:FieldBoolean name="reqShipment" notNull="true"/>
+        <oons:FieldDouble name="deliveryCost" notNull="true"/>
 
     </oons:Fields>
 

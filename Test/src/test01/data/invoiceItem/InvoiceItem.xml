@@ -7,10 +7,10 @@
 
     <oons:Fields>
 
-        <oons:FieldTableField name="invoice" class="Invoice" description="Invoice" required="true"/>
-        <oons:FieldTableField name="invItem" class="InventoryItem" required="true"/>
-        <oons:FieldDouble name="qty" description="Quantity" required="true"/>
-        <oons:FieldDouble name="unitPrice" description="Unit Price" required="true"/>
+        <oons:FieldTableField name="invoice" class="Invoice" description="Invoice" notNull="true"/>
+        <oons:FieldTableField name="invItem" class="InventoryItem" notNull="true"/>
+        <oons:FieldDouble name="qty" description="Quantity" notNull="true"/>
+        <oons:FieldDouble name="unitPrice" description="Unit Price" notNull="true"/>
 
         <oons:FieldDouble name="total" calculated="true"/>
 
