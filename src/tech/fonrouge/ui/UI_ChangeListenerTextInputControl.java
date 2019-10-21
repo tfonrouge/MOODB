@@ -11,7 +11,7 @@ class UI_ChangeListenerTextInputControl<T> extends UI_ChangeListener0<T, TextInp
     private StringProperty property;
 
     UI_ChangeListenerTextInputControl(TextInputControl textInputControl, MField<T> mField) {
-        super(textInputControl, mField);
+        super(textInputControl, mField, null);
     }
 
     @Override
@@ -46,7 +46,13 @@ class UI_ChangeListenerTextInputControl<T> extends UI_ChangeListener0<T, TextInp
 
     @Override
     public void update(T value) {
-        if (!mField.valueAsString().equals(property.getValue())) {
+        boolean update = false;
+        if (mField.fieldType == MTable.FIELD_TYPE.DOUBLE) {
+            update = !mField.value().equals(Double.valueOf(property.getValue()));
+        } else {
+            update = !mField.valueAsString().equals(property.getValue());
+        }
+        if (update) {
             property.setValue(mField.valueAsString(value));
         }
     }

@@ -42,6 +42,7 @@ public class Annotations {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     public @interface BindField {
-        String fieldName();
+        String fieldName() default "";
+        String linkedTable() default "";
     }
 }

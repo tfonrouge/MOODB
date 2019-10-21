@@ -173,6 +173,11 @@ abstract public class MTable {
     }
 
     @SuppressWarnings("unused")
+    public boolean find(MongoCursor<Document> mongoCursor) {
+        return setMongoCursor(mongoCursor);
+    }
+
+    @SuppressWarnings("unused")
     public Class<?> getBaseClass() {
         Class<?> clazz = getClass();
         while (clazz != MTable.class) {

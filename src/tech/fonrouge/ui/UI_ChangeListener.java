@@ -1,36 +1,30 @@
 package tech.fonrouge.ui;
 
-import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import tech.fonrouge.MOODB.MField;
+import tech.fonrouge.MOODB.MTable;
 
 public abstract class UI_ChangeListener<T, N extends Node> extends UI_ChangeListener0<T, N, T> {
     private boolean ignore = false;
 
-    UI_ChangeListener(N node, MField<T> mField) {
-        super(node, mField);
+    UI_ChangeListener(N node, MField<T> mField, MTable linkedTable) {
+        super(node, mField, linkedTable);
     }
 
     @Override
     final public void changed(ObservableValue<? extends T> observable, T oldValue, T newValue) {
         if (!ignore && !mField.valueEquals(newValue)) {
+            boolean result;
             if (mField.getTable().getLinkedField() == null) {
-                ignore = true;
-                if (!setmFieldValue(newValue)) {
-                    Platform.runLater(() -> {
-                        propertySetValue(oldValue);
-                        ignore = false;
-                    });
-                }
+                result = setmFieldValue(newValue);
             } else {
-                if (!mField.find(newValue)) {
-                    ignore = true;
-                    Platform.runLater(() -> {
-                        propertySetValue(oldValue);
-                        ignore = false;
-                    });
-                }
+                result = mField.find(newValue);
+            }
+            if (!result) {
+                ignore = true;
+                propertySetValue(oldValue);
+                ignore = false;
             }
         }
     }

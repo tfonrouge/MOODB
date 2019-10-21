@@ -5,14 +5,18 @@ import javafx.scene.Node;
 import tech.fonrouge.MOODB.MField;
 import tech.fonrouge.MOODB.MTable;
 
+import java.lang.reflect.Method;
+
 public abstract class UI_ChangeListener0<T, N extends Node, U> implements ChangeListener<U> {
 
     public N node;
     MField<T> mField;
+    MTable linkedTable;
 
-    UI_ChangeListener0(N node, MField<T> mField) {
+    UI_ChangeListener0(N node, MField<T> mField, MTable linkedTable) {
         this.node = node;
         this.mField = mField;
+        this.linkedTable = linkedTable;
         initialize(node);
         propertyAddListener();
         set_UI_state(node);

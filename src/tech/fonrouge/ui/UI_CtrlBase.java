@@ -30,9 +30,9 @@ import static tech.fonrouge.ui.Annotations.BindField;
 
 public abstract class UI_CtrlBase<T extends MTable> {
 
-    final List<UI_ChangeListener0> uiChangeListener0s = new ArrayList<>();
     @SuppressWarnings("WeakerAccess")
     final protected HashMap<String, Node> nodeHashMap = new HashMap<>();
+    final List<UI_ChangeListener0> uiChangeListener0s = new ArrayList<>();
     protected T table;
     protected Stage stage;
     protected Scene scene;
@@ -41,10 +41,6 @@ public abstract class UI_CtrlBase<T extends MTable> {
     URL fxmlResourcePath;
     FXMLLoader fxmlLoader;
     boolean fxmlHasController = false;
-
-    public T getTable() {
-        return table;
-    }
 
     private static Constructor<?> getCtorClass(Class<?> tableClass, String suffix) {
         Constructor<?> constructor;
@@ -139,6 +135,10 @@ public abstract class UI_CtrlBase<T extends MTable> {
         return false;
     }
 
+    public T getTable() {
+        return table;
+    }
+
     @SuppressWarnings("unused")
     public Stage getStage() {
         return stage;
@@ -196,18 +196,18 @@ public abstract class UI_CtrlBase<T extends MTable> {
     }
 
     @SuppressWarnings("unused")
-    protected <U extends MTable> void bindControl(TextField textField, MFieldTableField<U> fieldTableField, String detailField) {
+    protected <U extends MTable> void bindControl(TextField textField, MFieldTableField<U> fieldTableField, String detailField, MTable linkedTable) {
         uiChangeListener0s.add(new UI_ChangeListenerTextInputControl<>(textField, fieldTableField.syncedTable().fieldByName(detailField)));
     }
 
     @SuppressWarnings("unused")
-    final protected <U extends MTable> void bindControl(ComboBox<Object> comboBox, MFieldTableField<U> fieldTableField, String detailField) {
-        uiChangeListener0s.add(new UI_ChangeListenerComboBox<>(comboBox, fieldTableField.syncedTable().fieldByName(detailField)));
+    final protected <U extends MTable> void bindControl(ComboBox<Object> comboBox, MFieldTableField<U> fieldTableField, String detailField, MTable linkedTable) {
+        uiChangeListener0s.add(new UI_ChangeListenerComboBox<>(comboBox, fieldTableField.syncedTable().fieldByName(detailField), linkedTable));
     }
 
     @SuppressWarnings("unused")
     final protected void bindControl(ComboBox<String> comboBox, MFieldString fieldString) {
-        uiChangeListener0s.add(new UI_ChangeListenerComboBox<>(comboBox, fieldString));
+        uiChangeListener0s.add(new UI_ChangeListenerComboBox<>(comboBox, fieldString, null));
     }
 
     @SuppressWarnings("unused")
@@ -268,7 +268,7 @@ public abstract class UI_CtrlBase<T extends MTable> {
 
                     MField mField;
 
-                    if (bindField == null) {
+                    if (bindField == null || bindField.fieldName().isEmpty()) {
                         mField = getTableField(declaredField);
                     } else {
                         if (bindField.fieldName().contains(".")) {
@@ -282,18 +282,28 @@ public abstract class UI_CtrlBase<T extends MTable> {
 
                         Method method;
                         Boolean invoquedOk = null;
+                        MTable linkedTable = null;
+
+                        if (bindField != null && !bindField.linkedTable().isEmpty()) {
+                            try {
+                                Method methodLinkedTable = getClass().getDeclaredMethod(bindField.linkedTable());
+                                linkedTable = (MTable) methodLinkedTable.invoke(this);
+                            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                         if (mField.fieldType == MTable.FIELD_TYPE.TABLE_FIELD) {
                             String subFieldName;
-                            if (bindField == null) {
+                            if (bindField == null || bindField.fieldName().isEmpty()) {
                                 String name = declaredField.getName();
                                 subFieldName = name.substring(name.indexOf(mField.getName()) + mField.getName().length());
                             } else {
                                 subFieldName = bindField.fieldName().substring(bindField.fieldName().indexOf("."));
                             }
                             if (!subFieldName.isEmpty()) {
-                                method = getBindControlMethod(getClass(), node.getClass(), mField.getClass().getSuperclass(), String.class);
-                                invoquedOk = invokeMethod(method, node, mField, subFieldName.substring(1));
+                                method = getBindControlMethod(getClass(), node.getClass(), mField.getClass().getSuperclass(), String.class, MTable.class);
+                                invoquedOk = invokeMethod(method, node, mField, subFieldName.substring(1), linkedTable);
                             }
                         } else {
                             method = getBindControlMethod(getClass(), node.getClass(), mField.getClass().getSuperclass());
@@ -306,7 +316,7 @@ public abstract class UI_CtrlBase<T extends MTable> {
                         UI_Message.warning("UI Controller", "Table field not found", "Control: " + declaredField.toString());
                     }
                 } else {
-                    if (bindField != null) {
+                    if (bindField != null && !bindField.fieldName().isEmpty()) {
                         MField<Integer> mField = table.fieldByName(bindField.fieldName());
                         if (mField != null) {
                             UITextFieldInteger uiTextFieldInteger = (UITextFieldInteger) node;

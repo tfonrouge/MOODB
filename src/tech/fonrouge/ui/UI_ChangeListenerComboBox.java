@@ -13,8 +13,8 @@ class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T, ComboBox<T>> {
 
     private ObjectProperty<T> property;
 
-    UI_ChangeListenerComboBox(ComboBox<T> comboBox, MField<T> mField) {
-        super(comboBox, mField);
+    UI_ChangeListenerComboBox(ComboBox<T> comboBox, MField<T> mField, MTable linkedTable) {
+        super(comboBox, mField, linkedTable);
     }
 
     @Override
@@ -30,17 +30,29 @@ class UI_ChangeListenerComboBox<T> extends UI_ChangeListener<T, ComboBox<T>> {
                 keyValueItems.forEach((key, value) -> observableList.add(key));
             }
         } else {
-            MTable mTable = mField.getTable().getLinkedField().linkedTable();
-            mTable.tableStatePush();
+            MTable mTable;
 
-            if (mField != null && mTable.find()) {
-                while (!mTable.getEof()) {
-                    T value = mField.value();
-                    observableList.add(value);
-                    mTable.next();
-                }
+            MField mField1;
+
+            if (linkedTable == null) {
+                mTable = mField.getTable().getLinkedField().linkedTable();
+                mField1 = mField;
+            } else {
+                mTable = linkedTable;
+                mField1 = mTable.fieldByName(mField.getName());
             }
-            mTable.tableStatePull();
+
+            if (mTable != null) {
+                mTable.tableStatePush();
+                if (mField1 != null && mTable.find()) {
+                    while (!mTable.getEof()) {
+                        T value = (T) mField1.value();
+                        observableList.add(value);
+                        mTable.next();
+                    }
+                }
+                mTable.tableStatePull();
+            }
         }
         return observableList;
     }

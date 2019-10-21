@@ -12,7 +12,7 @@ class UI_ChangeListenerSpinnerInteger extends UI_ChangeListener0<Integer, Spinne
     private ObjectProperty<Integer> property;
 
     UI_ChangeListenerSpinnerInteger(Spinner<Integer> spinner, MField<Integer> mField) {
-        super(spinner, mField);
+        super(spinner, mField, null);
     }
 
     @Override

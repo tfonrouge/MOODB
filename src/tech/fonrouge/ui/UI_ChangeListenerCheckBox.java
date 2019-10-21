@@ -11,7 +11,7 @@ class UI_ChangeListenerCheckBox extends UI_ChangeListener0<Boolean, CheckBox, Bo
     private BooleanProperty property;
 
     UI_ChangeListenerCheckBox(CheckBox checkBox, MField<Boolean> mField) {
-        super(checkBox, mField);
+        super(checkBox, mField, null);
     }
 
     @Override
