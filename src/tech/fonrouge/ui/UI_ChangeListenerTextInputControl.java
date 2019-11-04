@@ -48,7 +48,9 @@ class UI_ChangeListenerTextInputControl<T> extends UI_ChangeListener0<T, TextInp
     public void update(T value) {
         boolean update = false;
         if (mField.fieldType == MTable.FIELD_TYPE.DOUBLE) {
-            update = !mField.value().equals(Double.valueOf(property.getValue()));
+            if (mField.value() != null) {
+                update = !mField.value().equals(Double.valueOf(property.getValue()));
+            }
         } else {
             update = !mField.valueAsString().equals(property.getValue());
         }
