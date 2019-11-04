@@ -242,7 +242,7 @@ public abstract class UI_CtrlBase<T extends MTable> {
 
     @SuppressWarnings("WeakerAccess")
     protected void bindControls() {
-        Field[] declaredFields = getClass().getFields();
+        Field[] declaredFields = getClass().getDeclaredFields();
         for (Field declaredField : declaredFields) {
 
             AssignWith assignWith = declaredField.getAnnotation(AssignWith.class);
